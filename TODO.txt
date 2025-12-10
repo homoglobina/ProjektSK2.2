@@ -5,3 +5,5 @@
 - add lobbies 
 
 - add game logic
+
+- Come up with message naming scheme that would work well with qt app

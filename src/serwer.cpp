@@ -9,8 +9,11 @@
 
 void Serwer::handleClientMessage(int client_fd, const std::string& msg, int index ) {
     // Placeholder for handling client messages
+    std::string trimmed_msg = msg;
+    trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1); // Trim newline characters
+
     std::cout << "==============================\n";
-    std::cout << "Handling message from " << client_fd << ": '" << msg << "'\n";
+    std::cout << "Handling message from " << client_fd << ": '" << trimmed_msg << "'\n";
     std::cout << "Player index: " << index << ", Name: " << playerList[index].getName() << ", State: " << playerList[index].getState() << "\n";
     std::cout << "==============================\n";
 
@@ -24,8 +27,8 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
                 return;
             }
         }
-        std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << msg << "\n";
-        playerList[index].setName(msg);
+        std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << trimmed_msg << "\n";
+        playerList[index].setName(trimmed_msg);
         playerList[index].setState(1);
         // std::string welcomeMsg = "Witaj, " + msg + "!\n";
         // write(client_fd, welcomeMsg.c_str(), welcomeMsg.size());
@@ -178,7 +181,6 @@ void Serwer::run() {
         }
     }
 }
-
 
 Serwer::~Serwer() {
     if (epoll_fd >= 0) close(epoll_fd);
