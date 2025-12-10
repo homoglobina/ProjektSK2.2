@@ -1,0 +1,7 @@
+- fix so that after disconnecting a playername dissapears from playerList
+
+- fix spacing 
+
+- add lobbies 
+
+- add game logic

@@ -3,31 +3,39 @@
 #include <cstring>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <unordered_map>  
 
 #define MAX_EVENTS 10
 
 void Serwer::handleClientMessage(int client_fd, const std::string& msg, int index ) {
     // Placeholder for handling client messages
-    std::cout << "Handling message from " << client_fd << ": " << msg << "\n";
+    std::cout << "==============================\n";
+    std::cout << "Handling message from " << client_fd << ": '" << msg << "'\n";
+    std::cout << "Player index: " << index << ", Name: " << playerList[index].getName() << ", State: " << playerList[index].getState() << "\n";
+    std::cout << "==============================\n";
 
-
-
-    switch (playerList[index]->getState())
+    switch (playerList[index].getState())
     {
-    case 0:
-        for (const auto& player : playerList) {
-            if (player->getName() == msg) {
+    case 0: // Stan 0 - Wybór nazwy
+        for (auto player : playerList) {
+            if (player.getName() == msg) {
                 std::string response = "Nazwa zajęta, wybierz inną: ";
                 write(client_fd, response.c_str(), response.size());
-                break;
+                return;
             }
         }
+        std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << msg << "\n";
+        playerList[index].setName(msg);
+        playerList[index].setState(1);
+        // std::string welcomeMsg = "Witaj, " + msg + "!\n";
+        // write(client_fd, welcomeMsg.c_str(), welcomeMsg.size());
         break;
-    case 1: //  Stan 2 - Wybór Lobby
-        printLobbies();
+    case 1: //  Stan 1 - Wybór Lobby
+        printPlayers(client_fd);
+        printLobbies(client_fd);
         break;
     case 2:
-        // Stan 3 - Rozgrywka
+        // Stan 2 - Rozgrywka
         break;
 
     default:
@@ -53,10 +61,12 @@ void Serwer::printLobbies(int client_fd) {
 
 }
 
-void Serwer::printPlayers() {
-    std::cout << "Lista graczy:\n";
+void Serwer::printPlayers(int client_fd) {
+    std::string message = "Lista graczy:\n";
+    write(client_fd, message.c_str(), message.size());
     for (const auto& player : playerList) {
-        std::cout << "Gracz: " << player->getName() << ", FD: " << player->getFd() << "\n";
+        std::string playerInfo = "Gracz: " + player.getName() + ", FD: " + std::to_string(player.getFd()) + "\n";
+        write(client_fd, playerInfo.c_str(), playerInfo.size());
     }
 }
 
@@ -103,6 +113,7 @@ Serwer::Serwer(int port) {
 
 void Serwer::run() {
     struct epoll_event events[MAX_EVENTS];
+    std::unordered_map<int, size_t> fd_to_index; // Track fd -> player index
     
     while (1) {
         int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
@@ -128,42 +139,46 @@ void Serwer::run() {
                 // Add new client to epoll
                 struct epoll_event ev;
                 ev.events = EPOLLIN;
-                ev.data.fd = cd;
+                ev.data.fd = cd;  // Only set fd
                 epoll_ctl(epoll_fd, EPOLL_CTL_ADD, cd, &ev);
                 
+                // Create new player and add to playerList
+                size_t player_index = playerList.size();
                 Gracz newPlayer;
                 newPlayer.setFd(cd);
-                newPlayer.setNr(i);
-                playerList.push_back(&newPlayer); 
-
+                newPlayer.setNr(player_index);
+                playerList.push_back(newPlayer);
+                
+                fd_to_index[cd] = player_index;
 
                 write(cd, "Nawiązano połączenie\n", 25);
                 write(cd, "Wybierz unikalne imie: ", 23);
 
             } else {
-
                 // Handle client data
+                int client_fd = events[i].data.fd;
                 char buffer[1024];
-                int n = read(events[i].data.fd, buffer, sizeof(buffer));
+                int n = read(client_fd, buffer, sizeof(buffer));
 
                 if (n <= 0) {
                     // Connection closed or error
-                    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[i].data.fd, nullptr);
-                    close(events[i].data.fd);
+                    std::cout << "Zamknięcie połączenia z " << client_fd << "\n";
+                    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, nullptr);
+                    close(client_fd);
+                    fd_to_index.erase(client_fd);  // Clean up mapping
                 }
-                else { // nie pusta wiadomość
-                    // Echo back the data
-
-                    handleClientMessage(events[i].data.fd, std::string(buffer, n), i);
-
-                    // // Echo back the data
-                    // write(events[i].data.fd, buffer, n);
-
+                else {
+                    // Find player index from fd
+                    auto it = fd_to_index.find(client_fd);
+                    if (it != fd_to_index.end()) {
+                        handleClientMessage(client_fd, std::string(buffer, n), it->second);
+                    }
                 }
             }
         }
     }
 }
+
 
 Serwer::~Serwer() {
     if (epoll_fd >= 0) close(epoll_fd);

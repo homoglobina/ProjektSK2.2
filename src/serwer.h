@@ -24,7 +24,7 @@ private:
     int epoll_fd;
     struct sockaddr_in server_addr;
     std::vector<Lobby*> lobbyList;
-    std::vector<Gracz*> playerList;
+    std::vector<Gracz> playerList;
 
 
 };
