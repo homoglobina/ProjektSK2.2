@@ -1,0 +1,74 @@
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <unistd.h>
+#include <iostream>
+#include <thread>
+#include <vector>
+//  Przetrzymuje informacje o graczach, lobby i nawiązuje połączenia
+
+class Lobby;
+class Gracz;
+
+class Serwer {
+public:
+    Serwer(int port);
+    ~Serwer();
+    void run();
+    void handleClientMessage(int client_fd, const std::string& msg, int index );
+    void printLobbies(int client_fd);
+    void printPlayers(int client_fd);
+
+private:
+    int socket_fd;
+    int epoll_fd;
+    struct sockaddr_in server_addr;
+    std::vector<Lobby*> lobbyList;
+    std::vector<Gracz*> playerList;
+
+
+};
+
+
+
+class Lobby {
+public:
+    Lobby();
+    ~Lobby();   
+    int getId() const { return id; }
+    void printPlayers();
+    
+private:
+    int id;
+    std::vector<int> playerFds;
+    char currentLetter;
+
+};
+
+class Gracz {
+public:
+    Gracz();
+    ~Gracz();
+    
+    void setFd(int fd) { this->fd = fd; }
+    int getFd() const { return fd; }
+
+    void setNr(int nr) { this->nr = nr; }
+    int getNr() const { return nr; }
+
+    int getState() const { return state; }
+    void setState(int state) { this->state = state; }
+
+    void setName(const std::string& name) { this->name = name; }
+    std::string getName() const { return name; }
+    
+    void setCurrentLobbyID(int id) { this->currentLobbyID = id; }
+    int getCurrentLobbyID() const { return currentLobbyID; }
+
+private:
+    std::string name;
+    int nr;
+    int fd;
+    int currentLobbyID;
+    int state;
+};
