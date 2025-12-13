@@ -5,6 +5,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <unordered_map>
 //  Przetrzymuje informacje o graczach, lobby i nawiązuje połączenia
 
 class Lobby;
@@ -28,22 +29,25 @@ private:
     std::vector<Lobby*> lobbyList;
     std::vector<Gracz> playerList;
 
-
+    std::unordered_map<std::string, int> lobbyName_to_id; // lobbyName ->  Lobbyid
 };
-
 
 
 class Lobby {
 public:
-    Lobby(std::string name);
+    Lobby(std::string name, int id);
     ~Lobby();   
     void printPlayers();
     std::string getName() const { return name; }
+    int getMaxPlayers() const;
+    int getId() const { return id; }
 
 private:
     std::vector<int> playerFds;
     char currentLetter;
     std::string name;
+    int maxPlayers;
+    int id;
 };
 
 class Gracz {

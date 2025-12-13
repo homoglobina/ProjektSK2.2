@@ -8,17 +8,26 @@
 #define MAX_EVENTS 10
 
 void Serwer::createLobby(std::string lobbyName) {
+   
     for (const auto& lobby : lobbyList) {
         if (lobby->getName() == lobbyName) {
             std::cout << "Lobby o nazwie '" << lobbyName << "' już istnieje.\n";
             return;
         }
     }
-    Lobby* newLobby = new Lobby(lobbyName);
+
+    int newLobbyID = 0;
+    if (!lobbyList.empty()) {
+        newLobbyID = lobbyList.back()->getId() + 1;
+    } else {
+        newLobbyID = 0;
+    }
+    
+    Lobby* newLobby = new Lobby(lobbyName,newLobbyID);
     lobbyList.push_back(newLobby);
+    lobbyName_to_id[lobbyName] = newLobby->getId();
     std::cout << "Utworzono nowe lobby: " << lobbyName << "\n";
 }
-
 
 void Serwer::handleClientMessage(int client_fd, const std::string& msg, int index ) {
     // Placeholder for handling client messages
@@ -26,42 +35,59 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
     trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1); // Trim newline characters
     std::string welcomeMsg = "Witaj, " + trimmed_msg + "!\n";
 
-
     std::cout << "==============================\n";
     std::cout << "Handling message from " << client_fd << ": '" << trimmed_msg << "'\n";
     std::cout << "Player index: " << index << ", Name: " << playerList[index].getName() << ", State: " << playerList[index].getState() << "\n";
     std::cout << "==============================\n";
 
-    switch (playerList[index].getState())
-    {
-    case 0: // Stan 0 - Wybór nazwy
-        for (auto player : playerList) {
-            if (player.getName() == trimmed_msg) {
-                std::string response = "Nazwa zajęta, wybierz inną: ";
-                write(client_fd, response.c_str(), response.size());
-                return;
+
+
+    switch (playerList[index].getState()) {
+        
+        case 0: // Stan 0 - Wybór nazwy
+            for (auto player : playerList) {
+                if (player.getName() == trimmed_msg) {
+                    std::string response = "Nazwa zajęta, wybierz inną: ";
+                    write(client_fd, response.c_str(), response.size());
+                    return;
+                }
             }
-        }
-        std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << trimmed_msg << "\n";
-        playerList[index].setName(trimmed_msg);
-        playerList[index].setState(1);
-        write(client_fd, welcomeMsg.c_str(), welcomeMsg.size());
-        break;
-    case 1: //  Stan 1 - Wybór Lobby
-        printPlayers(client_fd);
-        printLobbies(client_fd);
-        break;
-    case 2:
-        // Stan 2 - Rozgrywka
-        break;
+            std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << trimmed_msg << "\n";
+            playerList[index].setName(trimmed_msg);
+            playerList[index].setState(1);
+            write(client_fd, welcomeMsg.c_str(), welcomeMsg.size());
+            break;
+        
+        case 1: //  Stan 1 - Wybór Lobby
+            // printPlayers(client_fd);
+            printLobbies(client_fd);
 
-    default:
-        break;
+            for (const auto& lobby : lobbyList) {
+                if (lobby->getName() == trimmed_msg) {
+                    std::string joinMsg = "Dołączyłeś do lobby: " + trimmed_msg + "\n";
+                    write(client_fd, joinMsg.c_str(), joinMsg.size());
+                    
+                    // logika dołączania do lobby
+                    
+                    playerList[index].setCurrentLobbyID(lobbyName_to_id[trimmed_msg]);
+
+                    playerList[index].setState(2);
+                    std::cout << "Gracz " << playerList[index].getName() << " dołączył do lobby " << trimmed_msg << "\n";
+                    std::cout << "Lobby gracza : " << playerList[index].getCurrentLobbyID() << "\n";
+
+                    return;
+                }
+            }
+
+            break;
+        
+        case 2:
+            // Stan 2 - Rozgrywka
+            break;
+
+        default:
+            break;
     }
-
-
-
-
 }
 
 void Serwer::printLobbies(int client_fd) {
