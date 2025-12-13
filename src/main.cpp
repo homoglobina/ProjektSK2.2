@@ -15,9 +15,11 @@ int main(int argc, char* argv[]) {
     //  Inicjalizacja serwera
     Serwer serwer(port);
 
+    // Test tworzenia lobby
     serwer.createLobby("Lobby1");
     serwer.createLobby("Lobby2");
     serwer.createLobby("Lobby1"); 
+    
     // Uruchomienie serwera
     serwer.run();
 

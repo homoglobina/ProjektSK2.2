@@ -1,18 +1,20 @@
-- fix so that after disconnecting a playername dissapears from playerList
+- fix so that after disconnecting a playername dissapears from playerList [ X ]
 
-- fix spacing 
+- add lobbies [ X ] (lobby = Pokój)
 
-- add lobbies 
+- maybe change the naming from lobbies to rooms since this is the name used in documentation
 
 - add game logic
+
+- fix spacing of messages
 
 - Come up with message naming scheme that would work well with qt app
 
 - Gracz łączy się do serwera i wysyła swój nick (jeśli nick jest już zajęty,
-serwer prosi o podanie innego nicku).
+serwer prosi o podanie innego nicku). [ X ]
 
 - Po wybraniu nicku gracz trafia do lobby, w którym widzi bieżącą listę pokoi
-oraz liczbę graczy znajdujących się w każdym pokoju.
+oraz liczbę graczy znajdujących się w każdym pokoju.  [ X ]
 
 - Z lobby gracz może wejść do istniejącego pokoju lub założyć nowy.
 Gracz może w każdej chwili wrócić z pokoju do lobby.

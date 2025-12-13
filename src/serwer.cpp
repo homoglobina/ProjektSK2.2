@@ -67,7 +67,9 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
                     
                     // logika dołączania do lobby
                     
-                    playerList[index].setCurrentLobbyID(lobbyName_to_id[trimmed_msg]);
+                    int lobbyID = lobbyName_to_id[trimmed_msg];
+                    playerList[index].setCurrentLobbyID(lobbyID);
+                    lobbyList[lobbyID]->addPlayer(client_fd);
 
                     playerList[index].setState(2);
                     std::cout << "Gracz " << playerList[index].getName() << " dołączył do lobby " << trimmed_msg << "\n";
@@ -79,11 +81,19 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
 
             break;
         
+        // Stan 2 - Rozgrywka w lobby 
         case 2:
+            
+            std::string lobbyMsg = "Jesteś w lobby. Twoja wiadomość: " + trimmed_msg + "\n";
+            write(client_fd, lobbyMsg.c_str(), lobbyMsg.size());
+            
+            int currentLobbyID = playerList[index].getCurrentLobbyID();
 
 
 
-            // Stan 2 - Rozgrywka
+
+
+
             break;
 
         default:
@@ -211,6 +221,12 @@ void Serwer::run() {
                     close(client_fd);
 
                     // Remove data regarding the disconnected player
+
+                    int currentLobbyID = playerList[index].getCurrentLobbyID();
+                    if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size())) {
+                        lobbyList[currentLobbyID]->removePlayer(client_fd);
+                    }
+
                     fd_to_index.erase(client_fd);
                     for (auto it = playerList.begin(); it != playerList.end(); ++it) {
                         if (it->getFd() == client_fd) {
@@ -218,6 +234,8 @@ void Serwer::run() {
                             break;
                         }
                     }
+
+
                     // Remaining players info
                     // printPlayers(1);
                 }
@@ -230,6 +248,8 @@ void Serwer::run() {
                 }
             }
         }
+   
+   
     }
 }
 

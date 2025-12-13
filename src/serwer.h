@@ -38,6 +38,8 @@ public:
     Lobby(std::string name, int id);
     ~Lobby();   
     void printPlayers();
+    void addPlayer(int playerFd) { playerFds.push_back(playerFd); }
+    void removePlayer(int playerFd);
     std::string getName() const { return name; }
     int getMaxPlayers() const;
     int getId() const { return id; }

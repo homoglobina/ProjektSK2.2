@@ -14,3 +14,12 @@ void Lobby::printPlayers() {
 int Lobby::getMaxPlayers() const {
     return maxPlayers;
 }
+
+void Lobby::removePlayer(int playerFd) {
+    for (auto it = playerFds.begin(); it != playerFds.end(); ++it) {
+        if (*it == playerFd) {
+            playerFds.erase(it);
+            break;
+        }
+    }
+}
