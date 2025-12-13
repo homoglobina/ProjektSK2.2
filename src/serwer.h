@@ -50,6 +50,8 @@ private:
     std::string name;
     int maxPlayers;
     int id;
+    int state;  // 1 - waiting for players, 2 - in game 3 - 10 seconds countdown 4 - finish
+
 };
 
 class Gracz {
@@ -79,3 +81,4 @@ private:
     int currentLobbyID;
     int state;
 };
+

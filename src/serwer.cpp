@@ -84,12 +84,12 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
         // Stan 2 - Rozgrywka w lobby 
         case 2:
             
-            std::string lobbyMsg = "Jesteś w lobby. Twoja wiadomość: " + trimmed_msg + "\n";
-            write(client_fd, lobbyMsg.c_str(), lobbyMsg.size());
-            
-            int currentLobbyID = playerList[index].getCurrentLobbyID();
+            // std::string roomMsg = "Jesteś w pokoju. Twoja wiadomość: " + trimmed_msg + "\n";
+            // write(client_fd, roomMsg.c_str(), roomMsg.size());
 
+            // int currentLobbyID = playerList[index].getCurrentLobbyID();
 
+            // decoding message logic to be added here
 
 
 
@@ -222,7 +222,8 @@ void Serwer::run() {
 
                     // Remove data regarding the disconnected player
 
-                    int currentLobbyID = playerList[index].getCurrentLobbyID();
+                    auto it_index = fd_to_index.find(client_fd);
+                    int currentLobbyID = playerList[it_index->second].getCurrentLobbyID();
                     if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size())) {
                         lobbyList[currentLobbyID]->removePlayer(client_fd);
                     }
