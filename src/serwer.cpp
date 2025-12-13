@@ -40,8 +40,6 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
     std::cout << "Player index: " << index << ", Name: " << playerList[index].getName() << ", State: " << playerList[index].getState() << "\n";
     std::cout << "==============================\n";
 
-
-
     switch (playerList[index].getState()) {
         
         case 0: // Stan 0 - Wybór nazwy
@@ -82,6 +80,9 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
             break;
         
         case 2:
+
+
+
             // Stan 2 - Rozgrywka
             break;
 
@@ -208,7 +209,17 @@ void Serwer::run() {
                     std::cout << "Zamknięcie połączenia z " << client_fd << "\n";
                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, nullptr);
                     close(client_fd);
-                    fd_to_index.erase(client_fd);  // Clean up mapping
+
+                    // Remove data regarding the disconnected player
+                    fd_to_index.erase(client_fd);
+                    for (auto it = playerList.begin(); it != playerList.end(); ++it) {
+                        if (it->getFd() == client_fd) {
+                            playerList.erase(it);
+                            break;
+                        }
+                    }
+                    // Remaining players info
+                    // printPlayers(1);
                 }
                 else {
                     // Find player index from fd

@@ -1,56 +1,46 @@
-- fix so that after disconnecting a playername dissapears from playerList
-
-- fix spacing 
-
-- add lobbies 
-
-- add game logic
-
-- Come up with message naming scheme that would work well with qt app
-
-- Gracz łączy się do serwera i wysyła swój nick (jeśli nick jest już zajęty,
+Gracz łączy się do serwera i wysyła swój nick (jeśli nick jest już zajęty,
 serwer prosi o podanie innego nicku).
 
-- Po wybraniu nicku gracz trafia do lobby, w którym widzi bieżącą listę pokoi
+Po wybraniu nicku gracz trafia do lobby, w którym widzi bieżącą listę pokoi
 oraz liczbę graczy znajdujących się w każdym pokoju.
 
-- Z lobby gracz może wejść do istniejącego pokoju lub założyć nowy.
+Z lobby gracz może wejść do istniejącego pokoju lub założyć nowy.
 Gracz może w każdej chwili wrócić z pokoju do lobby.
 
-- Jeśli w pokoju trwa gra, gracz dołącza do niej natychmiast i widzi aktualną literę,
+Jeśli w pokoju trwa gra, gracz dołącza do niej natychmiast i widzi aktualną literę,
 kategorie obowiązujące w tej rundzie oraz pozostały czas.
 Jeśli gra nie trwa, gracz widzi listę osób w pokoju i czeka na rozpoczęcie rundy.
 
-- Runda rozpoczyna się automatycznie, gdy w pokoju są przynajmniej dwaj gracze.
+Runda rozpoczyna się automatycznie, gdy w pokoju są przynajmniej dwaj gracze.
 W momencie rozpoczęcia serwer losuje jedną literę oraz ustala zestaw kategorii
 (wszystkie pokoje korzystają z tego samego zestawu kategorii, m.in. Państwo, Miasto,
 Zwierzę, Roślina, Rzecz). Czas trwania rundy wynosi 60 sekund.
 
-- Wszyscy gracze mogą przesyłać swoje odpowiedzi dla każdej kategorii.
+Wszyscy gracze mogą przesyłać swoje odpowiedzi dla każdej kategorii.
 Gracz, który uzupełni wszystkie kategorie, może zakończyć rundę po swojej stronie;
 jeśli jest pierwszym graczem, który to zrobił, pozostały czas zostaje automatycznie
 skrócony do 10 sekund dla wszystkich.
 
-- Gracz może wprowadzać odpowiedzi również gdy dołączył w połowie rundy, pod warunkiem
+Gracz może wprowadzać odpowiedzi również gdy dołączył w połowie rundy, pod warunkiem
 że pozostał jeszcze czas. Jeśli czas minie, a gracz nie poda odpowiedzi w danej kategorii,
 otrzymuje za nią 0 punktów.
 
-- Po zakończeniu rundy serwer zbiera i porównuje wszystkie odpowiedzi graczy.
+Po zakończeniu rundy serwer zbiera i porównuje wszystkie odpowiedzi graczy.
 Za odpowiedź identyczną jak co najmniej jednego innego gracza przyznawane jest 10 punktów,
 za odpowiedź unikalną — 15 punktów. Brak odpowiedzi oznacza 0 punktów.
 Punktacja dotyczy każdej kategorii osobno.
 
-- Po przydzieleniu punktów wszystkie wyniki są wyświetlane graczom, a serwer aktualizuje
+Po przydzieleniu punktów wszystkie wyniki są wyświetlane graczom, a serwer aktualizuje
 ranking w pokoju. Ranking zawiera również graczy, którzy rozłączyli się wcześniej.
 
-- Runda kończy się, gdy minie czas, gdy upłynie 10 sekund od momentu podania kompletu
+Runda kończy się, gdy minie czas, gdy upłynie 10 sekund od momentu podania kompletu
 odpowiedzi przez pierwszego gracza, albo gdy wszyscy obecni gracze wyślą już swoje odpowiedzi.
 Po zakończeniu rundy i wyświetleniu wyników rozpoczynana jest kolejna, o ile w pokoju
 pozostaje przynajmniej dwóch graczy.
 
-- Jeśli liczba graczy spadnie poniżej dwóch, gra w pokoju zatrzymuje się i stan pokoju
+Jeśli liczba graczy spadnie poniżej dwóch, gra w pokoju zatrzymuje się i stan pokoju
 wraca do oczekiwania na nowych graczy.
 
-- Gra trwa 10 rund, jeśli gracze pozostają w pokoju.
+Gra trwa 10 rund, jeśli gracze pozostają w pokoju.
 Gracze na bieżąco widzą ranking punktów oraz aktualny stan rundy, włączając w to graczy,
 którzy opuścili grę.
