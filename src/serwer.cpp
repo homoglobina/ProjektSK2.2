@@ -7,10 +7,25 @@
 
 #define MAX_EVENTS 10
 
+void Serwer::createLobby(std::string lobbyName) {
+    for (const auto& lobby : lobbyList) {
+        if (lobby->getName() == lobbyName) {
+            std::cout << "Lobby o nazwie '" << lobbyName << "' już istnieje.\n";
+            return;
+        }
+    }
+    Lobby* newLobby = new Lobby(lobbyName);
+    lobbyList.push_back(newLobby);
+    std::cout << "Utworzono nowe lobby: " << lobbyName << "\n";
+}
+
+
 void Serwer::handleClientMessage(int client_fd, const std::string& msg, int index ) {
     // Placeholder for handling client messages
     std::string trimmed_msg = msg;
     trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1); // Trim newline characters
+    std::string welcomeMsg = "Witaj, " + trimmed_msg + "!\n";
+
 
     std::cout << "==============================\n";
     std::cout << "Handling message from " << client_fd << ": '" << trimmed_msg << "'\n";
@@ -21,7 +36,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
     {
     case 0: // Stan 0 - Wybór nazwy
         for (auto player : playerList) {
-            if (player.getName() == msg) {
+            if (player.getName() == trimmed_msg) {
                 std::string response = "Nazwa zajęta, wybierz inną: ";
                 write(client_fd, response.c_str(), response.size());
                 return;
@@ -30,8 +45,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
         std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << trimmed_msg << "\n";
         playerList[index].setName(trimmed_msg);
         playerList[index].setState(1);
-        // std::string welcomeMsg = "Witaj, " + msg + "!\n";
-        // write(client_fd, welcomeMsg.c_str(), welcomeMsg.size());
+        write(client_fd, welcomeMsg.c_str(), welcomeMsg.size());
         break;
     case 1: //  Stan 1 - Wybór Lobby
         printPlayers(client_fd);
@@ -50,13 +64,13 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
 
 }
 
-
 void Serwer::printLobbies(int client_fd) {
     // std::cout << "Lista lobby:\n";
     std::string message = "Lista lobby:\n";
     write(client_fd, message.c_str(), message.size());
     for (const auto& lobby : lobbyList) {
-        std::string lobbyInfo = "Lobby ID: " + std::to_string(lobby->getId()) + "\n";
+        // std::string lobbyInfo = "Lobby ID: " + std::to_string(lobby->getId()) + "\n";
+        std::string lobbyInfo = lobby->getName() + "\n";
         write(client_fd, lobbyInfo.c_str(), lobbyInfo.size());
     }
 

@@ -18,6 +18,8 @@ public:
     void handleClientMessage(int client_fd, const std::string& msg, int index );
     void printLobbies(int client_fd);
     void printPlayers(int client_fd);
+    // void broadcastToLobby(int lobbyID, const std::string& message);
+    void createLobby(std::string lobbyName);
 
 private:
     int socket_fd;
@@ -33,16 +35,15 @@ private:
 
 class Lobby {
 public:
-    Lobby();
+    Lobby(std::string name);
     ~Lobby();   
-    int getId() const { return id; }
     void printPlayers();
-    
+    std::string getName() const { return name; }
+
 private:
-    int id;
     std::vector<int> playerFds;
     char currentLetter;
-
+    std::string name;
 };
 
 class Gracz {
