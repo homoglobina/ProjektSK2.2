@@ -2,12 +2,17 @@
 
 // baisic prototype message decoder 
 void decodeMessage(const std::string& msg, std::string& command, std::string& content) {
-    size_t delimiterPos = msg.find('(');
-    if (delimiterPos != std::string::npos) {
-        command = msg.substr(0, delimiterPos);
-        content = msg.substr(delimiterPos + 1);
+    size_t open = msg.find('(');
+    size_t close = msg.rfind(')');
+    if (open != std::string::npos && close != std::string::npos && close > open) {
+        command = msg.substr(0, open);
+        content = msg.substr(open + 1, close - open - 1);
     } else {
         command = msg;
-        content = "";
+        content.clear();
     }
+}
+
+std::string encodeMessage(const std::string& command, const std::string& content) {
+    return command + "(" + content + ")";
 }

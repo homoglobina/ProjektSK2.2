@@ -4,6 +4,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <unordered_map>  
+#include <iomanip>
 
 #define MAX_EVENTS 10
 
@@ -11,7 +12,7 @@ void Serwer::createLobby(std::string lobbyName) {
    
     for (const auto& lobby : lobbyList) {
         if (lobby->getName() == lobbyName) {
-            std::cout << "Lobby o nazwie '" << lobbyName << "' już istnieje.\n";
+            std::cout << std::setw(16) << "Lobby o nazwie '" << lobbyName << "' już istnieje.\n";
             return;
         }
     }
@@ -26,7 +27,7 @@ void Serwer::createLobby(std::string lobbyName) {
     Lobby* newLobby = new Lobby(lobbyName,newLobbyID);
     lobbyList.push_back(newLobby);
     lobbyName_to_id[lobbyName] = newLobby->getId();
-    std::cout << "Utworzono nowe lobby: " << lobbyName << "\n";
+    std::cout << std::setw(16) << "Utworzono nowe lobby: " << lobbyName << "\n";
 }
 
 void Serwer::handleClientMessage(int client_fd, const std::string& msg, int index ) {
@@ -35,11 +36,18 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
     trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1); // Trim newline characters
     std::string welcomeMsg = "Witaj, " + trimmed_msg + "!\n";
 
-    std::cout << "==============================\n";
-    std::cout << "Handling message from " << client_fd << ": '" << trimmed_msg << "'\n";
-    std::cout << "Player index: " << index << ", Name: " << playerList[index].getName() << ", State: " << playerList[index].getState() << "\n";
+    int labelWidth = 15; // Set a consistent width for all labels
+
+    std::cout << "\n==============================\n";
+    std::cout << "Handling message from " << client_fd << ": \n'" << trimmed_msg << "'\n";
+
+    std::cout << std::left << std::setw(labelWidth) << "Player index:" << index << ",\n";
+    std::cout << std::left << std::setw(labelWidth) << "Name:"         << playerList[index].getName() << ",\n";
+    std::cout << std::left << std::setw(labelWidth) << "State:"        << playerList[index].getState() << "\n";
+
     std::cout << "==============================\n";
 
+    
     switch (playerList[index].getState()) {
         
         case 0: // Stan 0 - Wybór nazwy
@@ -216,7 +224,7 @@ void Serwer::run() {
 
                 if (n <= 0) {
                     // Connection closed or error
-                    std::cout << "Zamknięcie połączenia z " << client_fd << "\n";
+                    std::cout << std::setw(16) << "Zamknięcie połączenia z " << client_fd << "\n";
                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, nullptr);
                     close(client_fd);
 
