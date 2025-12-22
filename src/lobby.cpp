@@ -1,8 +1,27 @@
 #include "serwer.h"
 
-Lobby::Lobby(std::string name, int id) : name(name), currentLetter('A') , maxPlayers(10), id(id) {}
+Lobby::Lobby(std::string name, int id) : name(name), currentLetter('A') , maxPlayers(10), id(id) {
+    timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
+
+}
 
 Lobby::~Lobby() {}
+
+
+
+// void logic 
+
+
+
+void Lobby::startTimer(int seconds) {
+    struct itimerspec new_value;
+    new_value.it_value.tv_sec = seconds;
+    new_value.it_value.tv_nsec = 0;
+    new_value.it_interval.tv_sec = 0;
+    new_value.it_interval.tv_nsec = 0;
+
+    timerfd_settime(timer_fd, 0, &new_value, NULL);
+}
 
 void Lobby::printPlayers() {
     std::cout << "Players in lobby " << name << ":\n";

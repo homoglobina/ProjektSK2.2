@@ -2,6 +2,8 @@
 
 - add lobbies [ X ] (lobby = Pokój)
 
+- add creating lobbies as a player [  ]
+
 - maybe change the naming from lobbies to rooms since this is the name used in documentation
 
 - add game logic

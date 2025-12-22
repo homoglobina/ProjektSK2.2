@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 #include <unordered_map>
+#include <sys/timerfd.h>
 //  Przetrzymuje informacje o graczach, lobby i nawiązuje połączenia
 
 class Lobby;
@@ -33,6 +34,7 @@ private:
     std::vector<Gracz> playerList;
 
     std::unordered_map<std::string, int> lobbyName_to_id; // lobbyName ->  Lobbyid
+    std::unordered_map<int, int> timerFdToLobbyId; // timerfd ->  Lobbyid
 };
 
 
@@ -46,11 +48,15 @@ public:
     std::string getName() const { return name; }
     int getMaxPlayers() const;
     int getId() const { return id; }
+    int getTimerFd() const { return timer_fd; }
+    void startTimer(int seconds);
+
 
 private:
     std::vector<int> playerFds;
     char currentLetter;
     std::string name;
+    int timer_fd;
     int maxPlayers;
     int id;
     int state;  // 1 - waiting for players, 2 - in game 3 - 10 seconds countdown 4 - finish

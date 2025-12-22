@@ -25,8 +25,16 @@ void Serwer::createLobby(std::string lobbyName) {
     }
     
     Lobby* newLobby = new Lobby(lobbyName,newLobbyID);
+
+    //  Add lobby timer to epoll to add running out of time 
+    struct epoll_event ev;
+    ev.events = EPOLLIN;
+    ev.data.fd = newLobby->getTimerFd(); 
+    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, newLobby->getTimerFd(), &ev);
+
     lobbyList.push_back(newLobby);
     lobbyName_to_id[lobbyName] = newLobby->getId();
+    timerFdToLobbyId[newLobby->getTimerFd()] = newLobby->getId();
     std::cout << std::setw(16) << "Utworzono nowe lobby: " << lobbyName << "\n";
 }
 
@@ -36,7 +44,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
     trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1); // Trim newline characters
     
     int labelWidth = 15; // Set a consistent width for all labels
-    
+    int lobbyID;
     std::string command, content;
     decodeMessage(trimmed_msg, command, content);
   
@@ -57,7 +65,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
     switch (playerList[index].getState()) {
         
         case 0: // Stan 0 - Wybór nazwy
-            if (command != "Player_Name") {
+            if (command != "PlayerName") {
                 // std::string response = "Nieprawidłowy format wiadomości, użyj Player_Name(<TwojaNazwa>): ";
                 // write(client_fd, response.c_str(), response.size());
                 write(client_fd, "Error(\"Invalid_Format\")", 24);
@@ -97,6 +105,13 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
         case 1: //  Stan 1 - Wybór Lobby
             // printPlayers(client_fd);
             printLobbies(client_fd);
+            if (command != "LobbyName") {
+                // std::string response = "Nieprawidłowy format wiadomości, użyj JOIN_LOBBY(<NazwaLobby>): ";
+                // write(client_fd, response.c_str(), response.size());
+                write(client_fd, "Error(\"Invalid_Format\")", 24);
+                return;
+            } 
+
 
             for (const auto& lobby : lobbyList) {
                 if (lobby->getName() == content) {
@@ -105,7 +120,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
                     
                     // logika dołączania do lobby
                     
-                    int lobbyID = lobbyName_to_id[content];
+                    lobbyID = lobbyName_to_id[content];
                     playerList[index].setCurrentLobbyID(lobbyID);
                     lobbyList[lobbyID]->addPlayer(client_fd);
 
@@ -117,17 +132,16 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
                 }
             }
 
+            trimmed_msg = "Error(NoLobby" + content + ")";
+            write(client_fd, trimmed_msg.c_str(), trimmed_msg.size());
+
             break;
         
         // Stan 2 - Rozgrywka w lobby 
         case 2:
+            lobbyID = lobbyName_to_id[content];
+            // lobbyList[lobbyID]; // access the lobby object
             
-            // std::string roomMsg = "Jesteś w pokoju. Twoja wiadomość: " + trimmed_msg + "\n";
-            // write(client_fd, roomMsg.c_str(), roomMsg.size());
-
-            // int currentLobbyID = playerList[index].getCurrentLobbyID();
-
-            // decoding message logic to be added here
 
 
 
@@ -215,8 +229,10 @@ void Serwer::run() {
         }
 
         for (int i = 0; i < nfds; i++) {
-            if (events[i].data.fd == socket_fd) {
-                // New connection
+            
+
+
+            if (events[i].data.fd == socket_fd) { // New connection
                 sockaddr_in client_addr;
                 socklen_t sizeCl = sizeof(client_addr);
                 int cd = accept(socket_fd, (struct sockaddr*)&client_addr, &sizeCl);
@@ -245,6 +261,15 @@ void Serwer::run() {
 
                 write(cd, "Nawiązano połączenie\n", 25);
                 write(cd, "Wybierz unikalne imie: ", 23);
+
+            } else if (timerFdToLobbyId.count(events[i].data.fd)) {  // Timer event from a lobby
+                uint64_t expirations;
+                read(events[i].data.fd, &expirations, sizeof(expirations));
+                int lobbyID = timerFdToLobbyId[events[i].data.fd];
+                std::cout << "Timer wywołany dla lobby ID: " << lobbyID << "\n";
+                // Handle timer expiration for the lobby
+                // ..... 
+
 
             } else {
                 // Handle client data
