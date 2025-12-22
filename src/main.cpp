@@ -15,13 +15,13 @@ int main(int argc, char* argv[]) {
 
     // test encoding and decoding messages
 
-    std::string command, content;
-    std::string testMsg = "JOIN_LOBBY(Lobby1)";
-    decodeMessage(testMsg, command, content);
-    std::cout << "Decoded Command: " << command << ", Content: " << content << std::endl;
+    // std::string command, content;
+    // std::string testMsg = "JOIN_LOBBY(Lobby1)";
+    // decodeMessage(testMsg, command, content);
+    // std::cout << "Decoded Command: " << command << ", Content: " << content << std::endl;
 
-    std::string encodedMsg = encodeMessage("CREATE_LOBBY", "Lobby2");
-    std::cout << "Encoded Message: " << encodedMsg << std::endl;
+    // std::string encodedMsg = encodeMessage("CREATE_LOBBY", "Lobby2");
+    // std::cout << "Encoded Message: " << encodedMsg << std::endl;
 
 
 

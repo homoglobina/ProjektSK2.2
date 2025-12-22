@@ -34,12 +34,16 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
     // Placeholder for handling client messages
     std::string trimmed_msg = msg;
     trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1); // Trim newline characters
-    std::string welcomeMsg = "Witaj, " + trimmed_msg + "!\n";
-
+    
     int labelWidth = 15; // Set a consistent width for all labels
+    
+    std::string command, content;
+    decodeMessage(trimmed_msg, command, content);
+  
+    std::string welcomeMsg = "Witaj, " + content + "!";
 
     std::cout << "\n==============================\n";
-    std::cout << "Handling message from " << client_fd << ": \n'" << trimmed_msg << "'\n";
+    std::cout << "Handling message from " << client_fd << ": \n'" << content << "'\n";
 
     std::cout << std::left << std::setw(labelWidth) << "Player index:" << index << ",\n";
     std::cout << std::left << std::setw(labelWidth) << "Name:"         << playerList[index].getName() << ",\n";
@@ -47,21 +51,47 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
 
     std::cout << "==============================\n";
 
-    
+
+    std::cout << "Decoded Command: '" << command << "', Content: '" << content << "'\n";
+
     switch (playerList[index].getState()) {
         
         case 0: // Stan 0 - Wybór nazwy
-            for (auto player : playerList) {
-                if (player.getName() == trimmed_msg) {
-                    std::string response = "Nazwa zajęta, wybierz inną: ";
-                    write(client_fd, response.c_str(), response.size());
+            if (command != "Player_Name") {
+                // std::string response = "Nieprawidłowy format wiadomości, użyj Player_Name(<TwojaNazwa>): ";
+                // write(client_fd, response.c_str(), response.size());
+                write(client_fd, "Error(\"Invalid_Format\")", 24);
+                return;
+            }
+            else {
+                bool hasWhitespace = false;
+                for (char ch : content) {
+                    if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '\v' || ch == '\f') {
+                        hasWhitespace = true;
+                        break;
+                    }
+                }
+                if (content.empty() || hasWhitespace) {
+                    // Nazwa nie może być pusta ani zawierać białych znaków
+                    write(client_fd, "Error(\"Invalid_Name\")", 22);
                     return;
                 }
             }
-            std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << trimmed_msg << "\n";
-            playerList[index].setName(trimmed_msg);
+            for (auto player : playerList) {
+                if (player.getName() == content) {
+                    // std::string response = "Nazwa zajęta, wybierz inną: ";
+                    // write(client_fd, response.c_str(), response.size());
+                    write(client_fd, "Error(\"Taken_Name\")", 20);
+                    return;
+                }
+            }
+            std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << content << "\n";
+            playerList[index].setName(content);
             playerList[index].setState(1);
-            write(client_fd, welcomeMsg.c_str(), welcomeMsg.size());
+
+            trimmed_msg = std::string("Msg(") + welcomeMsg + ")";
+            write(client_fd, trimmed_msg.c_str(), trimmed_msg.size());
+            
             break;
         
         case 1: //  Stan 1 - Wybór Lobby
@@ -69,18 +99,18 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
             printLobbies(client_fd);
 
             for (const auto& lobby : lobbyList) {
-                if (lobby->getName() == trimmed_msg) {
-                    std::string joinMsg = "Dołączyłeś do lobby: " + trimmed_msg + "\n";
+                if (lobby->getName() == content) {
+                    std::string joinMsg = "Dołączyłeś do lobby: " + content + "\n";
                     write(client_fd, joinMsg.c_str(), joinMsg.size());
                     
                     // logika dołączania do lobby
                     
-                    int lobbyID = lobbyName_to_id[trimmed_msg];
+                    int lobbyID = lobbyName_to_id[content];
                     playerList[index].setCurrentLobbyID(lobbyID);
                     lobbyList[lobbyID]->addPlayer(client_fd);
 
                     playerList[index].setState(2);
-                    std::cout << "Gracz " << playerList[index].getName() << " dołączył do lobby " << trimmed_msg << "\n";
+                    std::cout << "Gracz " << playerList[index].getName() << " dołączył do lobby " << content << "\n";
                     std::cout << "Lobby gracza : " << playerList[index].getCurrentLobbyID() << "\n";
 
                     return;
@@ -256,9 +286,7 @@ void Serwer::run() {
                     }
                 }
             }
-        }
-   
-   
+        }   
     }
 }
 

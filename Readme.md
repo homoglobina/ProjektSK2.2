@@ -1,17 +1,27 @@
 # How to communicate with this server 
 
-### (NOT YET IMPLEMENTED) send and receive messages of specific format, we can use that since we use TCP and we are guaranteed that whole frames will be send/received
-### i propose that a single frame could look like below
-
-TYPE_OF_MESSAGE(DATA,DATA,(...))
+# Frames that look like bellow
+TYPE_OF_MESSAGE(DATA)
 
 e.g.
 
-GUESS(panstwo,Albania)
+GUESS(panstwo)
 
 ERROR("no more space in the lobby")
 
 and so on
+
+# Proposed frames
+
+Player_Name(Adam)  # for sending user's name to the server when first connecting
+
+Error(InvalidName) # Server sending errors regarding error with username propositions
+Error(TakenName)
+Msg(helllo new player)
+
+
+
+
 
 
 ## How to compile
