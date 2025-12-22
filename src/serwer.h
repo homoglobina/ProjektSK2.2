@@ -11,6 +11,9 @@
 class Lobby;
 class Gracz;
 
+std::string encodeMessage(const std::string& command, const std::string& content);
+void decodeMessage(const std::string& msg, std::string& command, std::string& content);
+
 class Serwer {
 public:
     Serwer(int port);

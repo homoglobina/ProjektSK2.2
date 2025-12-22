@@ -1,6 +1,6 @@
 #include "serwer.h"
 
-// baisic prototype message decoder 
+// basic prototype message decoder 
 void decodeMessage(const std::string& msg, std::string& command, std::string& content) {
     size_t open = msg.find('(');
     size_t close = msg.rfind(')');
