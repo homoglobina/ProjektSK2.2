@@ -1,26 +1,21 @@
-# How to communicate with this server 
+# Państwa-Miasta Server
 
-### Frames that look like bellow
-TypeOfMessage(Data)
+-----------
+## How to communicate with this server 
 
-e.g.
+### Use frames that look like so
+**TypeOfMessage(Data)**
 
-Guess(panstwo)
+e.g. : 
 
-Error("no more space in the lobby")
+- Guess(panstwo)
 
-and so on
+- Error("no more space in the lobby")
 
-### Proposed frames
+- and so on
 
-Player_Name(Adam)  # for sending user's name to the server when first connecting
-
-Error(InvalidName) # Server sending errors regarding error with username propositions
-Error(TakenName)
-Msg(helllo new player)
-
-
-# Gameplay
+---------------
+## Gameplay
 
 
 ### Serwer side 
@@ -58,8 +53,8 @@ Msg(Hello)
 
 
 
-
-# How to compile
+--------------------
+## How to compile
 
 create and move to the build directory
 run:
