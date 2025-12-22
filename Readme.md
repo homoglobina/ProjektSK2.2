@@ -29,7 +29,7 @@ Msg(helllo new player)
 NoLobby(pokoj1)
 
 #### Server send the remaining time of the lobby to player
-Time(1234)
+Time(15)
 
 
 

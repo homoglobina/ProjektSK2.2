@@ -7,11 +7,19 @@ Lobby::Lobby(std::string name, int id) : name(name), currentLetter('A') , maxPla
 
 Lobby::~Lobby() {}
 
+void Lobby::writeAll(const std::string& message) {
+    for (int playerFd : playerFds) {
+        write(playerFd, message.c_str(), message.size());
+    }
+}
 
-
-// void logic 
-
-
+void Lobby::writeAllExcept(int exceptFd, const std::string& message) {
+    for (int playerFd : playerFds) {
+        if (playerFd != exceptFd) {
+            write(playerFd, message.c_str(), message.size());
+        }
+    }
+}
 
 void Lobby::startTimer(int seconds) {
     struct itimerspec new_value;

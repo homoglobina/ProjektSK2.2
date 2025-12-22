@@ -142,8 +142,10 @@ void Serwer::handleClientMessage(int client_fd, const std::string& msg, int inde
             lobbyID = lobbyName_to_id[content];
             // lobbyList[lobbyID]; // access the lobby object
             
+            
+            lobbyList[lobbyID]->startTimer(10); // access the lobby object
 
-
+            
 
 
             break;

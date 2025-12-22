@@ -42,6 +42,8 @@ class Lobby {
 public:
     Lobby(std::string name, int id);
     ~Lobby();   
+    void writeAll(const std::string& message);
+    void writeAllExcept(int exceptFd, const std::string& message);
     void printPlayers();
     void addPlayer(int playerFd) { playerFds.push_back(playerFd); }
     void removePlayer(int playerFd);
