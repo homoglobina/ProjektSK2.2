@@ -52,9 +52,12 @@ public:
     int getId() const { return id; }
     int getTimerFd() const { return timer_fd; }
     void startTimer(int seconds);
+    void gameLogic(std::string command, std::string content, int client_fd, int index);  
+    
 
 
 private:
+    std::vector<int> categories;
     std::vector<int> playerFds;
     char currentLetter;
     std::string name;

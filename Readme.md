@@ -9,7 +9,7 @@
 
 e.g. : 
 ```
- Guess(panstwo)
+ Guess(1panstwo)
 
  Error("no more space in the lobby")
 
@@ -25,6 +25,19 @@ e.g. :
 ```
 NoLobby(pokoj1)
 ```
+#### Server sends info regarding what categories are in the game
+```
+Category(135)
+```
+
+Categories:
+    - countries "1"
+    - cities "2" // polish
+    - cities "3" // important worldwide 
+    - lakes "4"
+    - fruit "5"
+    - names "6"
+    ...
 
 #### Server send the remaining time of the lobby to player
 ```
@@ -32,11 +45,12 @@ Time(15)
 ```
 
 
+
 ### Client side 
 
 #### Set up a name
 ```
-PlayerName
+PlayerName(Bartek)
 ```
 
 #### Join a Lobby
@@ -44,10 +58,20 @@ PlayerName
 LobbyName(pokoj1)
 ```
 
+#### Change game Settings
+```
+LobbySettings()
+```
+
+#### Start a game 
+```
+LobbyStart()
+```
+
 #### Player sends the guess
 ```
-Guess(panstwo,Malta)
-Guess(miasto,Warszawa)
+Guess(1,Malta)
+Guess(2,Warszawa)
 ```
 
 

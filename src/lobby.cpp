@@ -1,7 +1,11 @@
 #include "serwer.h"
+#include <algorithm>
+#include <cctype>
+#include <fstream>
 
 Lobby::Lobby(std::string name, int id) : name(name), currentLetter('A') , maxPlayers(10), id(id) {
     timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
+    state = 1; // initial state - waiting for players
 
 }
 
@@ -48,5 +52,88 @@ void Lobby::removePlayer(int playerFd) {
             playerFds.erase(it);
             break;
         }
+    }
+}
+
+bool checkAnswer(std::string& answer, int category) {
+    std::cout << "Checking category: " << category << "\n";
+
+    std::string file = "resources/" + std::to_string(category) + ".txt";
+    std::ifstream in(file);
+    if (!in.is_open()) return false;
+
+    auto trim = [](std::string &s) {
+        while (!s.empty() && std::isspace((unsigned char)s.front())) s.erase(s.begin());
+        while (!s.empty() && std::isspace((unsigned char)s.back())) s.pop_back();
+    };
+
+    std::vector<std::string> words;
+    std::string line;
+    while (std::getline(in, line)) {
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        trim(line);
+        if (line.empty()) continue;
+        std::transform(line.begin(), line.end(), line.begin(), [](unsigned char c){ return std::toupper(c); });
+        words.push_back(std::move(line));
+    }
+    in.close();
+
+    if (words.empty()) return false;
+
+    std::string key = answer;
+    std::cout << "Checking answer: '" << key << "' in category " << category << "\n";
+    trim(key);
+    std::cout << "Checking answer: '" << key << "' in category " << category << "\n";
+    std::transform(key.begin(), key.end(), key.begin(), [](unsigned char c){ return std::toupper(c); });
+
+    return std::binary_search(words.begin(), words.end(), key);
+}
+
+void Lobby::gameLogic(std::string command, std::string content, int client_fd, int index) {
+    int category;
+    std::string guess;
+    
+    switch (state)
+    {
+    case 0: // lobby created
+        
+        break;
+
+    case 1: // waiting for players
+        if (command == "LobbyStart") {
+            if (playerFds.size() >= 1) {
+                state = 2; 
+                writeAll("Gra rozpoczeta!\n");
+            } else {
+                write(client_fd, "Za malo graczy, aby rozpocząć grę.\n", 36);
+            }
+        }
+        else if (command == "LobbySettings") {
+            categories.clear();
+            // add Categories
+            for (auto& i : content) {
+                categories.push_back(i - '0');
+                std::cout << "Dodano kategorie: " << (i - '0') << "\n";
+            }
+            writeAll("Ustawienia lobby zostały zmienione.\n");
+        }
+        break;
+    case 2: // in game
+        if (command == "Guess") {
+            category = content[0] - '0';
+            guess = content.substr(1);    
+            if(content[1] == currentLetter && checkAnswer(guess, category)){
+                std::string response = "Poprawna odpowiedź od gracza " + std::to_string(index) + ": " + guess + "\n";
+                writeAll(response);
+            } else {
+                std::string response = "Niepoprawna odpowiedź od gracza " + std::to_string(index) + ": " + guess + "\n";
+                writeAll(response);
+            }        
+        }
+        break;
+    case 4: // finish
+        break;
+    default:
+        break;
     }
 }
