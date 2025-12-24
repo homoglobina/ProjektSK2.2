@@ -55,7 +55,7 @@ void Lobby::removePlayer(int playerFd) {
     }
 }
 
-bool checkAnswer(std::string& answer, int category) {
+bool Lobby::checkAnswer(std::string& answer, int category) {
     std::cout << "Checking category: " << category << "\n";
 
     std::string file = "resources/" + std::to_string(category) + ".txt";
@@ -108,7 +108,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, i
                 write(client_fd, "Za malo graczy, aby rozpocząć grę.\n", 36);
             }
         }
-        else if (command == "LobbySettings") {
+        else if (command == "LobbySettings" && client_fd == playerFds[0]) {  // pierwszy gracz moze zmieniac ustawienia staje się adminem
             categories.clear();
             // add Categories
             for (auto& i : content) {

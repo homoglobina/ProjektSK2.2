@@ -52,6 +52,7 @@ public:
     int getId() const { return id; }
     int getTimerFd() const { return timer_fd; }
     void startTimer(int seconds);
+    bool checkAnswer(std::string& answer, int category);
     void gameLogic(std::string command, std::string content, int client_fd, int index);  
     
 
