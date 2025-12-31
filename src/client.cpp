@@ -11,7 +11,8 @@
 // =====================
 // STRUCT: parsed message
 // =====================
-struct Message {
+struct Message
+{
     std::string command;
     std::vector<std::string> args;
 };
@@ -19,7 +20,8 @@ struct Message {
 // =====================
 // PARSER
 // =====================
-std::optional<Message> parseMessage(const std::string &raw) {
+std::optional<Message> parseMessage(const std::string &raw)
+{
     auto open = raw.find('(');
     auto close = raw.rfind(')');
 
@@ -33,7 +35,8 @@ std::optional<Message> parseMessage(const std::string &raw) {
 
     size_t start = 0;
     size_t pos;
-    while ((pos = inside.find(',', start)) != std::string::npos) {
+    while ((pos = inside.find(',', start)) != std::string::npos)
+    {
         msg.args.push_back(inside.substr(start, pos - start));
         start = pos + 1;
     }
@@ -50,10 +53,13 @@ std::vector<int> currentCategories;
 int timeRemaining = -1;
 bool roundActive = false;
 
-std::vector<int> parseCategories(const std::string& s) {
+std::vector<int> parseCategories(const std::string &s)
+{
     std::vector<int> v;
-    for (char c : s) {
-        if (c >= '0' && c <= '9') v.push_back(c - '0');
+    for (char c : s)
+    {
+        if (c >= '0' && c <= '9')
+            v.push_back(c - '0');
     }
     return v;
 }
@@ -61,7 +67,8 @@ std::vector<int> parseCategories(const std::string& s) {
 // =====================
 // Send Guess Command
 // =====================
-void sendGuess(int sock, int categoryId, const std::string &answer) {
+void sendGuess(int sock, int categoryId, const std::string &answer)
+{
     std::string cmd = "Guess(" + std::to_string(categoryId) + "," + answer + ")\n";
     send(sock, cmd.c_str(), cmd.size(), 0);
     std::cout << "[wysłano] " << cmd;
@@ -70,25 +77,32 @@ void sendGuess(int sock, int categoryId, const std::string &answer) {
 // =====================
 // Round input
 // =====================
-void runRoundInput(int sock) {
-    if (currentCategories.empty() || currentLetter.empty()) {
+void runRoundInput(int sock)
+{
+    if (currentCategories.empty() || currentLetter.empty())
+    {
         std::cout << "[błąd] brak danych rundy (Category/Letter)\n";
         return;
     }
 
     std::cout << "\n=== ROZPOCZĘCIE RUNDY ===\n";
     std::cout << "Litera: " << currentLetter << "\nKategorie:";
-    for (auto c : currentCategories) std::cout << " " << c;
+    for (auto c : currentCategories)
+        std::cout << " " << c;
     std::cout << "\n\n";
 
-    for (auto cat : currentCategories) {
+    for (auto cat : currentCategories)
+    {
         std::string answer;
         std::cout << "[kategoria " << cat << "][" << currentLetter << "] > ";
         std::getline(std::cin, answer);
 
-        if (!answer.empty()) {
+        if (!answer.empty())
+        {
             sendGuess(sock, cat, answer);
-        } else {
+        }
+        else
+        {
             std::cout << "[INFO] pomijam pustą odpowiedź\n";
         }
     }
@@ -99,35 +113,44 @@ void runRoundInput(int sock) {
 // =====================
 // HANDLE SERVER MESSAGE
 // =====================
-void handleParsedMessage(const Message &msg, int sock) {
+void handleParsedMessage(const Message &msg, int sock)
+{
 
     // Komunikaty czatu
-    if (msg.command == "Msg") {
-        if (!msg.args.empty()) std::cout << "[CHAT] " << msg.args[0] << "\n";
+    if (msg.command == "Msg")
+    {
+        if (!msg.args.empty())
+            std::cout << "[CHAT] " << msg.args[0] << "\n";
         return;
     }
 
     // Błędy
-    if (msg.command == "Error") {
+    if (msg.command == "Error")
+    {
         std::cout << "[BŁĄD] " << (msg.args.empty() ? "?" : msg.args[0]) << "\n";
         return;
     }
 
     // Kategorie
-    if (msg.command == "Category") {
-        if (!msg.args.empty()) {
+    if (msg.command == "Category")
+    {
+        if (!msg.args.empty())
+        {
             currentCategories = parseCategories(msg.args[0]);
             roundActive = true;
             std::cout << "[KATEGORIE] ";
-            for (auto c : currentCategories) std::cout << c << " ";
+            for (auto c : currentCategories)
+                std::cout << c << " ";
             std::cout << "\n";
         }
         return;
     }
 
     // Litera
-    if (msg.command == "Letter") {
-        if (!msg.args.empty()) {
+    if (msg.command == "Letter")
+    {
+        if (!msg.args.empty())
+        {
             currentLetter = msg.args[0];
             std::cout << "[LITERA] " << currentLetter << "\n";
         }
@@ -135,30 +158,43 @@ void handleParsedMessage(const Message &msg, int sock) {
     }
 
     // Czas
-    if (msg.command == "Time") {
-        if (!msg.args.empty()) {
+    if (msg.command == "Time")
+    {
+        if (!msg.args.empty())
+        {
             timeRemaining = std::stoi(msg.args[0]);
             std::cout << "[CZAS] " << timeRemaining << " sekund\n";
         }
 
         // START RUNDY — gdy mamy dane
-        if (roundActive && !currentLetter.empty() && timeRemaining == 60) {
+        if (roundActive && !currentLetter.empty() && timeRemaining == 60)
+        {
             runRoundInput(sock);
         }
         return;
     }
 
     // Zgadywanie
-    if (msg.command == "GuessOK") {
+    if (msg.command == "GuessOK")
+    {
         std::cout << "[INFO] odpowiedź zaakceptowana\n";
         return;
     }
 
-    if (msg.command == "GuessErr") {
+    if (msg.command == "GuessErr")
+    {
         std::cout << "[UWAGA] odpowiedź odrzucona: "
                   << (msg.args.size() ? msg.args[0] : "?") << "\n";
         return;
     }
+
+    //     // --- LOBBYSTART ---
+    // // użytkownik wpisuje dokładnie: LobbyStart()
+    // if (msg.command == "LobbyStart()") {
+    //     send(sock, msg.command.c_str(), msg.command.size(), 0);
+    //     std::cout << "[wysłano] LobbyStart()\n";
+    //     return;
+    // }
 
     std::cout << "[NIEZNANE] " << msg.command << "\n";
 }
@@ -166,11 +202,13 @@ void handleParsedMessage(const Message &msg, int sock) {
 // =====================
 // MAIN CLIENT
 // =====================
-int main() {
+int main()
+{
     std::cout << "=== PAŃSTWA-MIASTA KLIENT ===\n";
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
+    if (sock < 0)
+    {
         std::cerr << "Błąd tworzenia socketu\n";
         return 1;
     }
@@ -180,7 +218,8 @@ int main() {
     serverAddr.sin_port = htons(1234);
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 
-    if (connect(sock, (sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+    if (connect(sock, (sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
+    {
         std::cerr << "Nie mogę połączyć z serwerem\n";
         return 1;
     }
@@ -190,30 +229,54 @@ int main() {
     // =====================
     // MAIN LOOP
     // =====================
-    while (true) {
+
+    std::string recvBuffer;
+
+    while (true)
+    {
         // --- ODBIERANIE ---
         char buffer[1024];
         memset(buffer, 0, sizeof(buffer));
         int bytes = recv(sock, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
 
         if (bytes > 0) {
-            std::string raw(buffer, bytes);
-            auto parsed = parseMessage(raw);
+        buffer[bytes] = 0;
+        recvBuffer += buffer;
+
+        // obsługa wielu linii naraz
+        size_t pos;
+        while ((pos = recvBuffer.find('\n')) != std::string::npos) {
+            std::string line = recvBuffer.substr(0, pos);
+            recvBuffer.erase(0, pos + 1);
+
+            auto parsed = parseMessage(line);
             if (parsed)
                 handleParsedMessage(*parsed, sock);
             else
-                std::cout << "\n[RAW] " << raw << "\n> ";
+                std::cout << "[RAW] " << line << "\n";
         }
+    }
 
         // --- WYSYŁANIE ---
         std::string input;
-        if (std::getline(std::cin, input)) {
+        if (std::getline(std::cin, input))
+        {
 
-            if (input.empty()) continue;      // NIE wysyłaj pustych komend
-            if (input == "exit") break;
+            if (input.empty())
+                continue; // NIE wysyłaj pustych komend
+            if (input == "exit")
+                break;
 
             input += "\n";
             send(sock, input.c_str(), input.size(), 0);
+        }
+
+        // --- LOBBYSTART ---
+        if (input == "LobbyStart()")
+        {
+            send(sock, input.c_str(), input.size(), 0);
+            std::cout << "[wysłano] LobbyStart()\n";
+            continue;
         }
     }
 
