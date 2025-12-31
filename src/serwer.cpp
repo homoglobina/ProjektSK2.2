@@ -220,11 +220,110 @@ Serwer::Serwer(int port) {
     }
 }
 
+// void Serwer::run() {
+//     struct epoll_event events[MAX_EVENTS];
+//     std::unordered_map<int, size_t> fd_to_index; // Track fd -> player index
+    
+//     while (1) {
+//         int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+//         if (nfds < 0) {
+//             std::cerr << "Błąd epoll_wait: " << strerror(errno) << "\n";
+//             break;
+//         }
+
+//         for (int i = 0; i < nfds; i++) {
+            
+
+
+//             if (events[i].data.fd == socket_fd) { // New connection
+//                 sockaddr_in client_addr;
+//                 socklen_t sizeCl = sizeof(client_addr);
+//                 int cd = accept(socket_fd, (struct sockaddr*)&client_addr, &sizeCl);
+                
+//                 if (cd < 0) {
+//                     std::cerr << "Błąd accept: " << strerror(errno) << "\n";
+//                     continue;
+//                 }
+
+//                 std::cout << "Akceptowanie połączenia od " << cd << "\n";
+                
+//                 // Add new client to epoll
+//                 struct epoll_event ev;
+//                 ev.events = EPOLLIN;
+//                 ev.data.fd = cd;  // Only set fd
+//                 epoll_ctl(epoll_fd, EPOLL_CTL_ADD, cd, &ev);
+                
+//                 // Create new player and add to playerList
+//                 size_t player_index = playerList.size();
+//                 Gracz newPlayer;
+//                 newPlayer.setFd(cd);
+//                 newPlayer.setNr(player_index);
+//                 playerList.push_back(newPlayer);
+                
+//                 fd_to_index[cd] = player_index;
+
+//                 write(cd, "Nawiązano połączenie\n", 25);
+//                 write(cd, "Wybierz unikalne imie: ", 23);
+
+//             } else if (timerFdToLobbyId.count(events[i].data.fd)) {  // Timer event from a lobby
+//                 uint64_t expirations;
+//                 read(events[i].data.fd, &expirations, sizeof(expirations));
+//                 int lobbyID = timerFdToLobbyId[events[i].data.fd];
+//                 std::cout << "Timer wywołany dla lobby ID: " << lobbyID << "\n";
+//                 // Handle timer expiration for the lobby
+//                 // ..... 
+
+
+//             } else {
+//                 // Handle client data
+//                 int client_fd = events[i].data.fd;
+//                 char buffer[1024];
+//                 int n = read(client_fd, buffer, sizeof(buffer));
+
+//                 if (n <= 0) {
+//                     // Connection closed or error
+//                     std::cout << std::setw(16) << "Zamknięcie połączenia z " << client_fd << "\n";
+//                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, nullptr);
+//                     close(client_fd);
+
+//                     // Remove data regarding the disconnected player
+
+//                     auto it_index = fd_to_index.find(client_fd);
+//                     int currentLobbyID = playerList[it_index->second].getCurrentLobbyID();
+//                     if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size())) {
+//                         lobbyList[currentLobbyID]->removePlayer(client_fd);
+//                     }
+
+//                     fd_to_index.erase(client_fd);
+//                     for (auto it = playerList.begin(); it != playerList.end(); ++it) {
+//                         if (it->getFd() == client_fd) {
+//                             playerList.erase(it);
+//                             break;
+//                         }
+//                     }
+
+
+//                     // Remaining players info
+//                     // printPlayers(1);
+//                 }
+//                 else {
+//                     // Find player index from fd
+//                     auto it = fd_to_index.find(client_fd);
+//                     if (it != fd_to_index.end()) {
+//                         handleClientMessage(client_fd, std::string(buffer, n), it->second);
+//                     }
+//                 }
+//             }
+//         }   
+//     }
+// }
+
+
 void Serwer::run() {
     struct epoll_event events[MAX_EVENTS];
     std::unordered_map<int, size_t> fd_to_index; // Track fd -> player index
-    
-    while (1) {
+
+    while (true) {
         int nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
         if (nfds < 0) {
             std::cerr << "Błąd epoll_wait: " << strerror(errno) << "\n";
@@ -232,91 +331,102 @@ void Serwer::run() {
         }
 
         for (int i = 0; i < nfds; i++) {
-            
 
-
-            if (events[i].data.fd == socket_fd) { // New connection
+            // ======== NOWE POŁĄCZENIE ========
+            if (events[i].data.fd == socket_fd) {
                 sockaddr_in client_addr;
                 socklen_t sizeCl = sizeof(client_addr);
                 int cd = accept(socket_fd, (struct sockaddr*)&client_addr, &sizeCl);
-                
+
                 if (cd < 0) {
                     std::cerr << "Błąd accept: " << strerror(errno) << "\n";
                     continue;
                 }
 
                 std::cout << "Akceptowanie połączenia od " << cd << "\n";
-                
+
                 // Add new client to epoll
                 struct epoll_event ev;
                 ev.events = EPOLLIN;
-                ev.data.fd = cd;  // Only set fd
+                ev.data.fd = cd; 
                 epoll_ctl(epoll_fd, EPOLL_CTL_ADD, cd, &ev);
-                
-                // Create new player and add to playerList
+
+                // Create new player
                 size_t player_index = playerList.size();
                 Gracz newPlayer;
                 newPlayer.setFd(cd);
                 newPlayer.setNr(player_index);
                 playerList.push_back(newPlayer);
-                
+
                 fd_to_index[cd] = player_index;
 
-                write(cd, "Nawiązano połączenie\n", 25);
+                write(cd, "Nawiązano połączenie\n", 23);
                 write(cd, "Wybierz unikalne imie: ", 23);
+                continue;
+            }
 
-            } else if (timerFdToLobbyId.count(events[i].data.fd)) {  // Timer event from a lobby
+            // ======== TIMER LOBBY ========
+            if (timerFdToLobbyId.count(events[i].data.fd)) {
                 uint64_t expirations;
                 read(events[i].data.fd, &expirations, sizeof(expirations));
                 int lobbyID = timerFdToLobbyId[events[i].data.fd];
                 std::cout << "Timer wywołany dla lobby ID: " << lobbyID << "\n";
-                // Handle timer expiration for the lobby
-                // ..... 
+                // TODO: logika czasu
+                continue;
+            }
 
+            // ======== DANE OD KLIENTA ========
+            int client_fd = events[i].data.fd;
+            char buffer[1024];
+            int n = read(client_fd, buffer, sizeof(buffer));
 
-            } else {
-                // Handle client data
-                int client_fd = events[i].data.fd;
-                char buffer[1024];
-                int n = read(client_fd, buffer, sizeof(buffer));
+            // ---- BRAK DANYCH TERAZ (ALE POŁĄCZENIE ŻYJE) ----
+            if (n < 0) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    // brak danych, czekamy dalej
+                    continue;
+                }
+                std::cerr << "Błąd odczytu od " << client_fd << ": " << strerror(errno) << "\n";
+                continue;
+            }
 
-                if (n <= 0) {
-                    // Connection closed or error
-                    std::cout << std::setw(16) << "Zamknięcie połączenia z " << client_fd << "\n";
-                    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, nullptr);
-                    close(client_fd);
+            // ---- KLIENT ZAMKNĄŁ SOCKET ----
+            if (n == 0) {
+                std::cout << std::setw(16) << "Zamknięcie połączenia z " << client_fd << "\n";
 
-                    // Remove data regarding the disconnected player
+                epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client_fd, nullptr);
+                close(client_fd);
 
-                    auto it_index = fd_to_index.find(client_fd);
+                auto it_index = fd_to_index.find(client_fd);
+                if (it_index != fd_to_index.end()) {
                     int currentLobbyID = playerList[it_index->second].getCurrentLobbyID();
+
                     if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size())) {
                         lobbyList[currentLobbyID]->removePlayer(client_fd);
                     }
 
                     fd_to_index.erase(client_fd);
-                    for (auto it = playerList.begin(); it != playerList.end(); ++it) {
-                        if (it->getFd() == client_fd) {
-                            playerList.erase(it);
-                            break;
-                        }
-                    }
-
-
-                    // Remaining players info
-                    // printPlayers(1);
                 }
-                else {
-                    // Find player index from fd
-                    auto it = fd_to_index.find(client_fd);
-                    if (it != fd_to_index.end()) {
-                        handleClientMessage(client_fd, std::string(buffer, n), it->second);
+
+                for (auto it = playerList.begin(); it != playerList.end(); ++it) {
+                    if (it->getFd() == client_fd) {
+                        playerList.erase(it);
+                        break;
                     }
                 }
+
+                continue;
             }
-        }   
+
+            // ---- MAMY WIADOMOŚĆ ----
+            auto it = fd_to_index.find(client_fd);
+            if (it != fd_to_index.end()) {
+                handleClientMessage(client_fd, std::string(buffer, n), it->second);
+            }
+        }
     }
 }
+
 
 Serwer::~Serwer() {
     if (epoll_fd >= 0) close(epoll_fd);
