@@ -158,8 +158,13 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, i
     case 2: // in game
         if (command == "Guess")
         {
-            category = content[0] - '0';
-            guess = content.substr(1);
+            // category = content[0] - '0';
+            // guess = content.substr(1);
+            // content = "1,MIASTo"
+            size_t commaPos = content.find(',');
+            category = std::stoi(content.substr(0, commaPos));
+            guess = content.substr(commaPos + 1);
+
             if (content[1] == currentLetter && checkAnswer(guess, category))
             {
                 std::string response = "Poprawna odpowiedź od gracza " + std::to_string(index) + ": " + guess + "\n";

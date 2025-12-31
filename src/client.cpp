@@ -188,6 +188,25 @@ void handleParsedMessage(const Message &msg, int sock)
         return;
     }
 
+    // ===== KONIEC RUNDY =====
+if (msg.command == "RoundEnd") {
+    roundActive = false;
+    std::cout << "\n=== KONIEC RUNDY ===\n";
+    return;
+}
+
+// ===== PUNKTACJA =====
+if (msg.command == "Score") {
+    if (msg.args.size() >= 3) {
+        std::cout << "[WYNIK] kategoria " 
+                  << msg.args[0] << " → +" 
+                  << msg.args[1] << " pkt (" 
+                  << msg.args[2] << ")\n";
+    }
+    return;
+}
+
+
     //     // --- LOBBYSTART ---
     // // użytkownik wpisuje dokładnie: LobbyStart()
     // if (msg.command == "LobbyStart()") {
