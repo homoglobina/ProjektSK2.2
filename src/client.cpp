@@ -189,31 +189,41 @@ void handleParsedMessage(const Message &msg, int sock)
     }
 
     // ===== KONIEC RUNDY =====
-if (msg.command == "RoundEnd") {
-    roundActive = false;
-    std::cout << "\n=== KONIEC RUNDY ===\n";
-    return;
-}
-
-// ===== PUNKTACJA =====
-if (msg.command == "Score") {
-    if (msg.args.size() >= 3) {
-        std::cout << "[WYNIK] kategoria " 
-                  << msg.args[0] << " → +" 
-                  << msg.args[1] << " pkt (" 
-                  << msg.args[2] << ")\n";
+    if (msg.command == "RoundEnd")
+    {
+        roundActive = false;
+        std::cout << "\n=== KONIEC RUNDY ===\n";
+        return;
     }
-    return;
-}
 
+    // ===== PUNKTACJA =====
+    if (msg.command == "Score")
+    {
+        if (msg.args.size() >= 3)
+        {
+            std::cout << "[WYNIK] kategoria "
+                      << msg.args[0] << " → +"
+                      << msg.args[1] << " pkt ("
+                      << msg.args[2] << ")\n";
+        }
+        return;
+    }
 
-    //     // --- LOBBYSTART ---
-    // // użytkownik wpisuje dokładnie: LobbyStart()
-    // if (msg.command == "LobbyStart()") {
-    //     send(sock, msg.command.c_str(), msg.command.size(), 0);
-    //     std::cout << "[wysłano] LobbyStart()\n";
-    //     return;
-    // }
+    // ===== KONIEC GRY =====
+    if (msg.command == "GameEnd")
+    {
+        roundActive = false;
+        currentCategories.clear();
+        currentLetter.clear();
+        timeRemaining = -1;
+
+        std::cout << "\n===== KONIEC GRY =====\n";
+        std::cout << "   Gra zakończona po 10 rundach!\n";
+        std::cout << "   Możesz wpisać LobbyStart() aby rozpocząć nową.\n";
+        std::cout << "=======================\n\n";
+
+        return;
+    }
 
     std::cout << "[NIEZNANE] " << msg.command << "\n";
 }
@@ -258,23 +268,25 @@ int main()
         memset(buffer, 0, sizeof(buffer));
         int bytes = recv(sock, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
 
-        if (bytes > 0) {
-        buffer[bytes] = 0;
-        recvBuffer += buffer;
+        if (bytes > 0)
+        {
+            buffer[bytes] = 0;
+            recvBuffer += buffer;
 
-        // obsługa wielu linii naraz
-        size_t pos;
-        while ((pos = recvBuffer.find('\n')) != std::string::npos) {
-            std::string line = recvBuffer.substr(0, pos);
-            recvBuffer.erase(0, pos + 1);
+            // obsługa wielu linii naraz
+            size_t pos;
+            while ((pos = recvBuffer.find('\n')) != std::string::npos)
+            {
+                std::string line = recvBuffer.substr(0, pos);
+                recvBuffer.erase(0, pos + 1);
 
-            auto parsed = parseMessage(line);
-            if (parsed)
-                handleParsedMessage(*parsed, sock);
-            else
-                std::cout << "[RAW] " << line << "\n";
+                auto parsed = parseMessage(line);
+                if (parsed)
+                    handleParsedMessage(*parsed, sock);
+                else
+                    std::cout << "[RAW] " << line << "\n";
+            }
         }
-    }
 
         // --- WYSYŁANIE ---
         std::string input;

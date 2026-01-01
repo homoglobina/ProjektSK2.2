@@ -3,6 +3,10 @@
 #include <cctype>
 #include <fstream>
 
+int roundNumber = 0;
+const int maxRounds = 3;
+bool roundFinished = false;
+
 Lobby::Lobby(std::string name, int id) : name(name), currentLetter('A'), maxPlayers(10), id(id)
 {
     timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
@@ -112,6 +116,48 @@ bool Lobby::checkAnswer(std::string &answer, int category)
     return std::binary_search(words.begin(), words.end(), key);
 }
 
+void Lobby::startRound()
+{
+    std::cout << "=== START RUNDY " << roundNumber << " ===\n";
+
+    // wybór kategorii i litery
+    writeAll("Category(135)\n");
+    writeAll("Letter(M)\n");
+
+    // pełny czas tylko na start rundy
+    writeAll("Time(60)\n");
+
+    startTimer(10); // start timer for the round
+}
+
+void Lobby::gameFinished()
+{
+    writeAll("GameEnd()\n");
+
+    // reset lobby na kolejną grę
+    roundNumber = 0;
+    state = 1; // waiting room
+}
+
+void Lobby::endRound()
+{
+    writeAll("RoundEnd()\n");
+    writeAll("Score(1,10,Malta)\n");
+    writeAll("Score(3,15,Mediolan)\n");
+    writeAll("Score(5,0,-)\n");
+
+    roundNumber++;
+
+    if (roundNumber > maxRounds)
+    {
+        gameFinished();
+    }
+    else
+    {
+        startRound();
+    }
+}
+
 void Lobby::gameLogic(std::string command, std::string content, int client_fd, int index)
 {
     int category;
@@ -131,12 +177,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, i
                 state = 2;
                 writeAll("Msg(Gra rozpoczeta!)\n");
 
-                // TEST
-
-                writeAll("Category(135)\n");
-                writeAll("Letter(M)\n"); // docelowo random letter
-                writeAll("Time(60)\n");
-                //////////////////////////////////////////////////////////////////
+                startRound();
             }
             else
             {

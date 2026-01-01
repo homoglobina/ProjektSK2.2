@@ -372,6 +372,8 @@ void Serwer::run() {
                 int lobbyID = timerFdToLobbyId[events[i].data.fd];
                 std::cout << "Timer wywołany dla lobby ID: " << lobbyID << "\n";
                 // TODO: logika czasu
+                lobbyList[lobbyID]->endRound();
+
                 continue;
             }
 

@@ -55,6 +55,9 @@ public:
     bool checkAnswer(std::string& answer, int category);
     void gameLogic(std::string command, std::string content, int client_fd, int index);  
     
+    void startRound();
+    void endRound();
+    void gameFinished();
 
 
 private:
