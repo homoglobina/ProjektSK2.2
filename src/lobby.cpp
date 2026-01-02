@@ -4,8 +4,6 @@
 #include <fstream>
 #include <map>
 
-int roundNumber = 0;
-const int maxRounds = 3;
 bool roundFinished = false;
 
 // ====== PRZECHOWYWANIE ODPOWIEDZI ======
@@ -16,6 +14,7 @@ Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlay
 {
     timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     state = 1; // initial state - waiting for players
+    categories = {1, 2, 3}; // default categories
 }
 
 Lobby::~Lobby() {}
@@ -106,11 +105,17 @@ void Lobby::startRound()
 {
     std::cout << "=== START RUNDY " << roundNumber << " ===\n";
 
-    writeAll("Category(135)\n");
-    writeAll("Letter(M)\n");
+
+    std::string categoriesStr;
+    for (int cat : categories)
+        categoriesStr += std::to_string(cat);
+
+    writeAll("Category(" + categoriesStr + ")\n");
+
+    writeAll("Letter(" + std::string(1, currentLetter) + ")\n");
     writeAll("Time(60)\n");
 
-    startTimer(10); // automatyczne zakończenie
+    startTimer(60); // automatyczne zakończenie
 }
 
 // =========================
@@ -149,24 +154,24 @@ void Lobby::endRound()
         {
             int pts = 0;
 
-            // if(!ans.empty())
-            //     {printf("Player %d answered '%s' in category %d\n", player, ans.c_str(), cat);}
-            // else
-            //     {printf("Player %d gave no answer in category %d\n", player, cat);}
+            if(!ans.empty())
+                {printf("Player %d answered '%s' in category %d\n", player, ans.c_str(), cat);}
+            else
+                {printf("Player %d gave no answer in category %d\n", player, cat);}
 
-            // if(std::toupper(ans[0]) != currentLetter)
-            // {
-            //     printf("Answer '%s' does not start with letter '%c'\n", ans.c_str(), currentLetter);
-            // }
+            if(std::toupper(ans[0]) != currentLetter)
+            {
+                printf("Answer '%s' does not start with letter '%c'\n", ans.c_str(), currentLetter);
+            }
 
-            // if(checkAnswer(ans, cat))
-            // {
-            //     printf("Answer '%s' is valid in category %d\n", ans.c_str(), cat);
-            // }
-            // else
-            // {
-            //     printf("Answer '%s' is NOT valid in category %d\n", ans.c_str(), cat);
-            // }
+            if(checkAnswer(ans, cat))
+            {
+                printf("Answer '%s' is valid in category %d\n", ans.c_str(), cat);
+            }
+            else
+            {
+                printf("Answer '%s' is NOT valid in category %d\n", ans.c_str(), cat);
+            }
 
             // if (!ans.empty() && std::toupper(ans[0]) == currentLetter && checkAnswer(ans, cat))
             if (!ans.empty() && std::toupper(ans[0]) == currentLetter)
@@ -183,6 +188,7 @@ void Lobby::endRound()
 
             scores[cat][player] = pts;
         }
+        
     }
 
     // WYŚLIJ DO KLIENTÓW
@@ -195,6 +201,9 @@ void Lobby::endRound()
 
             writeAll("Score(" + std::to_string(cat) + "," +
                      std::to_string(pts) + "," + ans + ")\n");
+
+            write(playerFds[player], ("Points(" + std::to_string(pts) + ")\n").c_str(), ("Points(" + std::to_string(pts) + ")\n").size());
+                     
         }
 
     answers.clear(); // przygotowanie na kolejną rundę
@@ -220,7 +229,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, i
     case 1:
         if (command == "LobbyStart")
         {
-            if (playerFds.size() >= 1)
+            if (playerFds.size() >= 2)
             {
                 state = 2;
                 writeAll("Msg(Gra rozpoczeta!)\n");
@@ -233,24 +242,24 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, i
         }
         break;
 
-    case 2: // TRWA RUNDA
+    case 2: // TRWA RUNDA   Guess(category_id,answer)
         if (command == "Guess")
         {
             size_t commaPos = content.find(',');
             category = std::stoi(content.substr(0, commaPos));
             guess = content.substr(commaPos + 1);
-
             answers[category][index] = guess;
-
-            // if (!guess.empty() && std::toupper(guess[0]) == currentLetter && checkAnswer(guess, category))
-            if (!guess.empty() && std::toupper(guess[0]) == currentLetter)
+            
+            if (!guess.empty() && std::toupper(guess[0]) == currentLetter && checkAnswer(guess, category))
             {
-                writeAll("Msg(Poprawna odpowiedz: " + guess + ")\n");
+                write(client_fd, "Msg(Poprawna odpowiedz)\n", 25);
             }
             else
             {
-                writeAll("Msg(Niepoprawna odpowiedz: " + guess + ")\n");
+                write(client_fd, "Msg(Niepoprawna odpowiedz)\n", 28);
             }
+            std::cout << "Player " << index << " answered in category " << category << ": " << guess << "\n";
+        
         }
         break;
 

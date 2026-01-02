@@ -69,6 +69,8 @@ private:
     int maxPlayers;
     int id;
     int state;  // 1 - waiting for players, 2 - in game 3 - 10 seconds countdown 4 - finish
+    int maxRounds = 2;
+    int roundNumber{0};
 
 };
 

@@ -219,7 +219,7 @@ void handleParsedMessage(const Message &msg, int sock)
         timeRemaining = -1;
 
         std::cout << "\n===== KONIEC GRY =====\n";
-        std::cout << "   Gra zakończona po 10 rundach!\n";
+        std::cout << "   Gra zakończona po X rundach!\n";
         std::cout << "   Możesz wpisać LobbyStart() aby rozpocząć nową.\n";
         std::cout << "=======================\n\n";
 
@@ -235,11 +235,13 @@ void handleParsedMessage(const Message &msg, int sock)
 
 void printHelp(){
     std::string helpMsg = "Dostępne komendy:\n"
-                          " - JOIN_LOBBY(lobby_name) : Dołącz do lobby o podanej nazwie\n"
-                          " - CREATE_LOBBY(lobby_name) : Utwórz nowe lobby o podanej nazwie\n"
-                          " - LIST_LOBBIES() : Wyświetl listę dostępnych lobby\n"
+                          " - LobbyName(lobby_name) : Dołącz do lobby o podanej nazwie\n"
+                          " - CreateLobby(lobby_name) : Utwórz nowe lobby o podanej nazwie\n"
+                          " - ShowLobbies() : Wyświetl listę dostępnych lobby\n"
                           " - LobbyStart() : Rozpocznij grę w aktualnym lobby\n"
-                          " - HELP() : Wyświetl tę pomoc\n";
+                          " - HELP() : Wyświetl tę pomoc\n"
+                          " - Guess(category_id,answer) : Wyślij odpowiedź dla danej kategorii\n"
+                          " - exit : Zakończ działanie klienta\n\n";
 
     std::cout << helpMsg;
 }
