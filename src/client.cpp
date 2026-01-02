@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sstream>
+#include <sys/select.h>
 
 // =====================
 // STRUCT: parsed message
@@ -231,6 +232,18 @@ void handleParsedMessage(const Message &msg, int sock)
 // =====================
 // MAIN CLIENT
 // =====================
+
+void printHelp(){
+    std::string helpMsg = "Dostępne komendy:\n"
+                          " - JOIN_LOBBY(lobby_name) : Dołącz do lobby o podanej nazwie\n"
+                          " - CREATE_LOBBY(lobby_name) : Utwórz nowe lobby o podanej nazwie\n"
+                          " - LIST_LOBBIES() : Wyświetl listę dostępnych lobby\n"
+                          " - LobbyStart() : Rozpocznij grę w aktualnym lobby\n"
+                          " - HELP() : Wyświetl tę pomoc\n";
+
+    std::cout << helpMsg;
+}
+
 int main()
 {
     std::cout << "=== PAŃSTWA-MIASTA KLIENT ===\n";
@@ -244,7 +257,7 @@ int main()
 
     sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(1234);
+    serverAddr.sin_port = htons(12345);
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 
     if (connect(sock, (sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
@@ -255,59 +268,97 @@ int main()
 
     std::cout << "Połączono z serwerem!\n\n";
 
-    // =====================
-    // MAIN LOOP
-    // =====================
-
     std::string recvBuffer;
 
     while (true)
     {
-        // --- ODBIERANIE ---
-        char buffer[1024];
-        memset(buffer, 0, sizeof(buffer));
-        int bytes = recv(sock, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
+        fd_set readfds;
+        FD_ZERO(&readfds);
+        FD_SET(sock, &readfds);
+        FD_SET(STDIN_FILENO, &readfds);
 
-        if (bytes > 0)
+        int maxfd = sock + 1;
+
+        // Wait for activity on socket or stdin (with 100ms timeout)
+        struct timeval tv;
+        tv.tv_sec = 0;
+        tv.tv_usec = 100000; // 100ms
+
+        int activity = select(maxfd, &readfds, NULL, NULL, &tv);
+
+        if (activity < 0)
         {
-            buffer[bytes] = 0;
-            recvBuffer += buffer;
+            std::cerr << "Select error\n";
+            break;
+        }
 
-            // obsługa wielu linii naraz
-            size_t pos;
-            while ((pos = recvBuffer.find('\n')) != std::string::npos)
+        // Socket input
+        if (FD_ISSET(sock, &readfds))
+        {
+            char buffer[1024];
+            memset(buffer, 0, sizeof(buffer));
+            int bytes = recv(sock, buffer, sizeof(buffer) - 1, 0);
+
+            if (bytes > 0)
             {
-                std::string line = recvBuffer.substr(0, pos);
-                recvBuffer.erase(0, pos + 1);
+                buffer[bytes] = 0;
+                recvBuffer += buffer;
 
-                auto parsed = parseMessage(line);
-                if (parsed)
-                    handleParsedMessage(*parsed, sock);
-                else
-                    std::cout << "[RAW] " << line << "\n";
+                // obsługa wielu linii naraz
+                size_t pos;
+                while ((pos = recvBuffer.find('\n')) != std::string::npos)
+                {
+                    std::string line = recvBuffer.substr(0, pos);
+                    recvBuffer.erase(0, pos + 1);
+
+                    auto parsed = parseMessage(line);
+                    if (parsed)
+                        handleParsedMessage(*parsed, sock);
+                    else
+                        std::cout << "[RAW] " << line << "\n";
+                }
+            }
+            else if (bytes == 0)
+            {
+                std::cout << "Serwer zamknął połączenie\n";
+                break;
+            }
+            else
+            {
+                std::cerr << "Błąd odbioru\n";
+                break;
             }
         }
 
-        // --- WYSYŁANIE ---
-        std::string input;
-        if (std::getline(std::cin, input))
+        // Stdin input
+        if (FD_ISSET(STDIN_FILENO, &readfds))
         {
+            std::string input;
+            if (std::getline(std::cin, input))
+            {
+                if (input.empty())
+                    continue;
 
-            if (input.empty())
-                continue; // NIE wysyłaj pustych komend
-            if (input == "exit")
-                break;
+                else if (input == "exit")
+                    break;
 
-            input += "\n";
-            send(sock, input.c_str(), input.size(), 0);
-        }
+                else if (input == "HELP()" || input == "help()" || input == "Help()" || input == "help" || input == "Help" || input == "HELP")
+                {
+                    printHelp();
+                    continue;
+                }
+                    
+                else if (input == "LobbyStart()")
+                {
+                    input += "\n";
+                    send(sock, input.c_str(), input.size(), 0);
+                    std::cout << "[wysłano] LobbyStart()\n";
+                    continue;
+                }
 
-        // --- LOBBYSTART ---
-        if (input == "LobbyStart()")
-        {
-            send(sock, input.c_str(), input.size(), 0);
-            std::cout << "[wysłano] LobbyStart()\n";
-            continue;
+                input += "\n";
+                send(sock, input.c_str(), input.size(), 0);
+            }
         }
     }
 

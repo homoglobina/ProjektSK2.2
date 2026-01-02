@@ -56,7 +56,8 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
     decodeMessage(trimmed_msg, command, content);
 
     // std::string welcomeMsg = "Witaj, " + content + "!\n";
-    std::string welcomeMsg = "Witaj " + content + "!";
+    std::string welcomeMsg = "Witaj " + content + "! Użyje HELP by wyswietlic komendy \n";
+    
 
     std::cout << "\n==============================\n";
     std::cout << "Handling message from " << client_fd << ": \n'" << content << "'\n";
@@ -77,7 +78,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
         {
             // std::string response = "Nieprawidłowy format wiadomości, użyj Player_Name(<TwojaNazwa>): ";
             // write(client_fd, response.c_str(), response.size());
-            write(client_fd, "Error(\"Invalid_Format\")", 24);
+            write(client_fd, "Error(\"Invalid_Format\")\n", 25);
             return;
         }
         else
@@ -93,8 +94,9 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
             }
             if (content.empty() || hasWhitespace)
             {
+                std::cout << "Otrzymano nieprawidłową nazwę: " << content << "\n";
                 // Nazwa nie może być pusta ani zawierać białych znaków
-                write(client_fd, "Error(\"Invalid_Name\")", 22);
+                write(client_fd, "Error(\"Invalid_Name\")\n", 23);
                 return;
             }
         }
@@ -104,7 +106,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
             {
                 // std::string response = "Nazwa zajęta, wybierz inną: ";
                 // write(client_fd, response.c_str(), response.size());
-                write(client_fd, "Error(\"Taken_Name\")", 20);
+                write(client_fd, "Error(\"Taken_Name\")\n", 21);
                 return;
             }
         }
@@ -118,20 +120,34 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
         trimmed_msg = "Msg(" + welcomeMsg + ")\n";
         write(client_fd, trimmed_msg.c_str(), trimmed_msg.size());
 
+        // printHelp(client_fd);   
 
         break;
 
     case 1: //  Stan 1 - Wybór Lobby
         // printPlayers(client_fd);
-        printLobbies(client_fd);
-        if (command != "LobbyName")
+        // printLobbies(client_fd);
+
+        if (command == "CreateLobby")
+        {
+            createLobby(content);
+            std::string createdMsg = "Utworzono lobby: " + content + "\n";
+            write(client_fd, createdMsg.c_str(), createdMsg.size());
+            return;
+        }
+        else if (command != "LobbyName")
         {
             // std::string response = "Nieprawidłowy format wiadomości, użyj JOIN_LOBBY(<NazwaLobby>): ";
             // write(client_fd, response.c_str(), response.size());
-            write(client_fd, "Error(\"Invalid_Format\")", 24);
+            write(client_fd, "Error(\"Invalid_Format\")\n", 25);
             return;
         }
-
+        else if (command == "ShowLobbies")
+        {
+            printLobbies(client_fd);
+            return;
+        }
+        
         for (const auto &lobby : lobbyList)
         {
             if (lobby->getName() == content)
@@ -198,6 +214,7 @@ void Serwer::printPlayers(int client_fd)
         write(client_fd, playerInfo.c_str(), playerInfo.size());
     }
 }
+
 
 Serwer::Serwer(int port)
 {
@@ -388,12 +405,11 @@ void Serwer::run()
 
                 // write(cd, "Nawiązano połączenie\n", 23);
                 // write(cd, "Wybierz unikalne imie: ", 23);
-                write(cd, "Nawiązano połączenie\n",
-                      strlen("Nawiązano połączenie\n"));
+                write(cd, "Msg(Nawiązano połączenie)\n",
+                      strlen("Msg(Nawiązano połączenie)\n"));
 
-                write(cd, "Wybierz unikalne imie:\n",
-                      strlen("Wybierz unikalne imie:\n"));
-
+                write(cd, "Msg(Wybierz unikalne imie:)\n",
+                      strlen("Msg(Wybierz unikalne imie:)\n"));
                 continue;
             }
 

@@ -61,7 +61,7 @@ void Lobby::removePlayer(int playerFd)
 
 bool Lobby::checkAnswer(std::string &answer, int category)
 {
-    std::string file = "resources/" + std::to_string(category) + ".txt";
+    std::string file = "../resources/" + std::to_string(category) + ".txt";
     
     std::ifstream in(file);
     if (!in.is_open())
