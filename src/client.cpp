@@ -212,14 +212,38 @@ void handleParsedMessage(const Message &msg, int sock)
         return;
     }
 
-    // ===== PUNKTACJA =====
+    // ===== PUNKTACJA ZA RUNDĘ =====
     if (msg.command == "Score")
     {
         if (msg.args.size() >= 2)
-        {       // player, points,
-            std::cout << "[WYNIK] Gracz: "
+        {
+            std::cout << "[WYNIK RUNDY] Gracz: "
                       << msg.args[0] << " → +"
-                      << msg.args[1] << " pkt \n";
+                      << msg.args[1] << " pkt\n";
+        }
+        return;
+    }
+
+    // ===== SUMA PUNKTÓW =====
+    if (msg.command == "TotalScore")
+    {
+        if (msg.args.size() >= 2)
+        {
+            std::cout << "[SUMA] Gracz: "
+                      << msg.args[0] << " → "
+                      << msg.args[1] << " pkt (łącznie)\n";
+        }
+        return;
+    }
+
+    // ===== KOŃCOWE WYNIKI =====
+    if (msg.command == "FinalScore")
+    {
+        if (msg.args.size() >= 3)
+        {
+            std::cout << "[" << msg.args[0] << " miejsce] "
+                      << msg.args[1] << " → "
+                      << msg.args[2] << " pkt\n";
         }
         return;
     }
@@ -233,8 +257,8 @@ void handleParsedMessage(const Message &msg, int sock)
         timeRemaining = -1;
 
         std::cout << "\n===== KONIEC GRY =====\n";
-        std::cout << "   Gra zakończona po X rundach!\n";
-        std::cout << "   Możesz wpisać LobbyStart() aby rozpocząć nową.\n";
+        std::cout << "   Gratulacje wszystkim graczom!\n";
+        std::cout << "   Możesz wpisać LobbyStart() aby rozpocząć nową grę.\n";
         std::cout << "=======================\n\n";
 
         return;

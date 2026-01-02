@@ -7,7 +7,8 @@
 #include <vector>
 #include <unordered_map>
 #include <sys/timerfd.h>
-//  Przetrzymuje informacje o graczach, lobby i nawiązuje połączenia
+#include <map>
+
 
 class Lobby;
 class Gracz;
@@ -54,6 +55,7 @@ public:
     void startTimer(int seconds);
     bool checkAnswer(std::string& answer, int category);
     void gameLogic(std::string command, std::string content, int client_fd, Gracz& player);  
+    void sendGameStateToPlayer(Gracz* player);  
     
     void startRound();
     void endRound();
@@ -62,7 +64,8 @@ public:
 
 private:
     std::vector<int> categories;
-    std::vector<Gracz*> players;  // Changed from playerFds to players
+    std::vector<Gracz*> players;
+    std::map<std::string, int> totalScores; // Player name -> total score across all rounds
     char currentLetter;
     std::string name;
     int timer_fd;

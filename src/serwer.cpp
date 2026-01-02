@@ -142,6 +142,10 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
                     lobbyList[lobbyID]->addPlayer(&player);
 
                     player.setState(2);
+                    
+                    // Send current game state to the new player
+                    lobbyList[lobbyID]->sendGameStateToPlayer(&player);
+                    
                     std::cout << "Gracz " << player.getName() << " dołączył do lobby " << content << "\n";
                     std::cout << "Lobby gracza : " << player.getCurrentLobbyID() << "\n";
 
