@@ -78,38 +78,40 @@ void sendGuess(int sock, int categoryId, const std::string &answer)
 // =====================
 // Round input
 // =====================
-void runRoundInput(int sock)
-{
-    if (currentCategories.empty() || currentLetter.empty())
-    {
-        std::cout << "[błąd] brak danych rundy (Category/Letter)\n";
-        return;
-    }
+// void runRoundInput(int sock)
+// {
+//     if (currentCategories.empty() || currentLetter.empty())
+//     {
+//         std::cout << "[błąd] brak danych rundy (Category/Letter)\n";
+//         return;
+//     }
 
-    std::cout << "\n=== ROZPOCZĘCIE RUNDY ===\n";
-    std::cout << "Litera: " << currentLetter << "\nKategorie:";
-    for (auto c : currentCategories)
-        std::cout << " " << c;
-    std::cout << "\n\n";
+//     std::cout << "\n=== ROZPOCZĘCIE RUNDY ===\n";
+//     std::cout << "Litera: " << currentLetter << "\nKategorie:";
+//     for (auto c : currentCategories)
+//         std::cout << " " << c;
+//     std::cout << "\n\n";
 
-    for (auto cat : currentCategories)
-    {
-        std::string answer;
-        std::cout << "[kategoria " << cat << "][" << currentLetter << "] > ";
-        std::getline(std::cin, answer);
+//     for (auto cat : currentCategories)
+//     {
+//         std::string answer;
+//         std::cout << "[kategoria " << cat << "][" << currentLetter << "] > ";
+//         std::getline(std::cin, answer);
 
-        if (!answer.empty())
-        {
-            sendGuess(sock, cat, answer);
-        }
-        else
-        {
-            std::cout << "[INFO] pomijam pustą odpowiedź\n";
-        }
-    }
+//         if (!answer.empty())
+//         {
+//             sendGuess(sock, cat, answer);
+//         }
+//         else
+//         {
+//             std::cout << "[INFO] pomijam pustą odpowiedź\n";
+//         }
+//     }
 
-    std::cout << "=== KONIEC ODPOWIEDZI — czekam na wyniki ===\n";
-}
+//     std::cout << "=== KONIEC ODPOWIEDZI — czekam na wyniki ===\n";
+// }
+
+
 
 // =====================
 // HANDLE SERVER MESSAGE
@@ -141,7 +143,20 @@ void handleParsedMessage(const Message &msg, int sock)
             roundActive = true;
             std::cout << "[KATEGORIE] ";
             for (auto c : currentCategories)
-                std::cout << c << " ";
+            {
+                std::string catName;
+                switch (c)
+                {
+                    case 1: catName = "Państwa"; break;
+                    case 2: catName = "Miasta (PL)"; break;
+                    case 3: catName = "Miasta (świat)"; break;
+                    case 4: catName = "Jeziora"; break;
+                    case 5: catName = "Owoce/warzywa"; break;
+                    case 6: catName = "Imiona"; break;
+                    default: catName = "Kategoria " + std::to_string(c); break;
+                }
+                std::cout << c << " (" << catName << ") ";
+            }
             std::cout << "\n";
         }
         return;
@@ -167,11 +182,11 @@ void handleParsedMessage(const Message &msg, int sock)
             std::cout << "[CZAS] " << timeRemaining << " sekund\n";
         }
 
-        // START RUNDY — gdy mamy dane
-        if (roundActive && !currentLetter.empty() && timeRemaining == 60)
-        {
-            runRoundInput(sock);
-        }
+        // // START RUNDY — gdy mamy dane
+        // if (roundActive && !currentLetter.empty() && timeRemaining == 60)
+        // {
+        //     // runRoundInput(sock);
+        // }
         return;
     }
 
@@ -193,19 +208,18 @@ void handleParsedMessage(const Message &msg, int sock)
     if (msg.command == "RoundEnd")
     {
         roundActive = false;
-        std::cout << "\n=== KONIEC RUNDY ===\n";
+        std::cout << "\n\n=== KONIEC RUNDY ===\n";
         return;
     }
 
     // ===== PUNKTACJA =====
     if (msg.command == "Score")
     {
-        if (msg.args.size() >= 3)
-        {
-            std::cout << "[WYNIK] kategoria "
+        if (msg.args.size() >= 2)
+        {       // player, points,
+            std::cout << "[WYNIK] Gracz: "
                       << msg.args[0] << " → +"
-                      << msg.args[1] << " pkt ("
-                      << msg.args[2] << ")\n";
+                      << msg.args[1] << " pkt \n";
         }
         return;
     }
@@ -229,9 +243,6 @@ void handleParsedMessage(const Message &msg, int sock)
     std::cout << "[NIEZNANE] " << msg.command << "\n";
 }
 
-// =====================
-// MAIN CLIENT
-// =====================
 
 void printHelp(){
     std::string helpMsg = "Dostępne komendy:\n"
@@ -245,6 +256,10 @@ void printHelp(){
 
     std::cout << helpMsg;
 }
+
+// =====================
+// MAIN CLIENT
+// =====================
 
 int main()
 {

@@ -44,40 +44,34 @@ void Serwer::createLobby(std::string lobbyName)
     std::cout << std::setw(16) << "Utworzono nowe lobby: " << lobbyName << "\n";
 }
 
-void Serwer::handleClientMessage(int client_fd, const std::string &msg, int index)
+void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& player)
 {
-    // Placeholder for handling client messages
     std::string trimmed_msg = msg;
-    trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1); // Trim newline characters
+    trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1);
 
-    int labelWidth = 15; // Set a consistent width for all labels
+    int labelWidth = 15;
     int lobbyID;
     std::string command, content;
     decodeMessage(trimmed_msg, command, content);
 
-    // std::string welcomeMsg = "Witaj, " + content + "!\n";
     std::string welcomeMsg = "Witaj " + content + "!";
-    
 
     std::cout << "\n==============================\n";
     std::cout << "Handling message from " << client_fd << ": \n'" << content << "'\n";
 
-    std::cout << std::left << std::setw(labelWidth) << "Player index:" << index << ",\n";
-    std::cout << std::left << std::setw(labelWidth) << "Name:" << playerList[index].getName() << ",\n";
-    std::cout << std::left << std::setw(labelWidth) << "State:" << playerList[index].getState() << "\n";
+    std::cout << std::left << std::setw(labelWidth) << "Player index:" << player.getNr() << ",\n";
+    std::cout << std::left << std::setw(labelWidth) << "Name:" << player.getName() << ",\n";
+    std::cout << std::left << std::setw(labelWidth) << "State:" << player.getState() << "\n";
 
     std::cout << "==============================\n";
 
     std::cout << "Decoded Command: '" << command << "', Content: '" << content << "'\n";
 
-    switch (playerList[index].getState())
+    switch (player.getState())
     {
-
-    case 0: // Stan 0 - Wybór nazwy
+    case 0:
         if (command != "PlayerName")
         {
-            // std::string response = "Nieprawidłowy format wiadomości, użyj Player_Name(<TwojaNazwa>): ";
-            // write(client_fd, response.c_str(), response.size());
             write(client_fd, "Error(\"Invalid_Format\")\n", 25);
             return;
         }
@@ -95,39 +89,28 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
             if (content.empty() || hasWhitespace)
             {
                 std::cout << "Otrzymano nieprawidłową nazwę: " << content << "\n";
-                // Nazwa nie może być pusta ani zawierać białych znaków
                 write(client_fd, "Error(\"Invalid_Name\")\n", 23);
                 return;
             }
         }
-        for (auto player : playerList)
+        for (auto& p : playerList)
         {
-            if (player.getName() == content)
+            if (p.getName() == content)
             {
-                // std::string response = "Nazwa zajęta, wybierz inną: ";
-                // write(client_fd, response.c_str(), response.size());
                 write(client_fd, "Error(\"Taken_Name\")\n", 21);
                 return;
             }
         }
         std::cout << "Ustawianie nazwy gracza " << client_fd << " na " << content << "\n";
-        playerList[index].setName(content);
-        playerList[index].setState(1);
-
-        // trimmed_msg = std::string("Msg(") + welcomeMsg +")\n";
-        // write(client_fd, trimmed_msg.c_str(), trimmed_msg.size());
+        player.setName(content);
+        player.setState(1);
 
         trimmed_msg = "Msg(" + welcomeMsg + ")\n";
         write(client_fd, trimmed_msg.c_str(), trimmed_msg.size());
 
-        // printHelp(client_fd);   
-
         break;
 
-    case 1: //  Stan 1 - Wybór Lobby
-        // printPlayers(client_fd);
-        // printLobbies(client_fd);
-
+    case 1:
         if (command == "CreateLobby")
         {
             createLobby(content);
@@ -142,8 +125,6 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
         }
         else if (command != "LobbyName")
         {
-            // std::string response = "Nieprawidłowy format wiadomości, użyj JOIN_LOBBY(<NazwaLobby>): ";
-            // write(client_fd, response.c_str(), response.size());
             write(client_fd, "Error(\"Invalid_Format\")\n", 25);
             return;
         }
@@ -156,15 +137,13 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
                     std::string joinMsg = "Dołączyłeś do lobby: " + content + "\n";
                     write(client_fd, joinMsg.c_str(), joinMsg.size());
 
-                    // logika dołączania do lobby
-
                     lobbyID = lobbyName_to_id[content];
-                    playerList[index].setCurrentLobbyID(lobbyID);
-                    lobbyList[lobbyID]->addPlayer(client_fd);
+                    player.setCurrentLobbyID(lobbyID);
+                    lobbyList[lobbyID]->addPlayer(&player);
 
-                    playerList[index].setState(2);
-                    std::cout << "Gracz " << playerList[index].getName() << " dołączył do lobby " << content << "\n";
-                    std::cout << "Lobby gracza : " << playerList[index].getCurrentLobbyID() << "\n";
+                    player.setState(2);
+                    std::cout << "Gracz " << player.getName() << " dołączył do lobby " << content << "\n";
+                    std::cout << "Lobby gracza : " << player.getCurrentLobbyID() << "\n";
 
                     return;
                 }
@@ -176,17 +155,9 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, int inde
             break;
         }
 
-
-    // Stan 2 - Rozgrywka w lobby
     case 2:
-        // lobbyID = lobbyName_to_id[content];
-        // lobbyList[lobbyID]; // access the lobby object
-        lobbyID = playerList[index].getCurrentLobbyID();
-        lobbyList[lobbyID]->gameLogic(command, content, client_fd, index);
-
-        // test
-        // lobbyList[lobbyID]->startTimer(10); // access the lobby object
-
+        lobbyID = player.getCurrentLobbyID();
+        lobbyList[lobbyID]->gameLogic(command, content, client_fd, player);
         break;
 
     default:
@@ -268,7 +239,7 @@ Serwer::Serwer(int port)
 void Serwer::run()
 {
     struct epoll_event events[MAX_EVENTS];
-    std::unordered_map<int, size_t> fd_to_index; // Track fd -> player index
+    std::unordered_map<int, size_t> fd_to_index;
 
     while (true)
     {
@@ -388,7 +359,7 @@ void Serwer::run()
             auto it = fd_to_index.find(client_fd);
             if (it != fd_to_index.end())
             {
-                handleClientMessage(client_fd, std::string(buffer, n), it->second);
+                handleClientMessage(client_fd, std::string(buffer, n), playerList[it->second]);
             }
         }
     }

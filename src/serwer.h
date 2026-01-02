@@ -20,7 +20,7 @@ public:
     Serwer(int port);
     ~Serwer();
     void run();
-    void handleClientMessage(int client_fd, const std::string& msg, int index );
+    void handleClientMessage(int client_fd, const std::string& msg, Gracz& player);
     void printLobbies(int client_fd);
     void printPlayers(int client_fd);
     // void broadcastToLobby(int lobbyID, const std::string& message);
@@ -45,7 +45,7 @@ public:
     void writeAll(const std::string& message);
     void writeAllExcept(int exceptFd, const std::string& message);
     void printPlayers();
-    void addPlayer(int playerFd) { playerFds.push_back(playerFd); }
+    void addPlayer(Gracz* player) { players.push_back(player); }
     void removePlayer(int playerFd);
     std::string getName() const { return name; }
     int getMaxPlayers() const;
@@ -53,7 +53,7 @@ public:
     int getTimerFd() const { return timer_fd; }
     void startTimer(int seconds);
     bool checkAnswer(std::string& answer, int category);
-    void gameLogic(std::string command, std::string content, int client_fd, int index);  
+    void gameLogic(std::string command, std::string content, int client_fd, Gracz& player);  
     
     void startRound();
     void endRound();
@@ -62,7 +62,7 @@ public:
 
 private:
     std::vector<int> categories;
-    std::vector<int> playerFds;
+    std::vector<Gracz*> players;  // Changed from playerFds to players
     char currentLetter;
     std::string name;
     int timer_fd;
