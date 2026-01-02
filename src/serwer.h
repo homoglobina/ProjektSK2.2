@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <sys/timerfd.h>
 #include <map>
+#include <chrono>
 
 
 class Lobby;
@@ -60,19 +61,25 @@ public:
     void startRound();
     void endRound();
     void gameFinished();
-
+    void setRoundTime(int seconds) { roundTime = seconds; }
+    void setMaxRounds(int rounds) { maxRounds = rounds; }
+    void setCategories(const std::vector<int>& cats) { categories = cats; }
+    Gracz* getAdmin() const { return admin; }
+    void updateAdmin();
 
 private:
     std::vector<int> categories;
     std::vector<Gracz*> players;
     std::map<std::string, int> totalScores; // Player name -> total score across all rounds
+    Gracz* admin; // First player who joined (among remaining players)
     char currentLetter;
     std::string name;
     int timer_fd;
     int maxPlayers;
     int id;
     int state;  // 1 - waiting for players, 2 - in game 3 - 10 seconds countdown 4 - finish
-    int maxRounds = 2;
+    int maxRounds;
+    int roundTime; // Time per round in seconds
     int roundNumber{0};
 
 };

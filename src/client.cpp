@@ -53,6 +53,8 @@ std::string currentLetter;
 std::vector<int> currentCategories;
 int timeRemaining = -1;
 bool roundActive = false;
+bool isAdmin = false;
+std::string adminName;
 
 std::vector<int> parseCategories(const std::string &s)
 {
@@ -264,18 +266,36 @@ void handleParsedMessage(const Message &msg, int sock)
         return;
     }
 
+    // Admin notification
+    if (msg.command == "Admin")
+    {
+        if (!msg.args.empty())
+        {
+            adminName = msg.args[0];
+            std::cout << "[ADMIN] Administrator lobby: " << adminName << "\n";
+        }
+        return;
+    }
+
     std::cout << "[NIEZNANE] " << msg.command << "\n";
 }
 
 
 void printHelp(){
     std::string helpMsg = "Dostępne komendy:\n"
+                          " - PlayerName(name) : Ustaw swoją nazwę\n"
                           " - LobbyName(lobby_name) : Dołącz do lobby o podanej nazwie\n"
                           " - CreateLobby(lobby_name) : Utwórz nowe lobby o podanej nazwie\n"
                           " - ShowLobbies() : Wyświetl listę dostępnych lobby\n"
                           " - LobbyStart() : Rozpocznij grę w aktualnym lobby\n"
-                          " - HELP() : Wyświetl tę pomoc\n"
                           " - Guess(category_id,answer) : Wyślij odpowiedź dla danej kategorii\n"
+                          "\nKomendy administratora (tylko przed rozpoczęciem gry):\n"
+                          " - SetTime(seconds) : Ustaw czas rundy (10-300 sekund)\n"
+                          " - SetRounds(number) : Ustaw liczbę rund (1-10)\n"
+                          " - SetCategories(categories) : Ustaw kategorie (np. 123)\n"
+                          "   Kategorie: 1=Państwa, 2=Miasta(PL), 3=Miasta(świat),\n"
+                          "              4=Jeziora, 5=Owoce/warzywa, 6=Imiona\n"
+                          "\n - HELP() : Wyświetl tę pomoc\n"
                           " - exit : Zakończ działanie klienta\n\n";
 
     std::cout << helpMsg;

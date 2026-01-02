@@ -13,8 +13,11 @@ std::map<int, std::map<std::string, std::string>> answers;
 Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlayers(10), id(id)
 {
     timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-    state = 1; // initial state - waiting for players
-    categories = {1, 2, 3}; // default categories
+    state = 1;
+    categories = {1, 2, 3};
+    maxRounds = 2;
+    roundTime = 60;
+    admin = nullptr;
 }
 
 Lobby::~Lobby() {}
@@ -53,11 +56,42 @@ void Lobby::removePlayer(int playerFd)
     for (auto it = players.begin(); it != players.end(); ++it)
         if ((*it)->getFd() == playerFd)
         {
+            // Check if removed player was admin
+            bool wasAdmin = (*it == admin);
             players.erase(it);
+            
+            // Update admin if necessary
+            if (wasAdmin)
+                updateAdmin();
+            
             break;
         }
 }
 
+// =========================
+// UPDATE ADMIN
+// =========================
+void Lobby::updateAdmin()
+{
+    if (players.empty())
+    {
+        admin = nullptr;
+        return;
+    }
+    
+    // Set first player as admin
+    admin = players[0];
+    
+    std::string adminMsg = "Admin(" + admin->getName() + ")\n";
+    writeAll(adminMsg);
+    
+    write(admin->getFd(), "Msg(Jesteś administratorem lobby!)\n", 36);
+    std::cout << "New admin in lobby " << name << ": " << admin->getName() << "\n";
+}
+
+// =========================
+// SPRAWDZENIE ODPOWIEDZI
+// =========================
 bool Lobby::checkAnswer(std::string &answer, int category)
 {
     std::string file = "../resources/" + std::to_string(category) + ".txt";
@@ -111,10 +145,27 @@ void Lobby::sendGameStateToPlayer(Gracz* player)
         totalScores[player->getName()] = 0;
     }
     
+    // Send admin info
+    if (admin)
+    {
+        std::string adminMsg = "Admin(" + admin->getName() + ")\n";
+        write(playerFd, adminMsg.c_str(), adminMsg.size());
+        
+        if (player == admin)
+        {
+            write(playerFd, "Msg(Jesteś administratorem lobby!)\n", 36);
+        }
+    }
+    
     if (state == 1)
     {
         // Waiting for players
         write(playerFd, "Msg(Oczekiwanie na rozpoczęcie gry)\n", 37);
+        
+        // Send current settings
+        std::string settingsMsg = "Msg(Ustawienia: " + std::to_string(maxRounds) + 
+                                  " rund, " + std::to_string(roundTime) + "s na rundę)\n";
+        write(playerFd, settingsMsg.c_str(), settingsMsg.size());
         
         // Send current player list
         std::string playersList = "Msg(Gracze w lobby: ";
@@ -192,9 +243,9 @@ void Lobby::startRound()
     
     writeAll("Category(" + categoriesStr + ")\n");
     writeAll("Letter(" + std::string(1, currentLetter) + ")\n");
-    writeAll("Time(60)\n");
+    writeAll("Time(" + std::to_string(roundTime) + ")\n");
 
-    startTimer(60);
+    startTimer(roundTime);
 }
 
 // =========================
@@ -316,6 +367,89 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
     switch (state)
     {
     case 1:
+        // Admin commands - only work in waiting state
+        if (command == "SetTime")
+        {
+            if (&player != admin)
+            {
+                write(client_fd, "Msg(Tylko administrator może zmieniać ustawienia)\n", 51);
+                return;
+            }
+            
+            int newTime = std::stoi(content);
+            if (newTime < 10 || newTime > 300)
+            {
+                write(client_fd, "Msg(Czas musi być między 10 a 300 sekund)\n", 44);
+                return;
+            }
+            
+            setRoundTime(newTime);
+            std::string msg = "Msg(Czas rundy ustawiony na " + std::to_string(newTime) + "s)\n";
+            writeAll(msg);
+            std::cout << "Admin " << player.getName() << " set round time to " << newTime << "s\n";
+            return;
+        }
+        
+        if (command == "SetRounds")
+        {
+            if (&player != admin)
+            {
+                write(client_fd, "Msg(Tylko administrator może zmieniać ustawienia)\n", 51);
+                return;
+            }
+            
+            int newRounds = std::stoi(content);
+            if (newRounds < 1 || newRounds > 10)
+            {
+                write(client_fd, "Msg(Liczba rund musi być między 1 a 10)\n", 42);
+                return;
+            }
+            
+            setMaxRounds(newRounds);
+            std::string msg = "Msg(Liczba rund ustawiona na " + std::to_string(newRounds) + ")\n";
+            writeAll(msg);
+            std::cout << "Admin " << player.getName() << " set rounds to " << newRounds << "\n";
+            return;
+        }
+        
+        if (command == "SetCategories")
+        {
+            if (&player != admin)
+            {
+                write(client_fd, "Msg(Tylko administrator może zmieniać ustawienia)\n", 51);
+                return;
+            }
+            
+            // Parse categories: "1,2,3" or "123"
+            std::vector<int> newCategories;
+            for (char c : content)
+            {
+                if (c >= '1' && c <= '6')
+                {
+                    newCategories.push_back(c - '0');
+                }
+            }
+            
+            if (newCategories.empty())
+            {
+                write(client_fd, "Msg(Nieprawidłowe kategorie. Użyj liczb od 1 do 6)\n", 54);
+                return;
+            }
+            
+            setCategories(newCategories);
+            
+            std::string catStr;
+            for (int cat : newCategories)
+                catStr += std::to_string(cat) + ",";
+            if (!catStr.empty())
+                catStr.pop_back();
+            
+            std::string msg = "Msg(Kategorie ustawione na: " + catStr + ")\n";
+            writeAll(msg);
+            std::cout << "Admin " << player.getName() << " set categories to " << catStr << "\n";
+            return;
+        }
+        
         if (command == "LobbyStart")
         {
             if (players.size() >= 2)
@@ -329,7 +463,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                     totalScores[p->getName()] = 0;
                 }
                 
-                roundNumber = 0; // Reset round counter
+                roundNumber = 0;
                 writeAll("Msg(Gra rozpoczeta!)\n");
                 startRound();
             }

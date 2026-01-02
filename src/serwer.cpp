@@ -139,7 +139,13 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
 
                     lobbyID = lobbyName_to_id[content];
                     player.setCurrentLobbyID(lobbyID);
+                    
+                    // Add player and update admin if needed
                     lobbyList[lobbyID]->addPlayer(&player);
+                    if (lobbyList[lobbyID]->getAdmin() == nullptr)
+                    {
+                        lobbyList[lobbyID]->updateAdmin();
+                    }
 
                     player.setState(2);
                     
