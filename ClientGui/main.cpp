@@ -1,15 +1,7 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <optional>
-#include <cstring>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <sstream>
 #include <sys/select.h>
-
-
 #include "mywidget.h"
 #include <QApplication>
 

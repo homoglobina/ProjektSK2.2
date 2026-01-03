@@ -320,7 +320,7 @@
  mdp:/usr/include/linux/types.h
  mdp:/usr/include/locale.h
  mdp:/usr/include/pthread.h
- mdp:/usr/include/qt6/QtCore/QTimer
+ mdp:/usr/include/qt6/QtCore/QTime
  mdp:/usr/include/qt6/QtCore/q17memory.h
  mdp:/usr/include/qt6/QtCore/q20functional.h
  mdp:/usr/include/qt6/QtCore/q20iterator.h
@@ -329,7 +329,6 @@
  mdp:/usr/include/qt6/QtCore/q20utility.h
  mdp:/usr/include/qt6/QtCore/q23type_traits.h
  mdp:/usr/include/qt6/QtCore/q23utility.h
- mdp:/usr/include/qt6/QtCore/qabstracteventdispatcher.h
  mdp:/usr/include/qt6/QtCore/qalgorithms.h
  mdp:/usr/include/qt6/QtCore/qalloc.h
  mdp:/usr/include/qt6/QtCore/qanystringview.h
@@ -340,12 +339,12 @@
  mdp:/usr/include/qt6/QtCore/qatomic.h
  mdp:/usr/include/qt6/QtCore/qatomic_cxx11.h
  mdp:/usr/include/qt6/QtCore/qbasicatomic.h
- mdp:/usr/include/qt6/QtCore/qbasictimer.h
  mdp:/usr/include/qt6/QtCore/qbindingstorage.h
  mdp:/usr/include/qt6/QtCore/qbytearray.h
  mdp:/usr/include/qt6/QtCore/qbytearrayalgorithms.h
  mdp:/usr/include/qt6/QtCore/qbytearraylist.h
  mdp:/usr/include/qt6/QtCore/qbytearrayview.h
+ mdp:/usr/include/qt6/QtCore/qcalendar.h
  mdp:/usr/include/qt6/QtCore/qchar.h
  mdp:/usr/include/qt6/QtCore/qcheckedint_impl.h
  mdp:/usr/include/qt6/QtCore/qcompare.h
@@ -360,10 +359,9 @@
  mdp:/usr/include/qt6/QtCore/qcontiguouscache.h
  mdp:/usr/include/qt6/QtCore/qdarwinhelpers.h
  mdp:/usr/include/qt6/QtCore/qdatastream.h
- mdp:/usr/include/qt6/QtCore/qdeadlinetimer.h
+ mdp:/usr/include/qt6/QtCore/qdatetime.h
  mdp:/usr/include/qt6/QtCore/qdebug.h
  mdp:/usr/include/qt6/QtCore/qendian.h
- mdp:/usr/include/qt6/QtCore/qeventloop.h
  mdp:/usr/include/qt6/QtCore/qexceptionhandling.h
  mdp:/usr/include/qt6/QtCore/qflags.h
  mdp:/usr/include/qt6/QtCore/qfloat16.h
@@ -382,6 +380,7 @@
  mdp:/usr/include/qt6/QtCore/qlatin1stringview.h
  mdp:/usr/include/qt6/QtCore/qline.h
  mdp:/usr/include/qt6/QtCore/qlist.h
+ mdp:/usr/include/qt6/QtCore/qlocale.h
  mdp:/usr/include/qt6/QtCore/qlogging.h
  mdp:/usr/include/qt6/QtCore/qmalloc.h
  mdp:/usr/include/qt6/QtCore/qmap.h
@@ -437,7 +436,6 @@
  mdp:/usr/include/qt6/QtCore/qtenvironmentvariables.h
  mdp:/usr/include/qt6/QtCore/qtextstream.h
  mdp:/usr/include/qt6/QtCore/qtformat_impl.h
- mdp:/usr/include/qt6/QtCore/qtimer.h
  mdp:/usr/include/qt6/QtCore/qtmetamacros.h
  mdp:/usr/include/qt6/QtCore/qtnoop.h
  mdp:/usr/include/qt6/QtCore/qtpreprocessorsupport.h
@@ -479,13 +477,13 @@
  mdp:/usr/include/qt6/QtGui/qtguiglobal.h
  mdp:/usr/include/qt6/QtGui/qtransform.h
  mdp:/usr/include/qt6/QtGui/qwindowdefs.h
- mdp:/usr/include/qt6/QtNetwork/QUdpSocket
+ mdp:/usr/include/qt6/QtNetwork/QTcpSocket
  mdp:/usr/include/qt6/QtNetwork/qabstractsocket.h
  mdp:/usr/include/qt6/QtNetwork/qhostaddress.h
+ mdp:/usr/include/qt6/QtNetwork/qtcpsocket.h
  mdp:/usr/include/qt6/QtNetwork/qtnetwork-config.h
  mdp:/usr/include/qt6/QtNetwork/qtnetworkexports.h
  mdp:/usr/include/qt6/QtNetwork/qtnetworkglobal.h
- mdp:/usr/include/qt6/QtNetwork/qudpsocket.h
  mdp:/usr/include/qt6/QtWidgets/QWidget
  mdp:/usr/include/qt6/QtWidgets/qsizepolicy.h
  mdp:/usr/include/qt6/QtWidgets/qtwidgets-config.h

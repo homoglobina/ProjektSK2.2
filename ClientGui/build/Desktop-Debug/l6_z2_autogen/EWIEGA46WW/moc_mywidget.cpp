@@ -38,10 +38,33 @@ template <> constexpr inline auto MyWidget::qt_create_metaobjectdata<qt_meta_tag
 {
     namespace QMC = QtMocConstants;
     QtMocHelpers::StringRefStorage qt_stringData {
-        "MyWidget"
+        "MyWidget",
+        "joinBtnHit",
+        "",
+        "sendBtnHit",
+        "onConnected",
+        "onDisconnected",
+        "onReadyRead",
+        "onErrorOccurred",
+        "QAbstractSocket::SocketError",
+        "socketError"
     };
 
     QtMocHelpers::UintData qt_methods {
+        // Slot 'joinBtnHit'
+        QtMocHelpers::SlotData<void()>(1, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'sendBtnHit'
+        QtMocHelpers::SlotData<void()>(3, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onConnected'
+        QtMocHelpers::SlotData<void()>(4, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onDisconnected'
+        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onReadyRead'
+        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onErrorOccurred'
+        QtMocHelpers::SlotData<void(QAbstractSocket::SocketError)>(7, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 8, 9 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -63,10 +86,29 @@ Q_CONSTINIT const QMetaObject MyWidget::staticMetaObject = { {
 void MyWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     auto *_t = static_cast<MyWidget *>(_o);
-    (void)_t;
-    (void)_c;
-    (void)_id;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: _t->joinBtnHit(); break;
+        case 1: _t->sendBtnHit(); break;
+        case 2: _t->onConnected(); break;
+        case 3: _t->onDisconnected(); break;
+        case 4: _t->onReadyRead(); break;
+        case 5: _t->onErrorOccurred((*reinterpret_cast<std::add_pointer_t<QAbstractSocket::SocketError>>(_a[1]))); break;
+        default: ;
+        }
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        switch (_id) {
+        default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
+        case 5:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
+            case 0:
+                *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType::fromType< QAbstractSocket::SocketError >(); break;
+            }
+            break;
+        }
+    }
 }
 
 const QMetaObject *MyWidget::metaObject() const
@@ -85,6 +127,18 @@ void *MyWidget::qt_metacast(const char *_clname)
 int MyWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 6)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 6;
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 6)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 6;
+    }
     return _id;
 }
 QT_WARNING_POP

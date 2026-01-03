@@ -1,9 +1,9 @@
 #ifndef MYWIDGET_H
 #define MYWIDGET_H
 
-#include <QTimer>
-#include <QUdpSocket>
 #include <QWidget>
+#include <QTcpSocket>
+#include <QTime>
 
 namespace Ui {
 class MyWidget;
@@ -12,19 +12,28 @@ class MyWidget;
 class MyWidget : public QWidget {
     Q_OBJECT
 
-  public:
+public:
     explicit MyWidget(QWidget *parent = 0);
     ~MyWidget();
 
-  protected:
-    QUdpSocket *sock;
+private slots:
     void joinBtnHit();
-    void socketError(QUdpSocket::SocketError);
     void sendBtnHit();
-    /* TODO: dodać funkcję obsługującą pojawienie się danych do odbioru (o ile nie będzie użyta do tego lambda)*/
 
-  private:
+
+    void onConnected();
+    void onDisconnected();
+    void onReadyRead();
+    void onErrorOccurred(QAbstractSocket::SocketError socketError);
+
+private:
     Ui::MyWidget *ui;
+    QTcpSocket *sock;
+    QString buffer;
+
+
+    void handleMessage(const QString &command, const QStringList &args);
+    void logToGui(const QString &text, const QString &color = "black");
 };
 
 #endif // MYWIDGET_H
