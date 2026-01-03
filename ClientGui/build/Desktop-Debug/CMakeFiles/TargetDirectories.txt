@@ -1,0 +1,5 @@
+/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/l6_z2.dir
+/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/edit_cache.dir
+/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/rebuild_cache.dir
+/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/l6_z2_autogen_timestamp_deps.dir
+/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/l6_z2_autogen.dir

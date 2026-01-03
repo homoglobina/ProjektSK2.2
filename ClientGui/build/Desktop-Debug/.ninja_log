@@ -1,0 +1,9 @@
+# ninja log v7
+1	243	1767442143311445072	l6_z2_autogen/timestamp	2a27ea08636ed99c
+1	243	1767442143311445072	l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+1	243	1767442143311445072	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/timestamp	2a27ea08636ed99c
+1	243	1767442143311445072	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+244	2357	1767442143322617713	CMakeFiles/l6_z2.dir/mywidget.cpp.o	4b37f06ac3f484a5
+244	2375	1767442143321880040	CMakeFiles/l6_z2.dir/l6_z2_autogen/mocs_compilation.cpp.o	c40f8ce8d5ba3829
+244	2526	1767442143322725016	CMakeFiles/l6_z2.dir/main.cpp.o	35ffec499d4aba01
+2527	2756	1767442145604437923	l6_z2	a5934665143d74d5
