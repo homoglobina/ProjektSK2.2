@@ -29,7 +29,7 @@ class Ui_MyWidget
 public:
     QVBoxLayout *verticalLayout;
     QTabWidget *tabWidget;
-    QWidget *tab_7;
+    QWidget *tab_login;
     QGroupBox *joinGroup;
     QHBoxLayout *horizontalLayout;
     QLineEdit *groupLineEdit;
@@ -40,30 +40,36 @@ public:
     QPushButton *sendBtn;
     QLineEdit *msgLineEdit;
     QTextEdit *msgsTextEdit;
-    QWidget *tab_8;
+    QWidget *tab_lobbies;
+    QWidget *tab_Game;
 
     void setupUi(QWidget *MyWidget)
     {
         if (MyWidget->objectName().isEmpty())
             MyWidget->setObjectName("MyWidget");
-        MyWidget->resize(609, 435);
+        MyWidget->resize(421, 368);
         verticalLayout = new QVBoxLayout(MyWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName("verticalLayout");
         tabWidget = new QTabWidget(MyWidget);
         tabWidget->setObjectName("tabWidget");
-        tab_7 = new QWidget();
-        tab_7->setObjectName("tab_7");
-        joinGroup = new QGroupBox(tab_7);
+        tab_login = new QWidget();
+        tab_login->setObjectName("tab_login");
+        joinGroup = new QGroupBox(tab_login);
         joinGroup->setObjectName("joinGroup");
-        joinGroup->setGeometry(QRect(-500, 0, 985, 37));
+        joinGroup->setGeometry(QRect(0, 40, 400, 50));
         horizontalLayout = new QHBoxLayout(joinGroup);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName("horizontalLayout");
         groupLineEdit = new QLineEdit(joinGroup);
         groupLineEdit->setObjectName("groupLineEdit");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(groupLineEdit->sizePolicy().hasHeightForWidth());
+        groupLineEdit->setSizePolicy(sizePolicy);
 
         horizontalLayout->addWidget(groupLineEdit);
 
@@ -78,18 +84,15 @@ public:
 
         joinBtn = new QPushButton(joinGroup);
         joinBtn->setObjectName("joinBtn");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(joinBtn->sizePolicy().hasHeightForWidth());
-        joinBtn->setSizePolicy(sizePolicy);
 
         horizontalLayout->addWidget(joinBtn);
 
-        talkGroup = new QGroupBox(tab_7);
+        talkGroup = new QGroupBox(tab_login);
         talkGroup->setObjectName("talkGroup");
         talkGroup->setEnabled(false);
-        talkGroup->setGeometry(QRect(-280, 110, 621, 231));
+        talkGroup->setGeometry(QRect(0, 90, 400, 231));
+        talkGroup->setAlignment(Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter);
+        talkGroup->setFlat(false);
         gridLayout = new QGridLayout(talkGroup);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
@@ -110,10 +113,13 @@ public:
 
         gridLayout->addWidget(msgsTextEdit, 0, 0, 1, 2);
 
-        tabWidget->addTab(tab_7, QString());
-        tab_8 = new QWidget();
-        tab_8->setObjectName("tab_8");
-        tabWidget->addTab(tab_8, QString());
+        tabWidget->addTab(tab_login, QString());
+        tab_lobbies = new QWidget();
+        tab_lobbies->setObjectName("tab_lobbies");
+        tabWidget->addTab(tab_lobbies, QString());
+        tab_Game = new QWidget();
+        tab_Game->setObjectName("tab_Game");
+        tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
 
@@ -124,6 +130,9 @@ public:
         QWidget::setTabOrder(sendBtn, msgsTextEdit);
 
         retranslateUi(MyWidget);
+
+        tabWidget->setCurrentIndex(0);
+
 
         QMetaObject::connectSlotsByName(MyWidget);
     } // setupUi
@@ -136,8 +145,9 @@ public:
         joinBtn->setText(QCoreApplication::translate("MyWidget", "connect", nullptr));
         talkGroup->setTitle(QString());
         sendBtn->setText(QCoreApplication::translate("MyWidget", "send", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_7), QCoreApplication::translate("MyWidget", "Tab 1", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_8), QCoreApplication::translate("MyWidget", "Tab 2", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_login), QCoreApplication::translate("MyWidget", "Tab 1", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_lobbies), QCoreApplication::translate("MyWidget", "Tab 2", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Page", nullptr));
     } // retranslateUi
 
 };
