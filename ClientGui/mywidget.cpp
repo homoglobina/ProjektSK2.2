@@ -27,11 +27,15 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget) {
 
     // Tab 3
 
+    connect(ui->startGameButton,&QPushButton::clicked, this, &MyWidget::onStartButtonClicked);
+
     // Connection stuff
     connect(sock, &QTcpSocket::connected, this, &MyWidget::onConnected);
     connect(sock, &QTcpSocket::disconnected, this, &MyWidget::onDisconnected);
     connect(sock, &QTcpSocket::readyRead, this, &MyWidget::onReadyRead);
     connect(sock, &QTcpSocket::errorOccurred, this, &MyWidget::onErrorOccurred);
+
+
 
     // Initialization
     // Login = 0 Lobbies = 1 Game = 2
@@ -70,7 +74,6 @@ void MyWidget::onDisconnectBtnClicked() {
         sock->disconnectFromHost();
     }
 }
-
 
 void MyWidget::onConnected() {
     ui->joinBtn->setEnabled(true);
@@ -113,6 +116,13 @@ void MyWidget::onErrorOccurred(QAbstractSocket::SocketError) {
     if(isLoggedIn || sock->state() != QAbstractSocket::ConnectedState) {
         onDisconnected();
     }
+}
+
+
+void MyWidget::onStartButtonClicked() {
+    QByteArray data = ("LobbyStart()\n");
+    sock->write(data);
+
 }
 
 
@@ -210,6 +220,10 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args) {
             ui->listWidget->addItem(roomName);
             // }
         }
+    }
+
+    else if (command == "StartGame"){
+        ui->columnView->setResizeGripsVisible(true);
     }
 
     else if (command == "Joined") {

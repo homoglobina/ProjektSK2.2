@@ -423,7 +423,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                 }
                 
                 roundNumber = 0;
-                writeAll("Msg(Gra rozpoczeta!)\n");
+                writeAll("StartGame(Gra rozpoczeta!)\n");
                 startRound();
             }
             else

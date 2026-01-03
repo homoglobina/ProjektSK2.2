@@ -29,7 +29,7 @@ private slots:
 
     // Tab 3 (Game)
     void onLeaveBtnClicked();
-
+    void onStartButtonClicked();
 
 
     // All time

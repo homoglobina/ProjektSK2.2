@@ -15,6 +15,7 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
@@ -47,9 +48,12 @@ public:
     QPushButton *disconectButton;
     QPushButton *refreshButton;
     QPushButton *joinButton;
+    QLabel *label_2;
     QWidget *tab_Game;
     QColumnView *columnView;
     QPushButton *leaveButton;
+    QLabel *label;
+    QPushButton *startGameButton;
 
     void setupUi(QWidget *MyWidget)
     {
@@ -136,15 +140,25 @@ public:
         joinButton = new QPushButton(tab_lobbies);
         joinButton->setObjectName("joinButton");
         joinButton->setGeometry(QRect(490, 90, 84, 26));
+        label_2 = new QLabel(tab_lobbies);
+        label_2->setObjectName("label_2");
+        label_2->setGeometry(QRect(10, 20, 57, 16));
         tabWidget->addTab(tab_lobbies, QString());
         tab_Game = new QWidget();
         tab_Game->setObjectName("tab_Game");
         columnView = new QColumnView(tab_Game);
         columnView->setObjectName("columnView");
-        columnView->setGeometry(QRect(40, 30, 256, 192));
+        columnView->setEnabled(false);
+        columnView->setGeometry(QRect(10, 80, 256, 192));
         leaveButton = new QPushButton(tab_Game);
         leaveButton->setObjectName("leaveButton");
         leaveButton->setGeometry(QRect(500, 80, 84, 26));
+        label = new QLabel(tab_Game);
+        label->setObjectName("label");
+        label->setGeometry(QRect(10, 50, 111, 16));
+        startGameButton = new QPushButton(tab_Game);
+        startGameButton->setObjectName("startGameButton");
+        startGameButton->setGeometry(QRect(500, 140, 84, 26));
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -175,8 +189,11 @@ public:
         disconectButton->setText(QCoreApplication::translate("MyWidget", "Disconnect", nullptr));
         refreshButton->setText(QCoreApplication::translate("MyWidget", "Refresh", nullptr));
         joinButton->setText(QCoreApplication::translate("MyWidget", "Join", nullptr));
+        label_2->setText(QCoreApplication::translate("MyWidget", "Lobbies", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_lobbies), QCoreApplication::translate("MyWidget", "Lobbies", nullptr));
         leaveButton->setText(QCoreApplication::translate("MyWidget", "Leave", nullptr));
+        label->setText(QCoreApplication::translate("MyWidget", "Players in Lobby", nullptr));
+        startGameButton->setText(QCoreApplication::translate("MyWidget", "Start", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Game", nullptr));
     } // retranslateUi
 
