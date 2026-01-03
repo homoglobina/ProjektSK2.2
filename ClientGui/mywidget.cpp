@@ -273,7 +273,115 @@ void printHelp(){
 
 
 
-int clientTest(){
+// int clientTest(){
+
+
+
+
+
+//     std::cout << "Połączono z serwerem!\n\n";
+
+//     std::string recvBuffer;
+
+//     while (true)
+//     {
+//         fd_set readfds;
+//         FD_ZERO(&readfds);
+//         FD_SET(sock, &readfds);
+//         FD_SET(STDIN_FILENO, &readfds);
+
+//         int maxfd = sock + 1;
+
+//         // Wait for activity on socket or stdin (with 100ms timeout)
+//         struct timeval tv;
+//         tv.tv_sec = 0;
+//         tv.tv_usec = 100000; // 100ms
+
+//         int activity = select(maxfd, &readfds, NULL, NULL, &tv);
+
+//         if (activity < 0)
+//         {
+//             std::cerr << "Select error\n";
+//             break;
+//         }
+
+//         // Socket input
+//         if (FD_ISSET(sock, &readfds))
+//         {
+//             char buffer[1024];
+//             memset(buffer, 0, sizeof(buffer));
+//             int bytes = recv(sock, buffer, sizeof(buffer) - 1, 0);
+
+//             if (bytes > 0)
+//             {
+//                 buffer[bytes] = 0;
+//                 recvBuffer += buffer;
+
+//                 // obsługa wielu linii naraz
+//                 size_t pos;
+//                 while ((pos = recvBuffer.find('\n')) != std::string::npos)
+//                 {
+//                     std::string line = recvBuffer.substr(0, pos);
+//                     recvBuffer.erase(0, pos + 1);
+
+//                     auto parsed = parseMessage(line);
+//                     if (parsed)
+//                         handleParsedMessage(*parsed, sock);
+//                     else
+//                         std::cout << "[RAW] " << line << "\n";
+//                 }
+//             }
+//             else if (bytes == 0)
+//             {
+//                 std::cout << "Serwer zamknął połączenie\n";
+//                 break;
+//             }
+//             else
+//             {
+//                 std::cerr << "Błąd odbioru\n";
+//                 break;
+//             }
+//         }
+
+//         // Stdin input
+//         if (FD_ISSET(STDIN_FILENO, &readfds))
+//         {
+//             std::string input;
+//             if (std::getline(std::cin, input))
+//             {
+//                 if (input.empty())
+//                     continue;
+
+//                 else if (input == "exit")
+//                     break;
+
+//                 else if (input == "HELP()" || input == "help()" || input == "Help()" || input == "help" || input == "Help" || input == "HELP")
+//                 {
+//                     printHelp();
+//                     continue;
+//                 }
+
+//                 else if (input == "LobbyStart()")
+//                 {
+//                     input += "\n";
+//                     send(sock, input.c_str(), input.size(), 0);
+//                     std::cout << "[wysłano] LobbyStart()\n";
+//                     continue;
+//                 }
+
+//                 input += "\n";
+//                 send(sock, input.c_str(), input.size(), 0);
+//             }
+//         }
+//     }
+
+//     close(sock);
+//     return 0;
+// }
+
+
+
+MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget) {
 
     std::cout << "=== PAŃSTWA-MIASTA KLIENT ===\n";
 
@@ -281,19 +389,14 @@ int clientTest(){
     if (sock < 0)
     {
         std::cerr << "Błąd tworzenia socketu\n";
-        return 1;
+        return;
     }
+
 
     sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(12345);
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
-
-    if (connect(sock, (sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
-    {
-        std::cerr << "Nie mogę połączyć z serwerem\n";
-        return 1;
-    }
 
     std::cout << "Połączono z serwerem!\n\n";
 
@@ -391,12 +494,10 @@ int clientTest(){
         }
     }
 
-    close(sock);
-    return 0;
-}
+    ::close(sock);
+    // return 0;
 
 
-MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget) {
     ui->setupUi(this);
 
     connect(ui->joinBtn, &QPushButton::clicked, this, &MyWidget::joinBtnHit);
@@ -404,6 +505,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget) {
 
     connect(ui->sendBtn, &QPushButton::clicked, this, &MyWidget::sendBtnHit);
     connect(ui->msgLineEdit, &QLineEdit::returnPressed, ui->sendBtn, &QPushButton::click);
+
 }
 
 MyWidget::~MyWidget() {
