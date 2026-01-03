@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QTcpSocket>
 #include <QListWidgetItem>
-
+#include <QStandardItemModel>
 namespace Ui {
 class MyWidget;
 }
@@ -43,6 +43,8 @@ private:
     QTcpSocket *sock;
     QString buffer;
     bool isLoggedIn;
+
+    QStandardItemModel *playerModel;
 
     void handleMessage(const QString &command, const QStringList &args);
     void logToGui(const QString &text, const QString &color = "black");

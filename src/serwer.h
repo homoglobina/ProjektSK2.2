@@ -9,7 +9,7 @@
 #include <sys/timerfd.h>
 #include <map>
 #include <chrono>
-
+#include <memory>
 
 class Lobby;
 class Gracz;
@@ -33,7 +33,10 @@ private:
     int epoll_fd;
     struct sockaddr_in server_addr;
     std::vector<Lobby*> lobbyList;
-    std::vector<Gracz> playerList;
+
+    std::vector<std::shared_ptr<Gracz>> playerList;
+    std::unordered_map<int, size_t> fd_to_index; // clientFd -> playerList index
+
 
     std::unordered_map<std::string, int> lobbyName_to_id; // lobbyName ->  Lobbyid
     std::unordered_map<int, int> timerFdToLobbyId; // timerfd ->  Lobbyid

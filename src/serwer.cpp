@@ -96,7 +96,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
         }
         for (auto& p : playerList)
         {
-            if (p.getName() == content)
+            if (p->getName() == content)
             {
                 write(client_fd, "Error(\"Taken_Name\")\n", 21);
                 return;
@@ -204,7 +204,7 @@ void Serwer::printPlayers(int client_fd)
     write(client_fd, message.c_str(), message.size());
     for (const auto &player : playerList)
     {
-        std::string playerInfo = "Gracz: " + player.getName() + ", FD: " + std::to_string(player.getFd()) + "\n";
+        std::string playerInfo = "Gracz: " + player->getName() + ", FD: " + std::to_string(player->getFd()) + "\n";
         write(client_fd, playerInfo.c_str(), playerInfo.size());
     }
 }
@@ -236,6 +236,9 @@ Serwer::Serwer(int port)
 
     std::cout << "Rozpoczęcie nasłuchiwania\n";
     listen(socket_fd, 5);
+
+
+    playerList.reserve(1000);
 
     // Create epoll instance
     epoll_fd = epoll_create1(0);
@@ -296,12 +299,15 @@ void Serwer::run()
 
                 // Create new player
                 size_t player_index = playerList.size();
-                Gracz newPlayer;
-                newPlayer.setFd(cd);
-                newPlayer.setNr(player_index);
-                playerList.push_back(newPlayer);
+
+                auto newPlayer = std::make_shared<Gracz>();
+                newPlayer->setFd(cd);
+                newPlayer->setNr(player_index);
+
+                playerList.push_back(newPlayer); 
 
                 fd_to_index[cd] = player_index;
+
 
                 // write(cd, "Nawiązano połączenie\n", 23);
                 // write(cd, "Wybierz unikalne imie: ", 23);
@@ -353,7 +359,7 @@ void Serwer::run()
                 auto it_index = fd_to_index.find(client_fd);
                 if (it_index != fd_to_index.end())
                 {
-                    int currentLobbyID = playerList[it_index->second].getCurrentLobbyID();
+                    int currentLobbyID = playerList[it_index->second]->getCurrentLobbyID();
 
                     if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size()))
                     {
@@ -365,7 +371,7 @@ void Serwer::run()
 
                 for (auto it = playerList.begin(); it != playerList.end(); ++it)
                 {
-                    if (it->getFd() == client_fd)
+                    if ((*it)->getFd() == client_fd)
                     {
                         playerList.erase(it);
                         break;
@@ -379,7 +385,7 @@ void Serwer::run()
             auto it = fd_to_index.find(client_fd);
             if (it != fd_to_index.end())
             {
-                handleClientMessage(client_fd, std::string(buffer, n), playerList[it->second]);
+            handleClientMessage(client_fd, std::string(buffer, n), *playerList[it->second]);    
             }
         }
     }

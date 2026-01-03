@@ -48,9 +48,11 @@ void Lobby::printPlayers()
     // for (Gracz* player : players)
     //     std::cout << "Player " << player->getName() << " (FD: " << player->getFd() << ")\n";
 
+    std::string refreshMsg = "PlayerRefresh()\n";
+
     for (Gracz* player : players)
     {
-        write(player->getFd(), "PlayerRefresh()\n", 17);
+        write(player->getFd(), refreshMsg.c_str(), refreshMsg.size());
         std::string playerListMsg;
         for (Gracz* p : players)
         {
@@ -81,6 +83,7 @@ void Lobby::removePlayer(int playerFd)
             
             break;
         }
+    printPlayers();
 }
 
 // =========================

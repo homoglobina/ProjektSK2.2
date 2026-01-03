@@ -8,6 +8,9 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget) {
     sock = new QTcpSocket(this);
     isLoggedIn = false;
 
+    playerModel = new QStandardItemModel(this);
+    ui->columnView->setModel(playerModel);
+
     // Tab 1 Joining
     connect(ui->joinBtn, &QPushButton::clicked, this, &MyWidget::joinBtnHit);
     connect(ui->groupLineEdit, &QLineEdit::returnPressed, this, &MyWidget::joinBtnHit);
@@ -157,6 +160,8 @@ void MyWidget::onReadyRead() {
     QByteArray data = sock->readAll();
     buffer.append(QString::fromUtf8(data));
 
+    buffer.remove(QChar('\0'));
+
     while (buffer.contains('\n')) {
         int lineEnd = buffer.indexOf('\n');
         QString line = buffer.left(lineEnd).trimmed();
@@ -213,11 +218,28 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args) {
         ui->tabWidget->setCurrentIndex(2);
     }
 
+    else if (command == "PlayerRefresh") {
+        // Clear the current list
+        if (playerModel) playerModel->clear();
+    }
+    else if (command == "Player") {
+        if (!args.isEmpty()) {
+            QString playerName = args.first().trimmed();
+            if (playerModel) {
+                // Add the player to the view
+                playerModel->appendRow(new QStandardItem(playerName));
+            }
+        }
+    }
+
     else if (command == "LeftLobby"){
         ui->tabWidget->setTabEnabled(1, true);
-        ui->tabWidget->setTabEnabled(2,false);
+        ui->tabWidget->setTabEnabled(2, false);
         ui->tabWidget->setCurrentIndex(1);
 
+        if (playerModel) playerModel->clear();
+
+        onRefreshBtnClicked();
     }
 
     // --- ERRORS ---
