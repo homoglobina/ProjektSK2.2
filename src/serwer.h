@@ -26,7 +26,7 @@ public:
     void printLobbies(int client_fd);
     void printPlayers(int client_fd);
     // void broadcastToLobby(int lobbyID, const std::string& message);
-    void createLobby(std::string lobbyName);
+    int createLobby(std::string lobbyName);
 
 private:
     int socket_fd;

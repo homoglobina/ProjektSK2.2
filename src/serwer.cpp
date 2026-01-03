@@ -8,7 +8,7 @@
 
 #define MAX_EVENTS 10
 
-void Serwer::createLobby(std::string lobbyName)
+int Serwer::createLobby(std::string lobbyName)
 {
 
     for (const auto &lobby : lobbyList)
@@ -16,7 +16,7 @@ void Serwer::createLobby(std::string lobbyName)
         if (lobby->getName() == lobbyName)
         {
             std::cout << std::setw(16) << "Lobby o nazwie '" << lobbyName << "' już istnieje.\n";
-            return;
+            return -1;
         }
     }
 
@@ -42,6 +42,7 @@ void Serwer::createLobby(std::string lobbyName)
     lobbyName_to_id[lobbyName] = newLobby->getId();
     timerFdToLobbyId[newLobby->getTimerFd()] = newLobby->getId();
     std::cout << std::setw(16) << "Utworzono nowe lobby: " << lobbyName << "\n";
+    return newLobbyID;
 }
 
 void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& player)
@@ -105,7 +106,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
         player.setName(content);
         player.setState(1);
 
-        trimmed_msg = "Msg(" + welcomeMsg + ")\n";
+        trimmed_msg = "Welcome(" + welcomeMsg + ")\n";
         write(client_fd, trimmed_msg.c_str(), trimmed_msg.size());
 
         break;
@@ -113,10 +114,16 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
     case 1:
         if (command == "CreateLobby")
         {
-            createLobby(content);
-            std::string createdMsg = "Utworzono lobby: " + content + "\n";
-            write(client_fd, createdMsg.c_str(), createdMsg.size());
-            return;
+            if (createLobby(content) != -1){
+                std::string createdMsg = "Utworzono lobby: " + content + "\n";
+                write(client_fd, createdMsg.c_str(), createdMsg.size());
+                return;
+            }
+            else {
+                std::string errorMsg = "Error(\"Lobby_Exists\")\n";
+                write(client_fd, errorMsg.c_str(), errorMsg.size());
+                return;
+            }
         }
         else if (command == "ShowLobbies")
         {
@@ -134,7 +141,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
             {
                 if (lobby->getName() == content)
                 {
-                    std::string joinMsg = "Dołączyłeś do lobby: " + content + "\n";
+                    std::string joinMsg = "Joined(" + content + ")\n";
                     write(client_fd, joinMsg.c_str(), joinMsg.size());
 
                     lobbyID = lobbyName_to_id[content];
@@ -152,6 +159,9 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
                     // Send current game state to the new player
                     lobbyList[lobbyID]->sendGameStateToPlayer(&player);
                     
+                    // Send list of players to all in lobby
+                    lobbyList[lobbyID]->printPlayers();
+
                     std::cout << "Gracz " << player.getName() << " dołączył do lobby " << content << "\n";
                     std::cout << "Lobby gracza : " << player.getCurrentLobbyID() << "\n";
 
@@ -183,7 +193,7 @@ void Serwer::printLobbies(int client_fd)
     for (const auto &lobby : lobbyList)
     {
         // std::string lobbyInfo = "Lobby ID: " + std::to_string(lobby->getId()) + "\n";
-        std::string lobbyInfo = lobby->getName() + "\n";
+        std::string lobbyInfo = "Lobby(" + lobby->getName() + ")\n";
         write(client_fd, lobbyInfo.c_str(), lobbyInfo.size());
     }
 }

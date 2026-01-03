@@ -5,10 +5,6 @@
 #include "mywidget.h"
 #include <QApplication>
 
-// =====================
-// MAIN CLIENT
-// =====================
-
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 

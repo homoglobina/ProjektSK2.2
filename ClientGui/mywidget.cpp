@@ -1,38 +1,51 @@
 #include "mywidget.h"
 #include "ui_mywidget.h"
-
 #include <QMessageBox>
-#include <QHostAddress>
-#include <QDateTime>
-#include <QRegularExpression>
 
 MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget) {
     ui->setupUi(this);
 
     sock = new QTcpSocket(this);
+    isLoggedIn = false;
 
+    // Tab 1 Joining
     connect(ui->joinBtn, &QPushButton::clicked, this, &MyWidget::joinBtnHit);
     connect(ui->groupLineEdit, &QLineEdit::returnPressed, this, &MyWidget::joinBtnHit);
-
     connect(ui->sendBtn, &QPushButton::clicked, this, &MyWidget::sendBtnHit);
-    connect(ui->msgLineEdit, &QLineEdit::returnPressed, this, &MyWidget::sendBtnHit);
+    connect(ui->msgNickEdit, &QLineEdit::returnPressed, this, &MyWidget::sendBtnHit);
 
+    // Tab 2 LobbyList
+    connect(ui->refreshButton, &QPushButton::clicked, this, &MyWidget::onRefreshBtnClicked);
+    connect(ui->joinButton, &QPushButton::clicked, this, &MyWidget::onJoinLobbyBtnClicked);
+    connect(ui->disconectButton, &QPushButton::clicked, this, &MyWidget::onDisconnectBtnClicked);
+    connect(ui->leaveButton, &QPushButton::clicked, this, &MyWidget::onLeaveBtnClicked);
+    connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MyWidget::onLobbyItemDoubleClicked);
+
+
+    // Tab 3
+
+    // Connection stuff
     connect(sock, &QTcpSocket::connected, this, &MyWidget::onConnected);
     connect(sock, &QTcpSocket::disconnected, this, &MyWidget::onDisconnected);
     connect(sock, &QTcpSocket::readyRead, this, &MyWidget::onReadyRead);
     connect(sock, &QTcpSocket::errorOccurred, this, &MyWidget::onErrorOccurred);
 
-    ui->talkGroup->setEnabled(false);
+    // Initialization
+    // Login = 0 Lobbies = 1 Game = 2
+    ui->tabWidget->setTabEnabled(0, true);
+    ui->tabWidget->setTabEnabled(1, false);
+    ui->tabWidget->setTabEnabled(2, false);
 
+    ui->sendBtn->setEnabled(false);
+    ui->msgNickEdit->setEnabled(false);
     ui->groupLineEdit->setText("127.0.0.1");
     ui->portSpinBox->setValue(12345);
 
-    logToGui("<i>Welcome! Enter IP and Port to connect.</i>", "gray");
+    logToGui("<i>Welcome! Please connect to the server.</i>", "gray");
 }
 
 MyWidget::~MyWidget() {
-    if(sock->isOpen())
-        sock->close();
+    if(sock->isOpen()) sock->close();
     delete ui;
 }
 
@@ -41,62 +54,103 @@ void MyWidget::joinBtnHit() {
     if (sock->state() == QAbstractSocket::ConnectedState) {
         sock->disconnectFromHost();
     } else {
-        // Connect logic
         QString ip = ui->groupLineEdit->text();
         int port = ui->portSpinBox->value();
-
         ui->joinBtn->setEnabled(false);
         ui->joinBtn->setText("Connecting...");
-
         sock->connectToHost(ip, port);
     }
 }
 
+void MyWidget::onDisconnectBtnClicked() {
+    if (sock->state() == QAbstractSocket::ConnectedState) {
+        sock->disconnectFromHost();
+    }
+}
+
+
 void MyWidget::onConnected() {
     ui->joinBtn->setEnabled(true);
     ui->joinBtn->setText("Disconnect");
-    ui->joinGroup->setEnabled(true);
-    ui->talkGroup->setEnabled(true);
+
     ui->groupLineEdit->setEnabled(false);
     ui->portSpinBox->setEnabled(false);
+    ui->talkGroup->setEnabled(true);
 
-    logToGui("<b>Connected to server!</b>", "green");
-    ui->msgsTextEdit->append("Type <b>LobbyName(MyLobby)</b> to join a lobby.");
+    ui->sendBtn->setEnabled(true);
+    ui->msgNickEdit->setEnabled(true);
+    ui->msgNickEdit->setFocus();
 
-    ui->msgLineEdit->setFocus();
+    logToGui("<b>Connected! Please enter your nickname.</b>", "blue");
 }
 
 void MyWidget::onDisconnected() {
     ui->joinBtn->setEnabled(true);
     ui->joinBtn->setText("Connect");
-    ui->talkGroup->setEnabled(false);
+
     ui->groupLineEdit->setEnabled(true);
     ui->portSpinBox->setEnabled(true);
+    ui->talkGroup->setEnabled(false);
+    ui->sendBtn->setEnabled(false);
+    ui->msgNickEdit->setEnabled(false);
+    ui->listWidget->clear();
 
-    logToGui("<b>Disconnected from server.</b>", "red");
+    // Tab 0
+    ui->tabWidget->setTabEnabled(0, true);
+    ui->tabWidget->setTabEnabled(1, false);
+    ui->tabWidget->setTabEnabled(2, false);
+    ui->tabWidget->setCurrentIndex(0); // Jump back to login
+
+    isLoggedIn = false;
+    logToGui("<b>Disconnected.</b>", "red");
 }
 
 void MyWidget::onErrorOccurred(QAbstractSocket::SocketError) {
-    logToGui("<b>Socket Error: " + sock->errorString() + "</b>", "red");
-    ui->joinBtn->setEnabled(true);
-    ui->joinBtn->setText("Connect");
+    logToGui("Socket Error: " + sock->errorString(), "red");
+    if(isLoggedIn || sock->state() != QAbstractSocket::ConnectedState) {
+        onDisconnected();
+    }
 }
 
-void MyWidget::sendBtnHit() {
-    QString txt = ui->msgLineEdit->text().trimmed();
-    if (txt.isEmpty()) return;
 
-    // Protocol expects newline at the end
-    QByteArray data = (txt + "\n").toUtf8();
+void MyWidget::sendBtnHit() {
+    QString txt = ui->msgNickEdit->text().trimmed();
+    if (txt.isEmpty()) return;
+    QByteArray data = ("PlayerName(" + txt + ")\n").toUtf8();
     sock->write(data);
 
-    // Echo to own screen if it's not a command (optional style choice)
-    // if(!txt.contains("(")) {
-    //    logToGui("Me: " + txt, "gray");
-    // }
+    ui->msgNickEdit->clear();
+    ui->msgNickEdit->setFocus();
+}
 
-    ui->msgLineEdit->clear();
-    ui->msgLineEdit->setFocus();
+void MyWidget::onRefreshBtnClicked() {
+    ui->listWidget->clear();
+    sock->write("ShowLobbies()\n");
+}
+
+
+void MyWidget::onLeaveBtnClicked(){
+    sock->write("LeaveLobby()\n");
+}
+
+
+void MyWidget::onJoinLobbyBtnClicked() {
+    QListWidgetItem *item = ui->listWidget->currentItem();
+    if(!item) {
+        QMessageBox::warning(this, "Warning", "Please select a lobby first.");
+        return;
+    }
+
+    // Try joining
+    QString cmd = "LobbyName(" + item->text() + ")\n";
+    sock->write(cmd.toUtf8());
+}
+
+void MyWidget::onLobbyItemDoubleClicked(QListWidgetItem *item) {
+    if(item) {
+        ui->listWidget->setCurrentItem(item); // Ensure it's selected
+        onJoinLobbyBtnClicked();
+    }
 }
 
 void MyWidget::onReadyRead() {
@@ -107,9 +161,7 @@ void MyWidget::onReadyRead() {
         int lineEnd = buffer.indexOf('\n');
         QString line = buffer.left(lineEnd).trimmed();
         buffer.remove(0, lineEnd + 1);
-
         if (line.isEmpty()) continue;
-
 
         int openParen = line.indexOf('(');
         int closeParen = line.lastIndexOf(')');
@@ -120,81 +172,69 @@ void MyWidget::onReadyRead() {
             QStringList args = content.split(',', Qt::KeepEmptyParts);
 
             handleMessage(command, args);
-        } else {
-            logToGui("[RAW] " + line, "gray");
         }
     }
 }
 
 void MyWidget::handleMessage(const QString &command, const QStringList &args) {
+    if (command == "Welcome") {
+        QString msgContent = args.join(", ");
+        if (!isLoggedIn ) {
+            isLoggedIn = true;
+            logToGui("<b>Login Successful!</b>", "green");
 
-    //  CHAT
-    if (command == "Msg") {
-        if (!args.isEmpty()) {
-            logToGui("[CHAT] " + args.join(", "));
+
+            ui->tabWidget->setTabEnabled(0, false);
+            ui->tabWidget->setTabEnabled(1, true);
+            ui->tabWidget->setCurrentIndex(1);
+
+            // refresh
+            ui->listWidget->clear();
+            sock->write("ShowLobbies()\n");
+        }
+        else {
+            logToGui("[Server]: " + msgContent);
         }
     }
+
+    else if (command == "Lobby") {
+        if (!args.isEmpty()) {
+            QString roomName = args.first().trimmed();
+
+            // if (ui->listWidget->findItems(roomName, Qt::MatchExactly).isEmpty()) {
+            ui->listWidget->addItem(roomName);
+            // }
+        }
+    }
+
+    else if (command == "Joined") {
+        ui->tabWidget->setTabEnabled(1, false);
+        ui->tabWidget->setTabEnabled(2, true);
+        ui->tabWidget->setCurrentIndex(2);
+    }
+
+    else if (command == "LeftLobby"){
+        ui->tabWidget->setTabEnabled(1, true);
+        ui->tabWidget->setTabEnabled(2,false);
+        ui->tabWidget->setCurrentIndex(1);
+
+    }
+
     // --- ERRORS ---
     else if (command == "Error") {
-        logToGui("[ERROR] " + args.join(", "), "red");
-    }
-    // --- CATEGORIES ---
-    else if (command == "Category") {
-        QStringList catNames;
-        QString ids = args.value(0);
-
-        for (QChar c : ids) {
-            if (c == '1') catNames << "Państwa";
-            else if (c == '2') catNames << "Miasta (PL)";
-            else if (c == '3') catNames << "Miasta (World)";
-            else if (c == '4') catNames << "Jeziora";
-            else if (c == '5') catNames << "Owoce/Warzywa";
-            else if (c == '6') catNames << "Imiona";
+        QString errText = args.join(", ");
+        logToGui("<b>Error: " + errText + "</b>", "red");
+        if (!isLoggedIn) {
+            QMessageBox::critical(this, "Login Error", errText + "\nPlease try a different nickname.");
+            ui->msgNickEdit->setFocus();
         }
+    }
 
-        logToGui("<br><b>=== NEW ROUND ===</b>", "blue");
-        logToGui("Categories: " + catNames.join(" | "), "darkblue");
-    }
-    // --- LETTER ---
-    else if (command == "Letter") {
-        logToGui("<h1>LETTER: " + args.value(0) + "</h1>", "darkmagenta");
-    }
-    // --- TIME ---
-    else if (command == "Time") {
-        // Just show time in standard text to avoid spamming formatted logs
-        // Or update a separate QLabel if you added one to the UI
-        ui->msgsTextEdit->append("<i>Time left: " + args.value(0) + "s</i>");
-    }
-    // --- GAME STATUS ---
-    else if (command == "GuessOK") {
-        logToGui("<i>Answer accepted!</i>", "green");
-    }
-    else if (command == "GuessErr") {
-        logToGui("<i>Answer rejected: " + args.value(0) + "</i>", "orange");
-    }
-    else if (command == "RoundEnd") {
-        logToGui("<b>=== ROUND END ===</b><br>", "blue");
-    }
-    else if (command == "Score" || command == "TotalScore") {
-        if(args.size() >= 2)
-            logToGui("Score [" + args[0] + "]: " + args[1] + " pts");
-    }
-    else if (command == "FinalScore") {
-        if(args.size() >= 3)
-            logToGui("<b>#" + args[0] + " PLACE: " + args[1] + " (" + args[2] + " pts)</b>", "purple");
-    }
-    else if (command == "GameEnd") {
-        logToGui("<br><b>=== GAME OVER ===</b>", "red");
-    }
-    else if (command == "Admin") {
-        logToGui("Admin is: " + args.value(0), "darkcyan");
-    }
-    else {
-        logToGui("Unknown: " + command + " " + args.join(", "), "gray");
-    }
+
+
+    // TODO:
 }
 
-// Helper to print nice HTML to the text edit
 void MyWidget::logToGui(const QString &text, const QString &color) {
     ui->msgsTextEdit->append(QString("<font color='%1'>%2</font>").arg(color).arg(text));
 }

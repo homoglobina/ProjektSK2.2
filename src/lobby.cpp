@@ -44,9 +44,24 @@ void Lobby::startTimer(int seconds)
 
 void Lobby::printPlayers()
 {
-    std::cout << "Players in lobby " << name << ":\n";
+    // std::cout << "Players in lobby " << name << ":\n";
+    // for (Gracz* player : players)
+    //     std::cout << "Player " << player->getName() << " (FD: " << player->getFd() << ")\n";
+
     for (Gracz* player : players)
-        std::cout << "Player: " << player->getName() << " (FD: " << player->getFd() << ")\n";
+    {
+        write(player->getFd(), "PlayerRefresh()\n", 17);
+        std::string playerListMsg;
+        for (Gracz* p : players)
+        {
+            playerListMsg ="Player(" + p->getName() + ")\n";
+            write(player->getFd(), playerListMsg.c_str(), playerListMsg.size());
+
+        }
+    }
+        
+
+
 }
 
 int Lobby::getMaxPlayers() const { return maxPlayers; }
@@ -367,6 +382,54 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
     switch (state)
     {
     case 1:
+
+        if (command == "ShowSettings")
+        {
+            std::string settingsMsg = "Msg(Ustawienia: " + std::to_string(maxRounds) + 
+                                      " rund, " + std::to_string(roundTime) + "s na rundę, Kategorie: ";
+            for (int cat : categories)
+                settingsMsg += std::to_string(cat) + ",";
+            if (!categories.empty())
+                settingsMsg.pop_back();
+            settingsMsg += ")\n";
+            write(client_fd, settingsMsg.c_str(), settingsMsg.size());
+            return;
+        }
+
+        if (command == "LeaveLobby")
+        {
+            removePlayer(client_fd);
+            player.setCurrentLobbyID(-1);
+            player.setState(1);
+            write(client_fd, "LeftLobby()\n", 13);
+            std::cout << "Player " << player.getName() << " left the lobby.\n";
+            return;
+        }
+
+        if (command == "LobbyStart")
+        {
+            if (players.size() >= 2)
+            {
+                state = 2;
+                
+                // Initialize all player scores
+                totalScores.clear();
+                for (const auto* p : players)
+                {
+                    totalScores[p->getName()] = 0;
+                }
+                
+                roundNumber = 0;
+                writeAll("Msg(Gra rozpoczeta!)\n");
+                startRound();
+            }
+            else
+            {
+                write(client_fd, "Msg(Za malo graczy, aby rozpocząć grę)\n", 41);
+            }
+        }
+
+
         // Admin commands - only work in waiting state
         if (command == "SetTime")
         {
@@ -450,30 +513,8 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             return;
         }
         
-        if (command == "LobbyStart")
-        {
-            if (players.size() >= 2)
-            {
-                state = 2;
-                
-                // Initialize all player scores
-                totalScores.clear();
-                for (const auto* p : players)
-                {
-                    totalScores[p->getName()] = 0;
-                }
-                
-                roundNumber = 0;
-                writeAll("Msg(Gra rozpoczeta!)\n");
-                startRound();
-            }
-            else
-            {
-                write(client_fd, "Msg(Za malo graczy, aby rozpocząć grę)\n", 41);
-            }
-        }
+ 
         break;
-
     case 2:
         if (command == "Guess")
         {

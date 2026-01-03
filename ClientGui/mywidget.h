@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QTcpSocket>
-#include <QTime>
+#include <QListWidgetItem>
 
 namespace Ui {
 class MyWidget;
@@ -17,10 +17,22 @@ public:
     ~MyWidget();
 
 private slots:
+    // Tab 1 (Login)
     void joinBtnHit();
     void sendBtnHit();
 
+    // Tab 2 (Lobbies)
+    void onRefreshBtnClicked();
+    void onJoinLobbyBtnClicked();
+    void onDisconnectBtnClicked();
+    void onLobbyItemDoubleClicked(QListWidgetItem *item);
 
+    // Tab 3 (Game)
+    void onLeaveBtnClicked();
+
+
+
+    // All time
     void onConnected();
     void onDisconnected();
     void onReadyRead();
@@ -30,7 +42,7 @@ private:
     Ui::MyWidget *ui;
     QTcpSocket *sock;
     QString buffer;
-
+    bool isLoggedIn;
 
     void handleMessage(const QString &command, const QStringList &args);
     void logToGui(const QString &text, const QString &color = "black");

@@ -42,6 +42,13 @@ template <> constexpr inline auto MyWidget::qt_create_metaobjectdata<qt_meta_tag
         "joinBtnHit",
         "",
         "sendBtnHit",
+        "onRefreshBtnClicked",
+        "onJoinLobbyBtnClicked",
+        "onDisconnectBtnClicked",
+        "onLobbyItemDoubleClicked",
+        "QListWidgetItem*",
+        "item",
+        "onLeaveBtnClicked",
         "onConnected",
         "onDisconnected",
         "onReadyRead",
@@ -55,15 +62,27 @@ template <> constexpr inline auto MyWidget::qt_create_metaobjectdata<qt_meta_tag
         QtMocHelpers::SlotData<void()>(1, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'sendBtnHit'
         QtMocHelpers::SlotData<void()>(3, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onConnected'
+        // Slot 'onRefreshBtnClicked'
         QtMocHelpers::SlotData<void()>(4, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onDisconnected'
+        // Slot 'onJoinLobbyBtnClicked'
         QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onReadyRead'
+        // Slot 'onDisconnectBtnClicked'
         QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onErrorOccurred'
-        QtMocHelpers::SlotData<void(QAbstractSocket::SocketError)>(7, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        // Slot 'onLobbyItemDoubleClicked'
+        QtMocHelpers::SlotData<void(QListWidgetItem *)>(7, 2, QMC::AccessPrivate, QMetaType::Void, {{
             { 0x80000000 | 8, 9 },
+        }}),
+        // Slot 'onLeaveBtnClicked'
+        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onConnected'
+        QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onDisconnected'
+        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onReadyRead'
+        QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onErrorOccurred'
+        QtMocHelpers::SlotData<void(QAbstractSocket::SocketError)>(14, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 15, 16 },
         }}),
     };
     QtMocHelpers::UintData qt_properties {
@@ -90,17 +109,22 @@ void MyWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         switch (_id) {
         case 0: _t->joinBtnHit(); break;
         case 1: _t->sendBtnHit(); break;
-        case 2: _t->onConnected(); break;
-        case 3: _t->onDisconnected(); break;
-        case 4: _t->onReadyRead(); break;
-        case 5: _t->onErrorOccurred((*reinterpret_cast<std::add_pointer_t<QAbstractSocket::SocketError>>(_a[1]))); break;
+        case 2: _t->onRefreshBtnClicked(); break;
+        case 3: _t->onJoinLobbyBtnClicked(); break;
+        case 4: _t->onDisconnectBtnClicked(); break;
+        case 5: _t->onLobbyItemDoubleClicked((*reinterpret_cast<std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
+        case 6: _t->onLeaveBtnClicked(); break;
+        case 7: _t->onConnected(); break;
+        case 8: _t->onDisconnected(); break;
+        case 9: _t->onReadyRead(); break;
+        case 10: _t->onErrorOccurred((*reinterpret_cast<std::add_pointer_t<QAbstractSocket::SocketError>>(_a[1]))); break;
         default: ;
         }
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
         default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
-        case 5:
+        case 10:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
             case 0:
@@ -130,14 +154,14 @@ int MyWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 11;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 6)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 11;
     }
     return _id;
 }

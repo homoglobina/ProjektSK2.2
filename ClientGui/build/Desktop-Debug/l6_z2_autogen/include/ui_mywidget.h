@@ -11,10 +11,12 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QColumnView>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QTabWidget>
@@ -38,16 +40,22 @@ public:
     QGroupBox *talkGroup;
     QGridLayout *gridLayout;
     QPushButton *sendBtn;
-    QLineEdit *msgLineEdit;
+    QLineEdit *msgNickEdit;
     QTextEdit *msgsTextEdit;
     QWidget *tab_lobbies;
+    QListWidget *listWidget;
+    QPushButton *disconectButton;
+    QPushButton *refreshButton;
+    QPushButton *joinButton;
     QWidget *tab_Game;
+    QColumnView *columnView;
+    QPushButton *leaveButton;
 
     void setupUi(QWidget *MyWidget)
     {
         if (MyWidget->objectName().isEmpty())
             MyWidget->setObjectName("MyWidget");
-        MyWidget->resize(421, 368);
+        MyWidget->resize(637, 521);
         verticalLayout = new QVBoxLayout(MyWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -102,10 +110,10 @@ public:
 
         gridLayout->addWidget(sendBtn, 1, 1, 1, 1);
 
-        msgLineEdit = new QLineEdit(talkGroup);
-        msgLineEdit->setObjectName("msgLineEdit");
+        msgNickEdit = new QLineEdit(talkGroup);
+        msgNickEdit->setObjectName("msgNickEdit");
 
-        gridLayout->addWidget(msgLineEdit, 1, 0, 1, 1);
+        gridLayout->addWidget(msgNickEdit, 1, 0, 1, 1);
 
         msgsTextEdit = new QTextEdit(talkGroup);
         msgsTextEdit->setObjectName("msgsTextEdit");
@@ -116,22 +124,40 @@ public:
         tabWidget->addTab(tab_login, QString());
         tab_lobbies = new QWidget();
         tab_lobbies->setObjectName("tab_lobbies");
+        listWidget = new QListWidget(tab_lobbies);
+        listWidget->setObjectName("listWidget");
+        listWidget->setGeometry(QRect(10, 50, 256, 192));
+        disconectButton = new QPushButton(tab_lobbies);
+        disconectButton->setObjectName("disconectButton");
+        disconectButton->setGeometry(QRect(490, 10, 84, 26));
+        refreshButton = new QPushButton(tab_lobbies);
+        refreshButton->setObjectName("refreshButton");
+        refreshButton->setGeometry(QRect(490, 50, 84, 26));
+        joinButton = new QPushButton(tab_lobbies);
+        joinButton->setObjectName("joinButton");
+        joinButton->setGeometry(QRect(490, 90, 84, 26));
         tabWidget->addTab(tab_lobbies, QString());
         tab_Game = new QWidget();
         tab_Game->setObjectName("tab_Game");
+        columnView = new QColumnView(tab_Game);
+        columnView->setObjectName("columnView");
+        columnView->setGeometry(QRect(40, 30, 256, 192));
+        leaveButton = new QPushButton(tab_Game);
+        leaveButton->setObjectName("leaveButton");
+        leaveButton->setGeometry(QRect(500, 80, 84, 26));
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
 
         QWidget::setTabOrder(portSpinBox, groupLineEdit);
         QWidget::setTabOrder(groupLineEdit, joinBtn);
-        QWidget::setTabOrder(joinBtn, msgLineEdit);
-        QWidget::setTabOrder(msgLineEdit, sendBtn);
+        QWidget::setTabOrder(joinBtn, msgNickEdit);
+        QWidget::setTabOrder(msgNickEdit, sendBtn);
         QWidget::setTabOrder(sendBtn, msgsTextEdit);
 
         retranslateUi(MyWidget);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MyWidget);
@@ -145,9 +171,13 @@ public:
         joinBtn->setText(QCoreApplication::translate("MyWidget", "connect", nullptr));
         talkGroup->setTitle(QString());
         sendBtn->setText(QCoreApplication::translate("MyWidget", "send", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_login), QCoreApplication::translate("MyWidget", "Tab 1", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_lobbies), QCoreApplication::translate("MyWidget", "Tab 2", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Page", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_login), QCoreApplication::translate("MyWidget", "Join", nullptr));
+        disconectButton->setText(QCoreApplication::translate("MyWidget", "Disconnect", nullptr));
+        refreshButton->setText(QCoreApplication::translate("MyWidget", "Refresh", nullptr));
+        joinButton->setText(QCoreApplication::translate("MyWidget", "Join", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_lobbies), QCoreApplication::translate("MyWidget", "Lobbies", nullptr));
+        leaveButton->setText(QCoreApplication::translate("MyWidget", "Leave", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Game", nullptr));
     } // retranslateUi
 
 };
