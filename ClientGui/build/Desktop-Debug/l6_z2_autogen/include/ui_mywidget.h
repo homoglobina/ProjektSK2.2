@@ -54,6 +54,7 @@ public:
     QPushButton *leaveButton;
     QLabel *label;
     QPushButton *startGameButton;
+    QTextEdit *gameTextEdit;
 
     void setupUi(QWidget *MyWidget)
     {
@@ -87,7 +88,7 @@ public:
 
         portSpinBox = new QSpinBox(joinGroup);
         portSpinBox->setObjectName("portSpinBox");
-        portSpinBox->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::PlusMinus);
+        portSpinBox->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
         portSpinBox->setMinimum(1);
         portSpinBox->setMaximum(65535);
         portSpinBox->setValue(2000);
@@ -103,7 +104,6 @@ public:
         talkGroup->setObjectName("talkGroup");
         talkGroup->setEnabled(false);
         talkGroup->setGeometry(QRect(0, 90, 400, 231));
-        talkGroup->setAlignment(Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter);
         talkGroup->setFlat(false);
         gridLayout = new QGridLayout(talkGroup);
         gridLayout->setSpacing(6);
@@ -159,6 +159,9 @@ public:
         startGameButton = new QPushButton(tab_Game);
         startGameButton->setObjectName("startGameButton");
         startGameButton->setGeometry(QRect(500, 140, 84, 26));
+        gameTextEdit = new QTextEdit(tab_Game);
+        gameTextEdit->setObjectName("gameTextEdit");
+        gameTextEdit->setGeometry(QRect(300, 200, 291, 231));
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);

@@ -52,7 +52,7 @@
         <item>
          <widget class="QSpinBox" name="portSpinBox">
           <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+           <enum>QAbstractSpinBox::UpDownArrows</enum>
           </property>
           <property name="minimum">
            <number>1</number>
@@ -88,9 +88,6 @@
        </property>
        <property name="title">
         <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignBottom|Qt::AlignmentFlag::AlignHCenter</set>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -237,6 +234,16 @@
        </property>
        <property name="text">
         <string>Start</string>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="gameTextEdit">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>200</y>
+         <width>291</width>
+         <height>231</height>
+        </rect>
        </property>
       </widget>
      </widget>

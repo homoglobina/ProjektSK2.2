@@ -3,6 +3,7 @@
 #include <cctype>
 #include <fstream>
 #include <map>
+#include <cstring>
 
 bool roundFinished = false;
 
@@ -226,6 +227,8 @@ void Lobby::sendGameStateToPlayer(Gracz *player)
 // =========================
 void Lobby::startRound()
 {
+    writeAll("StartGame()\n");
+
     std::cout << "=== START RUNDY " << roundNumber + 1 << " ===\n";
 
     roundNumber++;
@@ -406,27 +409,71 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             return;
         }
 
+        // if (command == "LobbyStart")
+        // {
+        //     if (players.size() >= 2)
+        //     {
+        //         state = 2;
+
+        //         // Initialize all player scores
+        //         totalScores.clear();
+        //         for (const auto *p : players)
+        //         {
+        //             totalScores[p->getName()] = 0;
+        //         }
+
+        //         roundNumber = 0;
+        //         writeAll("StartGame(Gra rozpoczeta!)\n");
+        //         startRound();
+        //     }
+        //     else
+        //     {
+        //         write(client_fd, "Msg(Za malo graczy, aby rozpocząć grę)\n", 41);
+        //     }
+        // }
+
         if (command == "LobbyStart")
         {
-            if (players.size() >= 2)
+            // tylko admin
+            if (&player != admin)
             {
-                state = 2;
-
-                // Initialize all player scores
-                totalScores.clear();
-                for (const auto *p : players)
-                {
-                    totalScores[p->getName()] = 0;
-                }
-
-                roundNumber = 0;
-                writeAll("StartGame(Gra rozpoczeta!)\n");
-                startRound();
+                write(client_fd,
+                      "Error(Not_Admin)\n",
+                      strlen("Error(Not_Admin)\n"));
+                return;
             }
-            else
+
+            // gra już trwa
+            if (state == 2)
             {
-                write(client_fd, "Msg(Za malo graczy, aby rozpocząć grę)\n", 41);
+                write(client_fd,
+                      "Error(Game_Already_Started)\n",
+                      strlen("Error(Game_Already_Started)\n"));
+                return;
             }
+
+            // za mało graczy
+            if (players.size() < 2)
+            {
+                write(client_fd,
+                      "Msg(Za malo graczy, aby rozpocząć grę)\n",
+                      strlen("Msg(Za malo graczy, aby rozpocząć grę)\n"));
+                return;
+            }
+
+            // ===== START GRY =====
+            state = 2;
+            roundNumber = 0;
+
+            totalScores.clear();
+            for (auto *p : players)
+                totalScores[p->getName()] = 0;
+
+            // 🔥 TO JEST KLUCZ 🔥
+            writeAll("StartGame()\n");
+
+            startRound();
+            return;
         }
 
         // Admin commands - only work in waiting state

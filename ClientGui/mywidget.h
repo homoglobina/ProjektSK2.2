@@ -48,6 +48,8 @@ private:
 
     void handleMessage(const QString &command, const QStringList &args);
     void logToGui(const QString &text, const QString &color = "black");
+    void logGame(const QString &text, const QString &color = "black");
+
 };
 
 #endif // MYWIDGET_H
