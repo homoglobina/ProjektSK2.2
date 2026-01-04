@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QColumnView>
+#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -55,6 +56,13 @@ public:
     QLabel *label;
     QPushButton *startGameButton;
     QTextEdit *gameTextEdit;
+    QGroupBox *groupBox;
+    QWidget *formLayoutWidget;
+    QFormLayout *formLayout;
+    QLineEdit *answerEdit1;
+    QLineEdit *answerEdit3;
+    QLineEdit *answerEdit2;
+    QPushButton *sendAnswersButton;
 
     void setupUi(QWidget *MyWidget)
     {
@@ -162,6 +170,37 @@ public:
         gameTextEdit = new QTextEdit(tab_Game);
         gameTextEdit->setObjectName("gameTextEdit");
         gameTextEdit->setGeometry(QRect(300, 200, 291, 231));
+        groupBox = new QGroupBox(tab_Game);
+        groupBox->setObjectName("groupBox");
+        groupBox->setGeometry(QRect(10, 280, 251, 171));
+        formLayoutWidget = new QWidget(groupBox);
+        formLayoutWidget->setObjectName("formLayoutWidget");
+        formLayoutWidget->setGeometry(QRect(0, 20, 160, 151));
+        formLayout = new QFormLayout(formLayoutWidget);
+        formLayout->setSpacing(6);
+        formLayout->setContentsMargins(11, 11, 11, 11);
+        formLayout->setObjectName("formLayout");
+        formLayout->setContentsMargins(0, 0, 0, 0);
+        answerEdit1 = new QLineEdit(formLayoutWidget);
+        answerEdit1->setObjectName("answerEdit1");
+
+        formLayout->setWidget(0, QFormLayout::LabelRole, answerEdit1);
+
+        answerEdit3 = new QLineEdit(formLayoutWidget);
+        answerEdit3->setObjectName("answerEdit3");
+
+        formLayout->setWidget(2, QFormLayout::LabelRole, answerEdit3);
+
+        answerEdit2 = new QLineEdit(formLayoutWidget);
+        answerEdit2->setObjectName("answerEdit2");
+
+        formLayout->setWidget(1, QFormLayout::LabelRole, answerEdit2);
+
+        sendAnswersButton = new QPushButton(formLayoutWidget);
+        sendAnswersButton->setObjectName("sendAnswersButton");
+
+        formLayout->setWidget(3, QFormLayout::LabelRole, sendAnswersButton);
+
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -197,6 +236,8 @@ public:
         leaveButton->setText(QCoreApplication::translate("MyWidget", "Leave", nullptr));
         label->setText(QCoreApplication::translate("MyWidget", "Players in Lobby", nullptr));
         startGameButton->setText(QCoreApplication::translate("MyWidget", "Start", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("MyWidget", "GroupBox", nullptr));
+        sendAnswersButton->setText(QCoreApplication::translate("MyWidget", "PushButton", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Game", nullptr));
     } // retranslateUi
 

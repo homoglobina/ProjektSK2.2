@@ -12,6 +12,10 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     playerModel = new QStandardItemModel(this);
     ui->columnView->setModel(playerModel);
 
+    connect(ui->sendAnswersButton, &QPushButton::clicked,
+            this, &MyWidget::onSendAnswersClicked);
+    ui->sendAnswersButton->setEnabled(false);
+
     // Tab 1 Joining
     connect(ui->joinBtn, &QPushButton::clicked, this, &MyWidget::joinBtnHit);
     connect(ui->groupLineEdit, &QLineEdit::returnPressed, this, &MyWidget::joinBtnHit);
@@ -308,16 +312,41 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "Category")
     {
+        currentCategories.clear();
+
+        for (const QString &c : args)
+        {
+            for (QChar ch : c)
+            {
+                if (ch.isDigit())
+                    currentCategories.push_back(ch.digitValue());
+            }
+        }
+
         logGame("<b>Kategorie:</b> " + args.join(" "), "blue");
     }
 
     else if (command == "Letter")
     {
+        if (!args.isEmpty())
+        currentLetter = args[0][0];
+
         logGame("<b>Litera:</b> " + args.join(" "), "purple");
     }
 
     else if (command == "Time")
     {
+        roundActive = true;
+
+    ui->answerEdit1->clear();
+    ui->answerEdit2->clear();
+    ui->answerEdit3->clear();
+
+    ui->answerEdit1->setEnabled(true);
+    ui->answerEdit2->setEnabled(true);
+    ui->answerEdit3->setEnabled(true);
+    ui->sendAnswersButton->setEnabled(true);
+
         logGame("<b>Czas:</b> " + args.join(" ") + " s", "red");
     }
 
@@ -356,7 +385,36 @@ void MyWidget::logToGui(const QString &text, const QString &color)
 void MyWidget::logGame(const QString &text, const QString &color)
 {
     ui->gameTextEdit->append(
-        QString("<font color='%1'>%2</font>").arg(color, text)
-    );
+        QString("<font color='%1'>%2</font>").arg(color, text));
+}
+
+void MyWidget::onSendAnswersClicked() {
+    if (!roundActive) return;
+
+    QVector<QLineEdit*> edits = {
+        ui->answerEdit1,
+        ui->answerEdit2,
+        ui->answerEdit3
+    };
+
+    for (int i = 0; i < currentCategories.size() && i < edits.size(); ++i) {
+        QString ans = edits[i]->text().trimmed();
+        if (ans.isEmpty()) continue;
+
+        QString msg = "Guess(" +
+                      QString::number(currentCategories[i]) +
+                      "," + ans + ")\n";
+
+        sock->write(msg.toUtf8());
+    }
+
+    roundActive = false;
+
+    ui->sendAnswersButton->setEnabled(false);
+    ui->answerEdit1->setEnabled(false);
+    ui->answerEdit2->setEnabled(false);
+    ui->answerEdit3->setEnabled(false);
+
+    logToGui("<i>Odpowiedzi wysłane</i>", "gray");
 }
 

@@ -30,6 +30,7 @@ private slots:
     // Tab 3 (Game)
     void onLeaveBtnClicked();
     void onStartButtonClicked();
+    void onSendAnswersClicked();
 
 
     // All time
@@ -38,7 +39,14 @@ private slots:
     void onReadyRead();
     void onErrorOccurred(QAbstractSocket::SocketError socketError);
 
+
+
 private:
+
+    QVector<int> currentCategories;
+    QChar currentLetter;
+    bool roundActive = false;
+
     Ui::MyWidget *ui;
     QTcpSocket *sock;
     QString buffer;

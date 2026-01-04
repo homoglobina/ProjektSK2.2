@@ -426,11 +426,15 @@ CMakeFiles/l6_z2.dir/mywidget.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/qguiapplication_platform.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QColumnView \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qcolumnview.h \
- /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGridLayout \
- /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgridlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QFormLayout \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qformlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QLayout \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qlayout.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qlayoutitem.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qboxlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgridlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGridLayout \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgridlayout.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGroupBox \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgroupbox.h \

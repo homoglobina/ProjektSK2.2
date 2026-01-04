@@ -246,6 +246,47 @@
         </rect>
        </property>
       </widget>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>280</y>
+         <width>251</width>
+         <height>171</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>GroupBox</string>
+       </property>
+       <widget class="QWidget" name="formLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>20</y>
+          <width>160</width>
+          <height>151</height>
+         </rect>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLineEdit" name="answerEdit1"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLineEdit" name="answerEdit3"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLineEdit" name="answerEdit2"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="sendAnswersButton">
+           <property name="text">
+            <string>PushButton</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </widget>
     </widget>
    </item>
