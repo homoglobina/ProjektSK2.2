@@ -329,9 +329,7 @@ macro(append_compiler_executables_configuration)
                         "Please define CMAKE_CXX_COMPILER or enable the C++ language.")
     endif()
 
-    # QtCreator: see https://github.com/conan-io/cmake-conan/pull/689 for details
-    if(NOT "x${_conan_c_compiler}${_conan_cpp_compiler}" STREQUAL "x"
-       AND NOT CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+    if(NOT "x${_conan_c_compiler}${_conan_cpp_compiler}" STREQUAL "x")
         string(APPEND PROFILE "tools.build:compiler_executables={${_conan_c_compiler}${_conan_cpp_compiler}}\n")
     endif()
     unset(_conan_c_compiler)

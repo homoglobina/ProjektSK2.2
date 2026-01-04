@@ -24,13 +24,13 @@ Lobby::~Lobby() {}
 
 void Lobby::writeAll(const std::string &message)
 {
-    for (Gracz* player : players)
+    for (Gracz *player : players)
         write(player->getFd(), message.c_str(), message.size());
 }
 
 void Lobby::writeAllExcept(int exceptFd, const std::string &message)
 {
-    for (Gracz* player : players)
+    for (Gracz *player : players)
         if (player->getFd() != exceptFd)
             write(player->getFd(), message.c_str(), message.size());
 }
@@ -50,20 +50,16 @@ void Lobby::printPlayers()
 
     std::string refreshMsg = "PlayerRefresh()\n";
 
-    for (Gracz* player : players)
+    for (Gracz *player : players)
     {
         write(player->getFd(), refreshMsg.c_str(), refreshMsg.size());
         std::string playerListMsg;
-        for (Gracz* p : players)
+        for (Gracz *p : players)
         {
-            playerListMsg ="Player(" + p->getName() + ")\n";
+            playerListMsg = "Player(" + p->getName() + ")\n";
             write(player->getFd(), playerListMsg.c_str(), playerListMsg.size());
-
         }
     }
-        
-
-
 }
 
 int Lobby::getMaxPlayers() const { return maxPlayers; }
@@ -76,11 +72,11 @@ void Lobby::removePlayer(int playerFd)
             // Check if removed player was admin
             bool wasAdmin = (*it == admin);
             players.erase(it);
-            
+
             // Update admin if necessary
             if (wasAdmin)
                 updateAdmin();
-            
+
             break;
         }
     printPlayers();
@@ -96,13 +92,13 @@ void Lobby::updateAdmin()
         admin = nullptr;
         return;
     }
-    
+
     // Set first player as admin
     admin = players[0];
-    
+
     std::string adminMsg = "Admin(" + admin->getName() + ")\n";
     writeAll(adminMsg);
-    
+
     write(admin->getFd(), "Msg(Jesteś administratorem lobby!)\n", 36);
     std::cout << "New admin in lobby " << name << ": " << admin->getName() << "\n";
 }
@@ -113,11 +109,10 @@ void Lobby::updateAdmin()
 bool Lobby::checkAnswer(std::string &answer, int category)
 {
     std::string file = "../resources/" + std::to_string(category) + ".txt";
-    
+
     std::ifstream in(file);
     if (!in.is_open())
         return false;
-
 
     auto trim = [](std::string &s)
     {
@@ -153,41 +148,41 @@ bool Lobby::checkAnswer(std::string &answer, int category)
 // =========================
 // SEND GAME STATE TO NEW PLAYER
 // =========================
-void Lobby::sendGameStateToPlayer(Gracz* player)
+void Lobby::sendGameStateToPlayer(Gracz *player)
 {
     int playerFd = player->getFd();
-    
+
     // Initialize player score if not exists
     if (totalScores.find(player->getName()) == totalScores.end())
     {
         totalScores[player->getName()] = 0;
     }
-    
+
     // Send admin info
     if (admin)
     {
         std::string adminMsg = "Admin(" + admin->getName() + ")\n";
         write(playerFd, adminMsg.c_str(), adminMsg.size());
-        
+
         if (player == admin)
         {
             write(playerFd, "Msg(Jesteś administratorem lobby!)\n", 36);
         }
     }
-    
+
     if (state == 1)
     {
         // Waiting for players
         write(playerFd, "Msg(Oczekiwanie na rozpoczęcie gry)\n", 37);
-        
+
         // Send current settings
-        std::string settingsMsg = "Msg(Ustawienia: " + std::to_string(maxRounds) + 
+        std::string settingsMsg = "Msg(Ustawienia: " + std::to_string(maxRounds) +
                                   " rund, " + std::to_string(roundTime) + "s na rundę)\n";
         write(playerFd, settingsMsg.c_str(), settingsMsg.size());
-        
+
         // Send current player list
         std::string playersList = "Msg(Gracze w lobby: ";
-        for (const auto* p : players)
+        for (const auto *p : players)
         {
             if (p != player)
                 playersList += p->getName() + ", ";
@@ -199,26 +194,26 @@ void Lobby::sendGameStateToPlayer(Gracz* player)
     {
         // Game in progress - send current round info
         write(playerFd, "Msg(Gra w toku - dołączyłeś w trakcie rundy)\n", 47);
-        
+
         // Send categories
         std::string categoriesStr;
         for (int cat : categories)
             categoriesStr += std::to_string(cat);
         std::string catMsg = "Category(" + categoriesStr + ")\n";
         write(playerFd, catMsg.c_str(), catMsg.size());
-        
+
         // Send current letter
         std::string letterMsg = "Letter(" + std::string(1, currentLetter) + ")\n";
         write(playerFd, letterMsg.c_str(), letterMsg.size());
-        
+
         // Send round info
-        std::string roundMsg = "Msg(Runda " + std::to_string(roundNumber) + "/" + 
+        std::string roundMsg = "Msg(Runda " + std::to_string(roundNumber) + "/" +
                                std::to_string(maxRounds) + ")\n";
         write(playerFd, roundMsg.c_str(), roundMsg.size());
-        
+
         // Send current standings
         write(playerFd, "Msg(Aktualne wyniki:)\n", 23);
-        for (const auto& [name, score] : totalScores)
+        for (const auto &[name, score] : totalScores)
         {
             std::string scoreMsg = "Msg(" + name + ": " + std::to_string(score) + " pkt)\n";
             write(playerFd, scoreMsg.c_str(), scoreMsg.size());
@@ -232,11 +227,12 @@ void Lobby::sendGameStateToPlayer(Gracz* player)
 void Lobby::startRound()
 {
     std::cout << "=== START RUNDY " << roundNumber + 1 << " ===\n";
-    
+
     roundNumber++;
 
     static bool seeded = false;
-    if (!seeded) {
+    if (!seeded)
+    {
         std::srand(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
         seeded = true;
     }
@@ -247,7 +243,7 @@ void Lobby::startRound()
         categoriesStr += std::to_string(cat);
 
     // Initialize scores for any new players
-    for (const auto* player : players)
+    for (const auto *player : players)
     {
         if (totalScores.find(player->getName()) == totalScores.end())
         {
@@ -255,10 +251,10 @@ void Lobby::startRound()
         }
     }
 
-    std::string roundMsg = "Msg(Runda " + std::to_string(roundNumber) + "/" + 
+    std::string roundMsg = "Msg(Runda " + std::to_string(roundNumber) + "/" +
                            std::to_string(maxRounds) + ")\n";
     writeAll(roundMsg);
-    
+
     writeAll("Category(" + categoriesStr + ")\n");
     writeAll("Letter(" + std::string(1, currentLetter) + ")\n");
     writeAll("Time(" + std::to_string(roundTime) + ")\n");
@@ -272,25 +268,26 @@ void Lobby::startRound()
 void Lobby::gameFinished()
 {
     writeAll("RoundEnd()\n");
-    
+
     // Send final total scores
     writeAll("Msg(=== KOŃCOWE WYNIKI ===)\n");
-    
+
     // Sort players by score
     std::vector<std::pair<std::string, int>> sortedScores(totalScores.begin(), totalScores.end());
-    std::sort(sortedScores.begin(), sortedScores.end(), 
-              [](const auto& a, const auto& b) { return a.second > b.second; });
-    
+    std::sort(sortedScores.begin(), sortedScores.end(),
+              [](const auto &a, const auto &b)
+              { return a.second > b.second; });
+
     int position = 1;
-    for (const auto& [name, score] : sortedScores)
+    for (const auto &[name, score] : sortedScores)
     {
-        std::string finalMsg = "FinalScore(" + std::to_string(position) + "," + 
+        std::string finalMsg = "FinalScore(" + std::to_string(position) + "," +
                                name + "," + std::to_string(score) + ")\n";
         writeAll(finalMsg);
         std::cout << position << ". " << name << ": " << score << " punktów\n";
         position++;
     }
-    
+
     writeAll("GameEnd()\n");
 
     // Reset for next game
@@ -351,15 +348,15 @@ void Lobby::endRound()
     for (auto &[playerName, pts] : roundPoints)
     {
         totalScores[playerName] += pts;
-        
+
         // Send round score
         writeAll("Score(" + playerName + "," + std::to_string(pts) + ")\n");
         std::cout << "Player " << playerName << " scored " << pts << " points this round.\n";
     }
-    
+
     // Send total scores after each round
     writeAll("Msg(Suma punktów:)\n");
-    for (const auto& [name, totalScore] : totalScores)
+    for (const auto &[name, totalScore] : totalScores)
     {
         std::string totalMsg = "TotalScore(" + name + "," + std::to_string(totalScore) + ")\n";
         writeAll(totalMsg);
@@ -377,7 +374,7 @@ void Lobby::endRound()
 // =========================
 // LOGIKA W TRAKCIE GRY
 // =========================
-void Lobby::gameLogic(std::string command, std::string content, int client_fd, Gracz& player)
+void Lobby::gameLogic(std::string command, std::string content, int client_fd, Gracz &player)
 {
     int category;
     std::string guess;
@@ -388,7 +385,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
 
         if (command == "ShowSettings")
         {
-            std::string settingsMsg = "Msg(Ustawienia: " + std::to_string(maxRounds) + 
+            std::string settingsMsg = "Msg(Ustawienia: " + std::to_string(maxRounds) +
                                       " rund, " + std::to_string(roundTime) + "s na rundę, Kategorie: ";
             for (int cat : categories)
                 settingsMsg += std::to_string(cat) + ",";
@@ -414,14 +411,14 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             if (players.size() >= 2)
             {
                 state = 2;
-                
+
                 // Initialize all player scores
                 totalScores.clear();
-                for (const auto* p : players)
+                for (const auto *p : players)
                 {
                     totalScores[p->getName()] = 0;
                 }
-                
+
                 roundNumber = 0;
                 writeAll("StartGame(Gra rozpoczeta!)\n");
                 startRound();
@@ -432,7 +429,6 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             }
         }
 
-
         // Admin commands - only work in waiting state
         if (command == "SetTime")
         {
@@ -441,21 +437,21 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                 write(client_fd, "Msg(Tylko administrator może zmieniać ustawienia)\n", 51);
                 return;
             }
-            
+
             int newTime = std::stoi(content);
             if (newTime < 10 || newTime > 300)
             {
                 write(client_fd, "Msg(Czas musi być między 10 a 300 sekund)\n", 44);
                 return;
             }
-            
+
             setRoundTime(newTime);
             std::string msg = "Msg(Czas rundy ustawiony na " + std::to_string(newTime) + "s)\n";
             writeAll(msg);
             std::cout << "Admin " << player.getName() << " set round time to " << newTime << "s\n";
             return;
         }
-        
+
         if (command == "SetRounds")
         {
             if (&player != admin)
@@ -463,21 +459,21 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                 write(client_fd, "Msg(Tylko administrator może zmieniać ustawienia)\n", 51);
                 return;
             }
-            
+
             int newRounds = std::stoi(content);
             if (newRounds < 1 || newRounds > 10)
             {
                 write(client_fd, "Msg(Liczba rund musi być między 1 a 10)\n", 42);
                 return;
             }
-            
+
             setMaxRounds(newRounds);
             std::string msg = "Msg(Liczba rund ustawiona na " + std::to_string(newRounds) + ")\n";
             writeAll(msg);
             std::cout << "Admin " << player.getName() << " set rounds to " << newRounds << "\n";
             return;
         }
-        
+
         if (command == "SetCategories")
         {
             if (&player != admin)
@@ -485,7 +481,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                 write(client_fd, "Msg(Tylko administrator może zmieniać ustawienia)\n", 51);
                 return;
             }
-            
+
             // Parse categories: "1,2,3" or "123"
             std::vector<int> newCategories;
             for (char c : content)
@@ -495,37 +491,64 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                     newCategories.push_back(c - '0');
                 }
             }
-            
+
             if (newCategories.empty())
             {
                 write(client_fd, "Msg(Nieprawidłowe kategorie. Użyj liczb od 1 do 6)\n", 54);
                 return;
             }
-            
+
             setCategories(newCategories);
-            
+
             std::string catStr;
             for (int cat : newCategories)
                 catStr += std::to_string(cat) + ",";
             if (!catStr.empty())
                 catStr.pop_back();
-            
+
             std::string msg = "Msg(Kategorie ustawione na: " + catStr + ")\n";
             writeAll(msg);
             std::cout << "Admin " << player.getName() << " set categories to " << catStr << "\n";
             return;
         }
-        
- 
+
         break;
     case 2:
+
+    {
+        // ===== LEAVE LOBBY =====
+        if (command == "LeaveLobby")
+        {
+            std::cout << "Gracz " << player.getName()
+                      << " opuszcza lobby " << name << "\n";
+
+            // usuń z lobby
+            removePlayer(player.getFd());
+
+            // reset gracza
+            player.setCurrentLobbyID(-1);
+            player.setState(1);
+
+            // info do klienta
+            std::string msg = "LeftLobby()\n";
+            write(player.getFd(), msg.c_str(), msg.size());
+
+            // jeśli admin wyszedł – wybierz nowego
+            if (admin == &player)
+            {
+                updateAdmin();
+            }
+
+            return;
+        }
+
         if (command == "Guess")
         {
             size_t commaPos = content.find(',');
             category = std::stoi(content.substr(0, commaPos));
             guess = content.substr(commaPos + 1);
             answers[category][player.getName()] = guess;
-            
+
             if (!guess.empty() && std::toupper(guess[0]) == currentLetter && checkAnswer(guess, category))
             {
                 write(client_fd, "Msg(Poprawna odpowiedz)\n", 25);
@@ -537,6 +560,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             std::cout << "Player " << player.getName() << " answered in category " << category << ": " << guess << "\n";
         }
         break;
+    }
 
     default:
         break;

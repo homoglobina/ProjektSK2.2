@@ -45,7 +45,7 @@ int Serwer::createLobby(std::string lobbyName)
     return newLobbyID;
 }
 
-void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& player)
+void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &player)
 {
     std::string trimmed_msg = msg;
     trimmed_msg.erase(trimmed_msg.find_last_not_of("\n\r") + 1);
@@ -94,7 +94,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
                 return;
             }
         }
-        for (auto& p : playerList)
+        for (auto &p : playerList)
         {
             if (p->getName() == content)
             {
@@ -114,12 +114,14 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
     case 1:
         if (command == "CreateLobby")
         {
-            if (createLobby(content) != -1){
+            if (createLobby(content) != -1)
+            {
                 std::string createdMsg = "Utworzono lobby: " + content + "\n";
                 write(client_fd, createdMsg.c_str(), createdMsg.size());
                 return;
             }
-            else {
+            else
+            {
                 std::string errorMsg = "Error(\"Lobby_Exists\")\n";
                 write(client_fd, errorMsg.c_str(), errorMsg.size());
                 return;
@@ -135,7 +137,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
             write(client_fd, "Error(\"Invalid_Format\")\n", 25);
             return;
         }
-        else 
+        else
         {
             for (const auto &lobby : lobbyList)
             {
@@ -146,7 +148,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
 
                     lobbyID = lobbyName_to_id[content];
                     player.setCurrentLobbyID(lobbyID);
-                    
+
                     // Add player and update admin if needed
                     lobbyList[lobbyID]->addPlayer(&player);
                     if (lobbyList[lobbyID]->getAdmin() == nullptr)
@@ -155,10 +157,10 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
                     }
 
                     player.setState(2);
-                    
+
                     // Send current game state to the new player
                     lobbyList[lobbyID]->sendGameStateToPlayer(&player);
-                    
+
                     // Send list of players to all in lobby
                     lobbyList[lobbyID]->printPlayers();
 
@@ -176,9 +178,32 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz& p
         }
 
     case 2:
+    {
         lobbyID = player.getCurrentLobbyID();
         lobbyList[lobbyID]->gameLogic(command, content, client_fd, player);
         break;
+
+        // lobbyID = playerList[index]->getCurrentLobbyID();
+
+        // if (command == "LeaveLobby")
+        // {
+        //     lobbyList[lobbyID]->removePlayer(client_fd);
+
+        //     playerList[index]->setCurrentLobbyID(-1);
+        //     playerList[index]->setState(1);
+
+        //     const char *msg = "LeftLobby()\n";
+        //     write(client_fd, msg, strlen(msg));
+
+        //     std::cout << "Gracz "
+        //               << playerList[index]->getName()
+        //               << " opuscil lobby\n";
+        //     return;
+        // }
+
+        // lobbyList[lobbyID]->gameLogic(command, content, client_fd, index);
+        // break;
+    }
 
     default:
         break;
@@ -209,7 +234,6 @@ void Serwer::printPlayers(int client_fd)
     }
 }
 
-
 Serwer::Serwer(int port)
 {
     socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -236,7 +260,6 @@ Serwer::Serwer(int port)
 
     std::cout << "Rozpoczęcie nasłuchiwania\n";
     listen(socket_fd, 5);
-
 
     playerList.reserve(1000);
 
@@ -304,10 +327,9 @@ void Serwer::run()
                 newPlayer->setFd(cd);
                 newPlayer->setNr(player_index);
 
-                playerList.push_back(newPlayer); 
+                playerList.push_back(newPlayer);
 
                 fd_to_index[cd] = player_index;
-
 
                 // write(cd, "Nawiązano połączenie\n", 23);
                 // write(cd, "Wybierz unikalne imie: ", 23);
@@ -385,7 +407,7 @@ void Serwer::run()
             auto it = fd_to_index.find(client_fd);
             if (it != fd_to_index.end())
             {
-            handleClientMessage(client_fd, std::string(buffer, n), *playerList[it->second]);    
+                handleClientMessage(client_fd, std::string(buffer, n), *playerList[it->second]);
             }
         }
     }

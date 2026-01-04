@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "l6_z2",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "l6_z2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-l6_z2-Debug-7ac472e5e8426245a387.json",
+					"name" : "l6_z2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "l6_z2_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-l6_z2_autogen-Debug-543845fe5b158c234421.json",
+					"name" : "l6_z2_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "l6_z2_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-l6_z2_autogen_timestamp_deps-Debug-f0f01b9269d0d3365f9b.json",
+					"name" : "l6_z2_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/mnt/c/Users/HP/Documents/Wojtek/ProjektSK2.2/ClientGui/build/Desktop-Debug",
+		"source" : "/mnt/c/Users/HP/Documents/Wojtek/ProjektSK2.2/ClientGui"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
