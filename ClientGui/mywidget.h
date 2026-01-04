@@ -43,6 +43,9 @@ private slots:
 
 private:
 
+    QMap<QString, int> totalScores;
+
+
     QVector<int> currentCategories;
     QChar currentLetter;
     bool roundActive = false;

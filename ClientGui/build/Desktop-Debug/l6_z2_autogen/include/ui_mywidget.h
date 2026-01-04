@@ -16,12 +16,14 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -63,6 +65,7 @@ public:
     QLineEdit *answerEdit3;
     QLineEdit *answerEdit2;
     QPushButton *sendAnswersButton;
+    QTableWidget *scoreTable;
 
     void setupUi(QWidget *MyWidget)
     {
@@ -160,16 +163,16 @@ public:
         columnView->setGeometry(QRect(10, 80, 256, 192));
         leaveButton = new QPushButton(tab_Game);
         leaveButton->setObjectName("leaveButton");
-        leaveButton->setGeometry(QRect(500, 80, 84, 26));
+        leaveButton->setGeometry(QRect(110, 50, 84, 26));
         label = new QLabel(tab_Game);
         label->setObjectName("label");
         label->setGeometry(QRect(10, 50, 111, 16));
         startGameButton = new QPushButton(tab_Game);
         startGameButton->setObjectName("startGameButton");
-        startGameButton->setGeometry(QRect(500, 140, 84, 26));
+        startGameButton->setGeometry(QRect(110, 20, 84, 26));
         gameTextEdit = new QTextEdit(tab_Game);
         gameTextEdit->setObjectName("gameTextEdit");
-        gameTextEdit->setGeometry(QRect(300, 200, 291, 231));
+        gameTextEdit->setGeometry(QRect(300, 20, 291, 231));
         groupBox = new QGroupBox(tab_Game);
         groupBox->setObjectName("groupBox");
         groupBox->setGeometry(QRect(10, 280, 251, 171));
@@ -201,6 +204,12 @@ public:
 
         formLayout->setWidget(3, QFormLayout::LabelRole, sendAnswersButton);
 
+        scoreTable = new QTableWidget(tab_Game);
+        if (scoreTable->columnCount() < 3)
+            scoreTable->setColumnCount(3);
+        scoreTable->setObjectName("scoreTable");
+        scoreTable->setGeometry(QRect(280, 260, 321, 192));
+        scoreTable->setColumnCount(3);
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -236,8 +245,8 @@ public:
         leaveButton->setText(QCoreApplication::translate("MyWidget", "Leave", nullptr));
         label->setText(QCoreApplication::translate("MyWidget", "Players in Lobby", nullptr));
         startGameButton->setText(QCoreApplication::translate("MyWidget", "Start", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("MyWidget", "GroupBox", nullptr));
-        sendAnswersButton->setText(QCoreApplication::translate("MyWidget", "PushButton", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("MyWidget", "Odpowiedzi", nullptr));
+        sendAnswersButton->setText(QCoreApplication::translate("MyWidget", "Wyslij", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Game", nullptr));
     } // retranslateUi
 

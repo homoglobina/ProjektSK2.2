@@ -51,6 +51,12 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     ui->portSpinBox->setValue(12345);
 
     logToGui("<i>Welcome! Please connect to the server.</i>", "gray");
+
+    ui->scoreTable->setColumnCount(2);
+    ui->scoreTable->setHorizontalHeaderLabels({"Gracz", "Punkty"});
+    ui->scoreTable->horizontalHeader()->setStretchLastSection(true);
+    ui->scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->scoreTable->setSelectionMode(QAbstractItemView::NoSelection);
 }
 
 MyWidget::~MyWidget()
@@ -258,6 +264,10 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
         // wyczyść stare dane gry
         ui->msgsTextEdit->clear();
+
+        ui->scoreTable->setColumnCount(2);
+        ui->scoreTable->setHorizontalHeaderLabels({"Gracz", "Punkty"});
+        ui->scoreTable->setRowCount(0);
     }
 
     else if (command == "Joined")
@@ -329,7 +339,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     else if (command == "Letter")
     {
         if (!args.isEmpty())
-        currentLetter = args[0][0];
+            currentLetter = args[0][0];
 
         logGame("<b>Litera:</b> " + args.join(" "), "purple");
     }
@@ -338,40 +348,112 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     {
         roundActive = true;
 
-    ui->answerEdit1->clear();
-    ui->answerEdit2->clear();
-    ui->answerEdit3->clear();
+        ui->answerEdit1->clear();
+        ui->answerEdit2->clear();
+        ui->answerEdit3->clear();
 
-    ui->answerEdit1->setEnabled(true);
-    ui->answerEdit2->setEnabled(true);
-    ui->answerEdit3->setEnabled(true);
-    ui->sendAnswersButton->setEnabled(true);
+        ui->answerEdit1->setEnabled(true);
+        ui->answerEdit2->setEnabled(true);
+        ui->answerEdit3->setEnabled(true);
+        ui->sendAnswersButton->setEnabled(true);
 
         logGame("<b>Czas:</b> " + args.join(" ") + " s", "red");
     }
 
+    // else if (command == "RoundEnd")
+    // {
+    //     logGame("<hr><b>Koniec rundy</b>", "black");
+    // }
+
     else if (command == "RoundEnd")
     {
         logGame("<hr><b>Koniec rundy</b>", "black");
+
+        // ui->scoreTable->setRowCount(totalScores.size());
+
+        // int row = 0;
+        // for (auto it = totalScores.begin(); it != totalScores.end(); ++it)
+        // {
+        //     ui->scoreTable->setItem(row, 0, new QTableWidgetItem(it.key()));
+        //     ui->scoreTable->setItem(row, 1,
+        //                             new QTableWidgetItem(QString::number(it.value())));
+        //     row++;
+        // }
     }
+
+    // else if (command == "Score")
+    // {
+    //     if (args.size() >= 3)
+    //     {
+    //         logGame(
+    //             "Kat " + args[0] + ": +" + args[1] + " pkt (" + args[2] + ")",
+    //             "darkgreen");
+    //     }
+    // }
+
+    // else if (command == "Score")
+    // {
+    //     if (args.size() >= 3)
+    //     {
+    //         QString category = args[0];
+    //         int points = args[1].toInt();
+    //         QString answer = args[2];
+
+    //         QString player = "YOU"; // jeśli nie rozróżniasz jeszcze graczy
+    //         totalScores[player] += points;
+
+    //         logToGui(
+    //             "Kat " + category + ": +" + QString::number(points) +
+    //                 " pkt (" + answer + ")",
+    //             "darkgreen");
+    //     }
+    // }
 
     else if (command == "Score")
     {
-        if (args.size() >= 3)
+        QString player = args[0];
+        int points = args[1].toInt();
+
+        bool found = false;
+        for (int r = 0; r < ui->scoreTable->rowCount(); ++r)
         {
-            logGame(
-                "Kat " + args[0] + ": +" + args[1] + " pkt (" + args[2] + ")",
-                "darkgreen");
+            if (ui->scoreTable->item(r, 0)->text() == player)
+            {
+                int current = ui->scoreTable->item(r, 1)->text().toInt();
+                ui->scoreTable->item(r, 1)->setText(QString::number(current + points));
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            int row = ui->scoreTable->rowCount();
+            ui->scoreTable->insertRow(row);
+            ui->scoreTable->setItem(row, 0, new QTableWidgetItem(player));
+            ui->scoreTable->setItem(row, 1, new QTableWidgetItem(QString::number(points)));
         }
     }
 
+    // else if (command == "GameEnd")
+    // {
+    //     logGame("<b>KONIEC GRY</b>", "red");
+
+    //     ui->tabWidget->setTabEnabled(1, true);
+    //     ui->tabWidget->setTabEnabled(2, false);
+    //     ui->tabWidget->setCurrentIndex(1);
+    // }
+
     else if (command == "GameEnd")
     {
-        logGame("<b>KONIEC GRY</b>", "red");
+        logGame("<hr><b>KONIEC GRY</b>", "red");
 
-        ui->tabWidget->setTabEnabled(1, true);
-        ui->tabWidget->setTabEnabled(2, false);
-        ui->tabWidget->setCurrentIndex(1);
+        QMessageBox::information(
+            this,
+            "Koniec gry",
+            "Gra zakończona! Sprawdź wyniki w tabeli.");
+
+        ui->tabWidget->setCurrentIndex(1); // powrót do lobby
     }
 
     // TODO:
@@ -388,18 +470,21 @@ void MyWidget::logGame(const QString &text, const QString &color)
         QString("<font color='%1'>%2</font>").arg(color, text));
 }
 
-void MyWidget::onSendAnswersClicked() {
-    if (!roundActive) return;
+void MyWidget::onSendAnswersClicked()
+{
+    if (!roundActive)
+        return;
 
-    QVector<QLineEdit*> edits = {
+    QVector<QLineEdit *> edits = {
         ui->answerEdit1,
         ui->answerEdit2,
-        ui->answerEdit3
-    };
+        ui->answerEdit3};
 
-    for (int i = 0; i < currentCategories.size() && i < edits.size(); ++i) {
+    for (int i = 0; i < currentCategories.size() && i < edits.size(); ++i)
+    {
         QString ans = edits[i]->text().trimmed();
-        if (ans.isEmpty()) continue;
+        if (ans.isEmpty())
+            continue;
 
         QString msg = "Guess(" +
                       QString::number(currentCategories[i]) +
@@ -417,4 +502,3 @@ void MyWidget::onSendAnswersClicked() {
 
     logToGui("<i>Odpowiedzi wysłane</i>", "gray");
 }
-
