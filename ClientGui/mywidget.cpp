@@ -30,6 +30,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     sock = new QTcpSocket(this);
     isLoggedIn = false;
     gameRunning = false;
+    isAdmin = false;
 
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, &MyWidget::updateTimer);
@@ -93,7 +94,9 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     ui->scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->scoreTable->setSelectionMode(QAbstractItemView::NoSelection);
 
-
+    if (ui->adminLed) {
+        ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
+    }
     updateStartButtonState();
 }
 
@@ -138,7 +141,7 @@ void MyWidget::updateStartButtonState()
 
     int playerCount = playerModel->rowCount();
 
-    if (playerCount >= 2) {
+    if (playerCount >= 2 && isAdmin) {
         ui->startGameButton->setEnabled(true);
         ui->startGameButton->setStyleSheet("background-color: green; color: white; font-weight: bold;");
     } else {
@@ -190,6 +193,11 @@ void MyWidget::onDisconnected()
     ui->tabWidget->setTabEnabled(1, false);
     ui->tabWidget->setTabEnabled(2, false);
     ui->tabWidget->setCurrentIndex(0); // Jump back to login
+
+    // Tab 2
+    if (ui->adminLed) {
+        ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
+    }
 
     isLoggedIn = false;
     logToGui("<b>Disconnected.</b>", "red");
@@ -342,6 +350,9 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "Joined")
     {
+        isAdmin = false;
+        updateStartButtonState();
+
         ui->tabWidget->setTabEnabled(1, false);
         ui->tabWidget->setTabEnabled(2, true);
         ui->tabWidget->setCurrentIndex(2);
@@ -370,6 +381,10 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "LeftLobby")
     {
+        if (ui->adminLed) {
+            ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
+        }
+
         ui->tabWidget->setTabEnabled(1, true);
         ui->tabWidget->setTabEnabled(2, false);
         ui->tabWidget->setCurrentIndex(1);
@@ -526,6 +541,16 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         }
     }
 
+    else if (command == "BecameAdmin")
+    {
+        isAdmin = true;
+        updateStartButtonState();
+
+        if (ui->adminLed) {
+            ui->adminLed->setStyleSheet("background-color: #00FF00; border-radius: 15px; border: 1px solid black;");
+        }
+        logToGui("<b>Zostałeś administratorem lobby!</b>", "gold");
+    }
 
     else if (command == "GameEnd")
     {

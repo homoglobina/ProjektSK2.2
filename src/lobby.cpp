@@ -17,7 +17,7 @@ Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlay
     state = 1;
     categories = {1, 2, 3};
     maxRounds = 2;
-    roundTime = 60;
+    roundTime = 180;
     admin = nullptr;
 }
 
@@ -100,7 +100,7 @@ void Lobby::updateAdmin()
     std::string adminMsg = "Admin(" + admin->getName() + ")\n";
     writeAll(adminMsg);
 
-    write(admin->getFd(), "Msg(Jesteś administratorem lobby!)\n", 36);
+    write(admin->getFd(), "BecameAdmin()\n", 15);
     std::cout << "New admin in lobby " << name << ": " << admin->getName() << "\n";
 }
 
@@ -168,6 +168,7 @@ void Lobby::sendGameStateToPlayer(Gracz *player)
         if (player == admin)
         {
             write(playerFd, "Msg(Jesteś administratorem lobby!)\n", 36);
+            write(playerFd, "BecameAdmin()\n", 15);
         }
     }
 

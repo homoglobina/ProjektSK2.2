@@ -75,6 +75,8 @@ public:
     QLabel *label_6;
     QTextEdit *currentLetter;
     QLabel *label_7;
+    QLabel *label_8;
+    QLabel *adminLed;
 
     void setupUi(QWidget *MyWidget)
     {
@@ -175,13 +177,13 @@ public:
         leaveButton->setGeometry(QRect(10, 20, 84, 26));
         label = new QLabel(tab_Game);
         label->setObjectName("label");
-        label->setGeometry(QRect(490, 240, 111, 16));
+        label->setGeometry(QRect(490, 250, 111, 16));
         startGameButton = new QPushButton(tab_Game);
         startGameButton->setObjectName("startGameButton");
         startGameButton->setGeometry(QRect(110, 20, 84, 26));
         gameTextEdit = new QTextEdit(tab_Game);
         gameTextEdit->setObjectName("gameTextEdit");
-        gameTextEdit->setGeometry(QRect(480, 490, 291, 231));
+        gameTextEdit->setGeometry(QRect(490, 490, 321, 231));
         groupBox = new QGroupBox(tab_Game);
         groupBox->setObjectName("groupBox");
         groupBox->setGeometry(QRect(10, 250, 311, 171));
@@ -219,10 +221,10 @@ public:
         categoryWidget->setGeometry(QRect(10, 90, 221, 121));
         label_3 = new QLabel(tab_Game);
         label_3->setObjectName("label_3");
-        label_3->setGeometry(QRect(490, 20, 57, 16));
+        label_3->setGeometry(QRect(490, 30, 57, 16));
         label_4 = new QLabel(tab_Game);
         label_4->setObjectName("label_4");
-        label_4->setGeometry(QRect(480, 470, 141, 16));
+        label_4->setGeometry(QRect(490, 470, 141, 16));
         label_5 = new QLabel(tab_Game);
         label_5->setObjectName("label_5");
         label_5->setGeometry(QRect(10, 70, 81, 16));
@@ -235,13 +237,19 @@ public:
         currentLetter = new QTextEdit(tab_Game);
         currentLetter->setObjectName("currentLetter");
         currentLetter->setEnabled(false);
-        currentLetter->setGeometry(QRect(320, 180, 71, 64));
+        currentLetter->setGeometry(QRect(250, 170, 141, 51));
         QFont font;
         font.setBold(true);
         currentLetter->setFont(font);
         label_7 = new QLabel(tab_Game);
         label_7->setObjectName("label_7");
         label_7->setGeometry(QRect(250, 140, 91, 41));
+        label_8 = new QLabel(tab_Game);
+        label_8->setObjectName("label_8");
+        label_8->setGeometry(QRect(250, 30, 57, 16));
+        adminLed = new QLabel(tab_Game);
+        adminLed->setObjectName("adminLed");
+        adminLed->setGeometry(QRect(300, 20, 30, 30));
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -254,7 +262,7 @@ public:
 
         retranslateUi(MyWidget);
 
-        tabWidget->setCurrentIndex(2);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MyWidget);
@@ -268,6 +276,7 @@ public:
         joinBtn->setText(QCoreApplication::translate("MyWidget", "connect", nullptr));
         talkGroup->setTitle(QString());
         sendBtn->setText(QCoreApplication::translate("MyWidget", "send", nullptr));
+        msgNickEdit->setText(QCoreApplication::translate("MyWidget", "Enter nickname...", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_login), QCoreApplication::translate("MyWidget", "Join", nullptr));
         disconectButton->setText(QCoreApplication::translate("MyWidget", "Disconnect", nullptr));
         refreshButton->setText(QCoreApplication::translate("MyWidget", "Refresh", nullptr));
@@ -293,6 +302,8 @@ public:
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:48pt; font-weight:400;\">Q</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:48pt; font-weight:400;\"><br /></p></body></html>", nullptr));
         label_7->setText(QCoreApplication::translate("MyWidget", "Bie\305\274aca litera", nullptr));
+        label_8->setText(QCoreApplication::translate("MyWidget", "Admin", nullptr));
+        adminLed->setText(QString());
         tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Game", nullptr));
     } // retranslateUi
 

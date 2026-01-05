@@ -57,6 +57,7 @@ private:
 
     bool roundActive = false;
     bool gameRunning = false;
+    bool isAdmin = false;
 
     Ui::MyWidget *ui;
     QTcpSocket *sock;
