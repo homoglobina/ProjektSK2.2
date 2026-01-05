@@ -14,7 +14,7 @@ Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlay
     timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
     state = 1;
     categories = {1, 2, 3};
-    maxRounds = 2;
+    maxRounds = 10;
     roundTime = 60;
     admin = nullptr;
 }

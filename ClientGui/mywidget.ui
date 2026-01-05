@@ -271,11 +271,32 @@
          <item row="0" column="0">
           <widget class="QLineEdit" name="answerEdit1"/>
          </item>
-         <item row="2" column="0">
-          <widget class="QLineEdit" name="answerEdit3"/>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Państwo</string>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLineEdit" name="answerEdit2"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Miasto w PL</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLineEdit" name="answerEdit3"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="miastoLabel">
+           <property name="text">
+            <string>Miasto</string>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QPushButton" name="sendAnswersButton">
