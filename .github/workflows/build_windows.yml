@@ -13,14 +13,14 @@ jobs:
         version: '6.5.0'
         host: 'windows'
         target: 'desktop'
-        arch: 'win64_mingw'
+        arch: 'win64_msvc2019_64'
 
     - name: Build
       run: |
         cd ClientGui
         mkdir build
         cd build
-        cmake .. -G "MinGW Makefiles"
+        # cmake .. -G "MinGW Makefiles"
         cmake --build . --config Release
 
     - name: Deploy
