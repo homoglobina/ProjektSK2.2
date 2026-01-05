@@ -26,9 +26,8 @@ jobs:
     - name: Deploy
       run: |
         cd ClientGui/build
-        # MSVC puts the exe in a 'Release' subfolder
-        windeployqt --release Release\gui_client.exe --dir deploy
-        copy Release\gui_client.exe deploy\
+        windeployqt --release --no-translations --no-opengl-sw --no-compiler-runtime Release\gui_client.exe --dir deploy
+        Copy-Item Release\gui_client.exe -Destination deploy\
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
