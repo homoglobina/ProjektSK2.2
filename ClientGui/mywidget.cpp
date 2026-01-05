@@ -29,6 +29,7 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
 
     sock = new QTcpSocket(this);
     isLoggedIn = false;
+    gameRunning = false;
 
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, &MyWidget::updateTimer);
@@ -127,14 +128,18 @@ void MyWidget::onDisconnectBtnClicked()
     }
 }
 
-
 void MyWidget::updateStartButtonState()
 {
+    if (gameRunning) {
+        ui->startGameButton->setEnabled(false);
+        ui->startGameButton->setStyleSheet("");
+        return;
+    }
+
     int playerCount = playerModel->rowCount();
 
     if (playerCount >= 2) {
         ui->startGameButton->setEnabled(true);
-
         ui->startGameButton->setStyleSheet("background-color: green; color: white; font-weight: bold;");
     } else {
         ui->startGameButton->setEnabled(false);
@@ -318,6 +323,9 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "StartGame")
     {
+        gameRunning = true;
+        updateStartButtonState();
+
         logGame("<b>Gra rozpoczęta!</b>", "green");
 
         ui->tabWidget->setTabEnabled(1, false);
@@ -521,6 +529,8 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "GameEnd")
     {
+        roundActive = false;
+        gameRunning = false;
         logGame("<hr><b>KONIEC GRY</b>", "red");
 
         QMessageBox::information(
@@ -528,7 +538,8 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
             "Koniec gry",
             "Gra zakończona! Sprawdź wyniki w tabeli.");
 
-        ui->tabWidget->setCurrentIndex(1); // powrót do lobby
+        // ui->tabWidget->setCurrentIndex(1); // powrót do lobby
+        updateStartButtonState();
     }
 
     // TODO:

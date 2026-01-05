@@ -54,7 +54,9 @@ private:
 
     QVector<int> currentCategories;
     QChar currentLetter;
+
     bool roundActive = false;
+    bool gameRunning = false;
 
     Ui::MyWidget *ui;
     QTcpSocket *sock;

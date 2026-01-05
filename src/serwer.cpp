@@ -370,7 +370,7 @@ void Serwer::run()
                 continue;
             }
 
-            // ---- KLIENT ZAMKNĄŁ SOCKET ----
+            // KLIENT ZAMKNĄŁ SOCKET 
             if (n == 0)
             {
                 std::cout << std::setw(16) << "Zamknięcie połączenia z " << client_fd << "\n";
@@ -381,22 +381,46 @@ void Serwer::run()
                 auto it_index = fd_to_index.find(client_fd);
                 if (it_index != fd_to_index.end())
                 {
-                    int currentLobbyID = playerList[it_index->second]->getCurrentLobbyID();
+                    size_t idxToRemove = it_index->second;
 
-                    if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size()))
+
+                    if (idxToRemove < playerList.size()) 
                     {
-                        lobbyList[currentLobbyID]->removePlayer(client_fd);
+                        int currentLobbyID = playerList[idxToRemove]->getCurrentLobbyID();
+                        if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size()))
+                        {
+                            lobbyList[currentLobbyID]->removePlayer(client_fd);
+                        }
                     }
+
+                    size_t lastIdx = playerList.size() - 1;
+
+                    if (idxToRemove != lastIdx)
+                    {
+                        std::shared_ptr<Gracz> lastPlayer = playerList[lastIdx];
+                        int lastPlayerFd = lastPlayer->getFd();
+
+                        playerList[idxToRemove] = lastPlayer; 
+
+                        fd_to_index[lastPlayerFd] = idxToRemove;
+                        
+                        lastPlayer->setNr(idxToRemove);
+                    }
+
+
+                    playerList.pop_back();
 
                     fd_to_index.erase(client_fd);
                 }
-
-                for (auto it = playerList.begin(); it != playerList.end(); ++it)
+                else 
                 {
-                    if ((*it)->getFd() == client_fd)
+                    for (auto it = playerList.begin(); it != playerList.end(); ++it)
                     {
-                        playerList.erase(it);
-                        break;
+                        if ((*it)->getFd() == client_fd)
+                        {
+                            playerList.erase(it);
+                            break;
+                        }
                     }
                 }
 
