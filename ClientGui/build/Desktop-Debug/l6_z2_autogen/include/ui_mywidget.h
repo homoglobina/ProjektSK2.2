@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QColumnView>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFormLayout>
@@ -23,6 +24,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollArea>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QTableWidget>
@@ -77,6 +79,24 @@ public:
     QLabel *label_7;
     QLabel *label_8;
     QLabel *adminLed;
+    QWidget *formLayoutWidget_2;
+    QFormLayout *formLayout_2;
+    QLabel *label_9;
+    QComboBox *playersBox;
+    QLabel *label_10;
+    QComboBox *roundTimeBox;
+    QLabel *label_11;
+    QComboBox *maxRoundsBox;
+    QLabel *label_12;
+    QScrollArea *scrollArea;
+    QWidget *scrollAreaWidgetContents;
+    QCheckBox *checkCountry;
+    QCheckBox *checkCityPl;
+    QCheckBox *checkCityWorld;
+    QCheckBox *checkLake;
+    QCheckBox *checkFruit;
+    QCheckBox *checkName;
+    QPushButton *settingsButton;
 
     void setupUi(QWidget *MyWidget)
     {
@@ -250,6 +270,96 @@ public:
         adminLed = new QLabel(tab_Game);
         adminLed->setObjectName("adminLed");
         adminLed->setGeometry(QRect(300, 20, 30, 30));
+        formLayoutWidget_2 = new QWidget(tab_Game);
+        formLayoutWidget_2->setObjectName("formLayoutWidget_2");
+        formLayoutWidget_2->setGeometry(QRect(30, 470, 221, 221));
+        formLayout_2 = new QFormLayout(formLayoutWidget_2);
+        formLayout_2->setSpacing(6);
+        formLayout_2->setContentsMargins(11, 11, 11, 11);
+        formLayout_2->setObjectName("formLayout_2");
+        formLayout_2->setContentsMargins(0, 0, 0, 0);
+        label_9 = new QLabel(formLayoutWidget_2);
+        label_9->setObjectName("label_9");
+        QSizePolicy sizePolicy1(QSizePolicy::Policy::Maximum, QSizePolicy::Policy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(label_9->sizePolicy().hasHeightForWidth());
+        label_9->setSizePolicy(sizePolicy1);
+
+        formLayout_2->setWidget(0, QFormLayout::ItemRole::LabelRole, label_9);
+
+        playersBox = new QComboBox(formLayoutWidget_2);
+        playersBox->setObjectName("playersBox");
+
+        formLayout_2->setWidget(0, QFormLayout::ItemRole::FieldRole, playersBox);
+
+        label_10 = new QLabel(formLayoutWidget_2);
+        label_10->setObjectName("label_10");
+        sizePolicy1.setHeightForWidth(label_10->sizePolicy().hasHeightForWidth());
+        label_10->setSizePolicy(sizePolicy1);
+
+        formLayout_2->setWidget(1, QFormLayout::ItemRole::LabelRole, label_10);
+
+        roundTimeBox = new QComboBox(formLayoutWidget_2);
+        roundTimeBox->setObjectName("roundTimeBox");
+        QSizePolicy sizePolicy2(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(roundTimeBox->sizePolicy().hasHeightForWidth());
+        roundTimeBox->setSizePolicy(sizePolicy2);
+
+        formLayout_2->setWidget(1, QFormLayout::ItemRole::FieldRole, roundTimeBox);
+
+        label_11 = new QLabel(formLayoutWidget_2);
+        label_11->setObjectName("label_11");
+        sizePolicy1.setHeightForWidth(label_11->sizePolicy().hasHeightForWidth());
+        label_11->setSizePolicy(sizePolicy1);
+
+        formLayout_2->setWidget(2, QFormLayout::ItemRole::LabelRole, label_11);
+
+        maxRoundsBox = new QComboBox(formLayoutWidget_2);
+        maxRoundsBox->setObjectName("maxRoundsBox");
+
+        formLayout_2->setWidget(2, QFormLayout::ItemRole::FieldRole, maxRoundsBox);
+
+        label_12 = new QLabel(formLayoutWidget_2);
+        label_12->setObjectName("label_12");
+        sizePolicy1.setHeightForWidth(label_12->sizePolicy().hasHeightForWidth());
+        label_12->setSizePolicy(sizePolicy1);
+
+        formLayout_2->setWidget(3, QFormLayout::ItemRole::LabelRole, label_12);
+
+        scrollArea = new QScrollArea(formLayoutWidget_2);
+        scrollArea->setObjectName("scrollArea");
+        scrollArea->setWidgetResizable(true);
+        scrollAreaWidgetContents = new QWidget();
+        scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 147, 145));
+        checkCountry = new QCheckBox(scrollAreaWidgetContents);
+        checkCountry->setObjectName("checkCountry");
+        checkCountry->setGeometry(QRect(10, 10, 101, 20));
+        checkCityPl = new QCheckBox(scrollAreaWidgetContents);
+        checkCityPl->setObjectName("checkCityPl");
+        checkCityPl->setGeometry(QRect(10, 30, 111, 20));
+        checkCityWorld = new QCheckBox(scrollAreaWidgetContents);
+        checkCityWorld->setObjectName("checkCityWorld");
+        checkCityWorld->setGeometry(QRect(10, 50, 131, 20));
+        checkLake = new QCheckBox(scrollAreaWidgetContents);
+        checkLake->setObjectName("checkLake");
+        checkLake->setGeometry(QRect(10, 70, 85, 20));
+        checkFruit = new QCheckBox(scrollAreaWidgetContents);
+        checkFruit->setObjectName("checkFruit");
+        checkFruit->setGeometry(QRect(10, 90, 141, 20));
+        checkName = new QCheckBox(scrollAreaWidgetContents);
+        checkName->setObjectName("checkName");
+        checkName->setGeometry(QRect(10, 110, 121, 20));
+        scrollArea->setWidget(scrollAreaWidgetContents);
+
+        formLayout_2->setWidget(3, QFormLayout::ItemRole::FieldRole, scrollArea);
+
+        settingsButton = new QPushButton(tab_Game);
+        settingsButton->setObjectName("settingsButton");
+        settingsButton->setGeometry(QRect(290, 600, 84, 26));
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -304,6 +414,17 @@ public:
         label_7->setText(QCoreApplication::translate("MyWidget", "Bie\305\274aca litera", nullptr));
         label_8->setText(QCoreApplication::translate("MyWidget", "Admin", nullptr));
         adminLed->setText(QString());
+        label_9->setText(QCoreApplication::translate("MyWidget", "maxPlyers", nullptr));
+        label_10->setText(QCoreApplication::translate("MyWidget", "roundTime", nullptr));
+        label_11->setText(QCoreApplication::translate("MyWidget", "maxRounds", nullptr));
+        label_12->setText(QCoreApplication::translate("MyWidget", "Categories", nullptr));
+        checkCountry->setText(QCoreApplication::translate("MyWidget", "Pa\305\204stwa", nullptr));
+        checkCityPl->setText(QCoreApplication::translate("MyWidget", "Miasta (PL)", nullptr));
+        checkCityWorld->setText(QCoreApplication::translate("MyWidget", "Miasta (World)", nullptr));
+        checkLake->setText(QCoreApplication::translate("MyWidget", "Jeziora", nullptr));
+        checkFruit->setText(QCoreApplication::translate("MyWidget", "Owoce / Warzywa", nullptr));
+        checkName->setText(QCoreApplication::translate("MyWidget", "Imiona", nullptr));
+        settingsButton->setText(QCoreApplication::translate("MyWidget", "Change", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Game", nullptr));
     } // retranslateUi
 

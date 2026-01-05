@@ -60,7 +60,7 @@ public:
     bool checkAnswer(std::string& answer, int category);
     void gameLogic(std::string command, std::string content, int client_fd, Gracz& player);  
     void sendGameStateToPlayer(Gracz* player);  
-    
+    void changeSettings(int maxPlayers, int roundTime, int maxRounds, const std::vector<int> &categories);
     void startRound();
     void endRound();
     void gameFinished();

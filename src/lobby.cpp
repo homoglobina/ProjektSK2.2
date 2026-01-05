@@ -21,6 +21,15 @@ Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlay
     admin = nullptr;
 }
 
+
+void Lobby::changeSettings(int maxPlayers, int roundTime, int maxRounds, const std::vector<int> &categories)
+{
+    this->maxPlayers = maxPlayers;
+    this->roundTime = roundTime;
+    this->maxRounds = maxRounds;
+    this->categories = categories;
+}
+
 Lobby::~Lobby() {}
 
 void Lobby::writeAll(const std::string &message)
@@ -482,6 +491,65 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             }
 
             startRound();
+            return;
+        }
+
+        if(command == "changeSettings"){
+            if (&player != admin)
+            {
+                write(client_fd,
+                      "Error(Not_Admin)\n",
+                      strlen("Error(Not_Admin)\n"));
+                return;
+            }
+
+            // gra już trwa
+            if (state == 2)
+            {
+                write(client_fd,
+                      "Error(Game_Already_Started)\n",
+                      strlen("Error(Game_Already_Started)\n"));
+                return;
+            }
+
+
+            size_t pos = 0;
+            size_t commaPos = content.find(',', pos);
+            int newMaxPlayers = std::stoi(content.substr(pos, commaPos - pos));
+
+            pos = commaPos + 1;
+            commaPos = content.find(',', pos);
+            int newRoundTime = std::stoi(content.substr(pos, commaPos - pos));
+
+            pos = commaPos + 1;
+            commaPos = content.find(',', pos);
+            int newMaxRounds = std::stoi(content.substr(pos, commaPos - pos));
+
+            pos = commaPos + 1;
+            std::vector<int> newCategories;
+            while (pos < content.size())
+            {
+                commaPos = content.find(',', pos);
+                if (commaPos == std::string::npos)
+                    commaPos = content.size();
+                newCategories.push_back(std::stoi(content.substr(pos, commaPos - pos)));
+                pos = commaPos + 1;
+            }
+
+            changeSettings(newMaxPlayers, newRoundTime, newMaxRounds, newCategories);
+
+            std::string msg = "Msg(Ustawienia zmienione: maxGraczy=" + std::to_string(newMaxPlayers) +
+                              ", czasRundy=" + std::to_string(newRoundTime) +
+                              ", maxRund=" + std::to_string(newMaxRounds) +
+                              ", kategorie=";
+            for (int cat : newCategories)
+                msg += std::to_string(cat) + ",";
+            if (!newCategories.empty())
+                msg.pop_back();
+            msg += ")\n";
+
+            writeAll(msg);
+            std::cout << "Admin " << player.getName() << " changed settings.\n";
             return;
         }
 

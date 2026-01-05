@@ -98,6 +98,31 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
         ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
     }
     updateStartButtonState();
+
+    // Settings changing
+
+    if (ui->playersBox) {
+        for(int i = 2; i <= 10; i++) ui->playersBox->addItem(QString::number(i));
+        ui->playersBox->setCurrentText("10");
+    }
+
+    if (ui->roundTimeBox) {
+        ui->roundTimeBox->addItem("30");
+        ui->roundTimeBox->addItem("60");
+        ui->roundTimeBox->addItem("90");
+        ui->roundTimeBox->addItem("120");
+        ui->roundTimeBox->addItem("180");
+        ui->roundTimeBox->setCurrentText("60");
+    }
+
+    if (ui->maxRoundsBox) {
+        for(int i = 1; i <= 10; i++) ui->maxRoundsBox->addItem(QString::number(i));
+        ui->maxRoundsBox->setCurrentText("3");
+    }
+
+    connect(ui->settingsButton, &QPushButton::clicked, this, &MyWidget::onSettingsBtnClicked);
+
+    updateAdminInterface();
 }
 
 MyWidget::~MyWidget()
@@ -338,6 +363,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
         gameRunning = true;
         updateStartButtonState();
+        updateAdminInterface();
 
         logGame("<b>Gra rozpoczęta!</b>", "green");
 
@@ -352,6 +378,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     {
         isAdmin = false;
         updateStartButtonState();
+        updateAdminInterface();
 
         ui->tabWidget->setTabEnabled(1, false);
         ui->tabWidget->setTabEnabled(2, true);
@@ -545,6 +572,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     {
         isAdmin = true;
         updateStartButtonState();
+        updateAdminInterface();
 
         if (ui->adminLed) {
             ui->adminLed->setStyleSheet("background-color: #00FF00; border-radius: 15px; border: 1px solid black;");
@@ -565,6 +593,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
         // ui->tabWidget->setCurrentIndex(1); // powrót do lobby
         updateStartButtonState();
+        updateAdminInterface();
     }
 
     // TODO:
@@ -607,4 +636,64 @@ void MyWidget::onSendAnswersClicked()
     ui->answerEdit1->setFocus();
 
     logToGui("<i>Wysłano: " + getCategoryName(catId) + " - " + ans + "</i>", "gray");
+}
+
+void MyWidget::onSettingsBtnClicked()
+{
+    if (!isAdmin) return;
+
+    int maxPlayers = ui->playersBox->currentText().toInt();
+    int roundTime = ui->roundTimeBox->currentText().toInt();
+    int maxRounds = ui->maxRoundsBox->currentText().toInt();
+
+    QStringList catIds;
+    if (ui->checkCountry->isChecked())   catIds << "1";
+    if (ui->checkCityPl->isChecked())    catIds << "2";
+    if (ui->checkCityWorld->isChecked()) catIds << "3";
+    if (ui->checkLake->isChecked())      catIds << "4";
+    if (ui->checkFruit->isChecked())     catIds << "5";
+    if (ui->checkName->isChecked())      catIds << "6";
+
+    if (catIds.isEmpty()) {
+        QMessageBox::warning(this, "Błąd", "Wybierz przynajmniej jedną kategorię!");
+        return;
+    }
+
+
+    QString cmd = QString("changeSettings(%1,%2,%3,%4)\n")
+                      .arg(maxPlayers)
+                      .arg(roundTime)
+                      .arg(maxRounds)
+                      .arg(catIds.join(","));
+
+    sock->write(cmd.toUtf8());
+}
+
+void MyWidget::updateAdminInterface()
+{
+    bool enableSettings = (isAdmin && !gameRunning);
+
+    QList<QWidget*> adminWidgets = {
+        ui->settingsButton,
+        ui->playersBox,
+        ui->roundTimeBox,
+        ui->maxRoundsBox,
+        ui->checkCountry,
+        ui->checkCityPl,
+        ui->checkCityWorld,
+        ui->checkLake,
+        ui->checkFruit,
+        ui->checkName,
+        ui->label_9,
+        ui->label_10,
+        ui->label_11,
+        ui->label_12
+    };
+
+    for (QWidget* w : adminWidgets) {
+        if (w) {
+            w->setVisible(enableSettings);
+            // w->setEnabled(enableSettings); // grey out instead of hiding
+        }
+    }
 }

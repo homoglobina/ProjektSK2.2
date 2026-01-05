@@ -38,6 +38,7 @@ private slots:
     void onStartButtonClicked();
     void onSendAnswersClicked();
     void updateTimer();
+    void onSettingsBtnClicked();
 
     // All time
     void onConnected();
@@ -46,12 +47,11 @@ private slots:
     void onErrorOccurred(QAbstractSocket::SocketError socketError);
 
 
-
 private:
 
     QMap<QString, int> totalScores;
 
-
+    void updateAdminInterface();
     QVector<int> currentCategories;
     QChar currentLetter;
 
