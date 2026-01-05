@@ -357,7 +357,21 @@ void Lobby::endRound()
         {
             int pts = 0;
 
-            if (!ans.empty() && std::toupper(ans[0]) == currentLetter)
+            // if (!ans.empty() && std::toupper(ans[0]) == currentLetter)
+            // {
+            //     if (counter[ans] == 1)
+            //         pts = 15;
+            //     else
+            //         pts = 10;
+            // }
+            // else
+            // {
+            //     pts = 0;
+            // }
+
+            if (!ans.empty() &&
+                std::toupper(ans[0]) == currentLetter &&
+                checkAnswer(ans, cat))
             {
                 if (counter[ans] == 1)
                     pts = 15;
