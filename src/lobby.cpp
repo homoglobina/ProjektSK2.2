@@ -234,6 +234,10 @@ void Lobby::sendGameStateToPlayer(Gracz *player)
 // =========================
 void Lobby::startRound()
 {
+    if (state != 2)
+    {
+        return;
+    }
     writeAll("StartGame()\n");
 
     std::cout << "=== START RUNDY " << roundNumber + 1 << " ===\n";
@@ -287,6 +291,12 @@ void Lobby::startRound()
 // =========================
 void Lobby::gameFinished()
 {
+
+    struct itimerspec stop{};
+    timerfd_settime(timer_fd, 0, &stop, nullptr);
+
+    roundActive = false;
+
     writeAll("RoundEnd()\n");
 
     // Send final total scores
@@ -324,7 +334,9 @@ void Lobby::endRound()
 {
 
     if (!roundActive)
-    return;
+    {
+        return;
+    }
 
     roundActive = false;
 
@@ -392,9 +404,14 @@ void Lobby::endRound()
     answers.clear();
 
     if (roundNumber >= maxRounds)
+    {
         gameFinished();
+        return;
+    }
     else
+    {
         startRound();
+    }
 }
 
 // =========================

@@ -255,6 +255,9 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
 else if (command == "StartGame")
 {
+
+    ui->gameTextEdit->clear();
+    
     logGame("<b>Gra rozpoczęta!</b>", "green");
 
     ui->tabWidget->setTabEnabled(1, false);

@@ -182,8 +182,6 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
         lobbyID = player.getCurrentLobbyID();
         lobbyList[lobbyID]->gameLogic(command, content, client_fd, player);
         break;
-
-
     }
 
     default:
@@ -332,9 +330,9 @@ void Serwer::run()
                 // lobbyList[lobbyID]->endRound();
 
                 if (lobbyList[lobbyID]->isRoundActive())
-    {
-        lobbyList[lobbyID]->endRound();
-    }
+                {
+                    lobbyList[lobbyID]->endRound();
+                }
 
                 continue;
             }
@@ -356,7 +354,7 @@ void Serwer::run()
                 continue;
             }
 
-            // KLIENT ZAMKNĄŁ SOCKET 
+            // KLIENT ZAMKNĄŁ SOCKET
             if (n == 0)
             {
                 std::cout << std::setw(16) << "Zamknięcie połączenia z " << client_fd << "\n";
@@ -369,8 +367,7 @@ void Serwer::run()
                 {
                     size_t idxToRemove = it_index->second;
 
-
-                    if (idxToRemove < playerList.size()) 
+                    if (idxToRemove < playerList.size())
                     {
                         int currentLobbyID = playerList[idxToRemove]->getCurrentLobbyID();
                         if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size()))
@@ -386,19 +383,18 @@ void Serwer::run()
                         std::shared_ptr<Gracz> lastPlayer = playerList[lastIdx];
                         int lastPlayerFd = lastPlayer->getFd();
 
-                        playerList[idxToRemove] = lastPlayer; 
+                        playerList[idxToRemove] = lastPlayer;
 
                         fd_to_index[lastPlayerFd] = idxToRemove;
-                        
+
                         lastPlayer->setNr(idxToRemove);
                     }
-
 
                     playerList.pop_back();
 
                     fd_to_index.erase(client_fd);
                 }
-                else 
+                else
                 {
                     for (auto it = playerList.begin(); it != playerList.end(); ++it)
                     {
@@ -418,19 +414,19 @@ void Serwer::run()
             if (it != fd_to_index.end())
             {
                 std::string rawData(buffer, n);
-                
+
                 size_t pos = 0;
                 size_t newlinePos;
 
                 while ((newlinePos = rawData.find('\n', pos)) != std::string::npos)
                 {
                     std::string message = rawData.substr(pos, newlinePos - pos);
-                    
-                    if (!message.empty()) 
+
+                    if (!message.empty())
                     {
                         handleClientMessage(client_fd, message, *playerList[it->second]);
                     }
-                    
+
                     pos = newlinePos + 1;
                 }
             }
