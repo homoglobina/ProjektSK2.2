@@ -1,5 +1,0 @@
-/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/gui_client.dir
-/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/edit_cache.dir
-/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/rebuild_cache.dir
-/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/gui_client_autogen_timestamp_deps.dir
-/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/CMakeFiles/gui_client_autogen.dir
