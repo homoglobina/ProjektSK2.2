@@ -1,6 +1,6 @@
 # Państwa-Miasta Server
 
-## How to communicate with this server 
+## How to communicate with this server without a GUI client
 
 ### Use frames that look like so
 ```
