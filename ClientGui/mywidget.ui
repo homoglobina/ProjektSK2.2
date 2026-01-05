@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_login">
       <attribute name="title">
@@ -184,6 +184,29 @@
        </property>
        <property name="text">
         <string>Lobbies</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="createLobbyButton">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>270</y>
+         <width>84</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Create</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lobbyNameEdit">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>270</y>
+         <width>113</width>
+         <height>26</height>
+        </rect>
        </property>
       </widget>
      </widget>

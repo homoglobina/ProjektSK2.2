@@ -32,6 +32,7 @@ private slots:
     void onJoinLobbyBtnClicked();
     void onDisconnectBtnClicked();
     void onLobbyItemDoubleClicked(QListWidgetItem *item);
+    void onCreateLobbyBtnClicked();
 
     // Tab 3 (Game)
     void onLeaveBtnClicked();

@@ -57,6 +57,9 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     connect(ui->disconectButton, &QPushButton::clicked, this, &MyWidget::onDisconnectBtnClicked);
     connect(ui->leaveButton, &QPushButton::clicked, this, &MyWidget::onLeaveBtnClicked);
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MyWidget::onLobbyItemDoubleClicked);
+    connect(ui->createLobbyButton, &QPushButton::clicked, this, &MyWidget::onCreateLobbyBtnClicked);
+    connect(ui->lobbyNameEdit, &QLineEdit::returnPressed, this, &MyWidget::onCreateLobbyBtnClicked);
+
 
     // Tab 3
 
@@ -701,6 +704,27 @@ void MyWidget::updateAdminInterface()
     }
 }
 
+void MyWidget::onCreateLobbyBtnClicked()
+{
+    QString lobbyName = ui->lobbyNameEdit->text().trimmed();
+
+    if (lobbyName.isEmpty()) {
+        QMessageBox::warning(this, "Błąd", "Wpisz nazwę lobby!");
+        return;
+    }
+
+    if (lobbyName.contains(" ")) {
+        QMessageBox::warning(this, "Błąd", "Nazwa lobby nie może zawierać spacji!");
+        return;
+    }
+
+    QString cmd = "CreateLobby(" + lobbyName + ")\n";
+    sock->write(cmd.toUtf8());
+
+    sock->write("ShowLobbies()\n");
+
+    ui->lobbyNameEdit->clear();
+}
 
 void MyWidget::resetLobbyUI()
 {

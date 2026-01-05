@@ -431,7 +431,22 @@ void Serwer::run()
             auto it = fd_to_index.find(client_fd);
             if (it != fd_to_index.end())
             {
-                handleClientMessage(client_fd, std::string(buffer, n), *playerList[it->second]);
+                std::string rawData(buffer, n);
+                
+                size_t pos = 0;
+                size_t newlinePos;
+
+                while ((newlinePos = rawData.find('\n', pos)) != std::string::npos)
+                {
+                    std::string message = rawData.substr(pos, newlinePos - pos);
+                    
+                    if (!message.empty()) 
+                    {
+                        handleClientMessage(client_fd, message, *playerList[it->second]);
+                    }
+                    
+                    pos = newlinePos + 1;
+                }
             }
         }
     }
