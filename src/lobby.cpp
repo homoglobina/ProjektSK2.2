@@ -233,7 +233,8 @@ void Lobby::startRound()
     std::cout << "=== START RUNDY " << roundNumber + 1 << " ===\n";
 
     roundNumber++;
-
+    fastTimerTriggered = false;
+    
     static bool seeded = false;
     if (!seeded)
     {
@@ -612,6 +613,30 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             {
                 write(client_fd, "Msg(Niepoprawna odpowiedz)\n", 28);
             }
+            if (!fastTimerTriggered) 
+            {
+                bool allAnswered = true;
+                for (int cat : categories) 
+                {
+                    if (answers[cat].find(player.getName()) == answers[cat].end() || 
+                        answers[cat][player.getName()].empty()) 
+                    {
+                        allAnswered = false;
+                        break;
+                    }
+                }
+
+                if (allAnswered) 
+                {
+                    fastTimerTriggered = true;
+                    startTimer(15);         
+                    writeAll("Time(15)\n"); 
+                    
+                    std::string msg = "Msg(Gracz " + player.getName() + " skończył! Czas skrócony do 15s.)\n";
+                    writeAll(msg);
+                }
+            }
+            
             std::cout << "Player " << player.getName() << " answered in category " << category << ": " << guess << "\n";
         }
         break;

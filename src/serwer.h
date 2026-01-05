@@ -84,6 +84,7 @@ private:
     int maxRounds;
     int roundTime; // Time per round in seconds
     int roundNumber{0};
+    bool fastTimerTriggered;
 
 };
 
