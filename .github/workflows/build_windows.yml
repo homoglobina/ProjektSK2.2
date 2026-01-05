@@ -18,7 +18,7 @@ jobs:
     - name: Build
       run: |
         cd ClientGui
-        mkdir build
+        # mkdir build
         cd build
         cmake .. -G "MinGW Makefiles"
         cmake --build . --config Release
