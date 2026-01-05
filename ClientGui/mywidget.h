@@ -6,6 +6,7 @@
 #include <QListWidgetItem>
 #include <QStandardItemModel>
 
+#include <QTimer>
 #include <QMap>
 #include <QVector>
 #include <QChar>
@@ -36,7 +37,7 @@ private slots:
     void onLeaveBtnClicked();
     void onStartButtonClicked();
     void onSendAnswersClicked();
-
+    void updateTimer();
 
     // All time
     void onConnected();
@@ -61,6 +62,11 @@ private:
     bool isLoggedIn;
 
     QStandardItemModel *playerModel;
+
+    QTimer *gameTimer;
+    int timeLeft;
+
+    void updateStartButtonState();
 
     QString getCategoryName(int id);
 

@@ -30,6 +30,12 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     sock = new QTcpSocket(this);
     isLoggedIn = false;
 
+    gameTimer = new QTimer(this);
+    connect(gameTimer, &QTimer::timeout, this, &MyWidget::updateTimer);
+    timeLeft = 0;
+
+
+
     playerModel = new QStandardItemModel(this);
     ui->columnView->setModel(playerModel);
 
@@ -78,6 +84,9 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     ui->scoreTable->horizontalHeader()->setStretchLastSection(true);
     ui->scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->scoreTable->setSelectionMode(QAbstractItemView::NoSelection);
+
+
+    updateStartButtonState();
 }
 
 MyWidget::~MyWidget()
@@ -108,6 +117,31 @@ void MyWidget::onDisconnectBtnClicked()
     if (sock->state() == QAbstractSocket::ConnectedState)
     {
         sock->disconnectFromHost();
+    }
+}
+
+
+void MyWidget::updateStartButtonState()
+{
+    int playerCount = playerModel->rowCount();
+
+    if (playerCount >= 2) {
+        ui->startGameButton->setEnabled(true);
+
+        ui->startGameButton->setStyleSheet("background-color: green; color: white; font-weight: bold;");
+    } else {
+        ui->startGameButton->setEnabled(false);
+        ui->startGameButton->setStyleSheet("");
+    }
+}
+
+void MyWidget::updateTimer()
+{
+    if (timeLeft > 0) {
+        timeLeft--;
+        ui->timeNumber->display(timeLeft);
+    } else {
+        gameTimer->stop();
     }
 }
 
@@ -300,9 +334,11 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "PlayerRefresh")
     {
-        // Clear the current list
+
         if (playerModel)
             playerModel->clear();
+
+        updateStartButtonState();
     }
     else if (command == "Player")
     {
@@ -311,8 +347,8 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
             QString playerName = args.first().trimmed();
             if (playerModel)
             {
-                // Add the player to the view
                 playerModel->appendRow(new QStandardItem(playerName));
+                updateStartButtonState();
             }
         }
     }
@@ -388,21 +424,25 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         roundActive = true;
 
         ui->answerEdit1->clear();
-        // ui->answerEdit2->clear();
-        // ui->answerEdit3->clear();
-
         ui->answerEdit1->setEnabled(true);
-        // ui->answerEdit2->setEnabled(true);
-        // ui->answerEdit3->setEnabled(true);
         ui->sendAnswersButton->setEnabled(true);
+
+        if (!args.isEmpty()) {
+            timeLeft = args[0].toInt();
+            ui->timeNumber->display(timeLeft);
+            gameTimer->start(1000);
+        }
+
+
 
         logGame("<b>Czas:</b> " + args.join(" ") + " s", "red");
     }
 
-    // else if (command == "RoundEnd")
-    // {
-    //     logGame("<hr><b>Koniec rundy</b>", "black");
-    // }
+    else if (command == "RoundEnd")
+    {
+        gameTimer->stop();
+        logGame("<hr><b>Koniec rundy</b>", "black");
+    }
 
     else if (command == "RoundEnd")
     {
@@ -420,33 +460,6 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         // }
     }
 
-    // else if (command == "Score")
-    // {
-    //     if (args.size() >= 3)
-    //     {
-    //         logGame(
-    //             "Kat " + args[0] + ": +" + args[1] + " pkt (" + args[2] + ")",
-    //             "darkgreen");
-    //     }
-    // }
-
-    // else if (command == "Score")
-    // {
-    //     if (args.size() >= 3)
-    //     {
-    //         QString category = args[0];
-    //         int points = args[1].toInt();
-    //         QString answer = args[2];
-
-    //         QString player = "YOU"; // jeśli nie rozróżniasz jeszcze graczy
-    //         totalScores[player] += points;
-
-    //         logToGui(
-    //             "Kat " + category + ": +" + QString::number(points) +
-    //                 " pkt (" + answer + ")",
-    //             "darkgreen");
-    //     }
-    // }
 
     else if (command == "Score")
     {
@@ -474,14 +487,6 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         }
     }
 
-    // else if (command == "GameEnd")
-    // {
-    //     logGame("<b>KONIEC GRY</b>", "red");
-
-    //     ui->tabWidget->setTabEnabled(1, true);
-    //     ui->tabWidget->setTabEnabled(2, false);
-    //     ui->tabWidget->setCurrentIndex(1);
-    // }
 
     else if (command == "GameEnd")
     {
