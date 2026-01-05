@@ -7,7 +7,6 @@
 
 bool roundFinished = false;
 
-
 std::map<int, std::map<std::string, std::string>> answers;
 
 Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlayers(10), id(id)
@@ -16,10 +15,9 @@ Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlay
     state = 1;
     categories = {1, 2, 3};
     maxRounds = 2;
-    roundTime = 180;
+    roundTime = 60;
     admin = nullptr;
 }
-
 
 void Lobby::changeSettings(int maxPlayers, int roundTime, int maxRounds, const std::vector<int> &categories)
 {
@@ -242,7 +240,7 @@ void Lobby::startRound()
 
     roundNumber++;
     fastTimerTriggered = false;
-    
+
     static bool seeded = false;
     if (!seeded)
     {
@@ -270,9 +268,18 @@ void Lobby::startRound()
 
     writeAll("Category(" + categoriesStr + ")\n");
     writeAll("Letter(" + std::string(1, currentLetter) + ")\n");
-    writeAll("Time(" + std::to_string(roundTime) + ")\n");
+    // writeAll("Time(" + std::to_string(roundTime) + ")\n");
+
+    playersAnswered = 0;
+    roundActive = true;
+    shortened = false;
+
+    // reset odpowiedzi graczy
+    for (auto *p : players)
+        p->answeredThisRound = false;
 
     startTimer(roundTime);
+    writeAll("Time(" + std::to_string(roundTime) + ")\n");
 }
 
 // =========================
@@ -315,6 +322,12 @@ void Lobby::gameFinished()
 // =========================
 void Lobby::endRound()
 {
+
+    if (!roundActive)
+    return;
+
+    roundActive = false;
+
     writeAll("RoundEnd()\n");
 
     // scores[category][playerName] = punkty
@@ -479,7 +492,6 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             for (auto *p : players)
                 totalScores[p->getName()] = 0;
 
-                
             writeAll("StartGame()\n");
 
             for (const auto *p : players)
@@ -493,7 +505,8 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             return;
         }
 
-        if(command == "changeSettings"){
+        if (command == "changeSettings")
+        {
             if (&player != admin)
             {
                 write(client_fd,
@@ -510,7 +523,6 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                       strlen("Error(Game_Already_Started)\n"));
                 return;
             }
-
 
             size_t pos = 0;
             size_t commaPos = content.find(',', pos);
@@ -667,12 +679,26 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
 
         if (command == "Guess")
         {
-            size_t commaPos = content.find(',');
-            category = std::stoi(content.substr(0, commaPos));
-            guess = content.substr(commaPos + 1);
-            answers[category][player.getName()] = guess;
+            if (!roundActive)
+                return;
 
-            if (!guess.empty() && std::toupper(guess[0]) == currentLetter && checkAnswer(guess, category))
+            if (player.answeredThisRound)
+                return;
+
+            // --- PARSOWANIE ---
+            size_t commaPos = content.find(',');
+            int category = std::stoi(content.substr(0, commaPos));
+            std::string guess = content.substr(commaPos + 1);
+
+            // --- ZAPIS ODPOWIEDZI ---
+            answers[category][player.getName()] = guess;
+            player.answeredThisRound = true;
+            playersAnswered++;
+
+            // --- FEEDBACK ---
+            if (!guess.empty() &&
+                std::toupper(guess[0]) == currentLetter &&
+                checkAnswer(guess, category))
             {
                 write(client_fd, "Msg(Poprawna odpowiedz)\n", 25);
             }
@@ -680,32 +706,93 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             {
                 write(client_fd, "Msg(Niepoprawna odpowiedz)\n", 28);
             }
-            if (!fastTimerTriggered) 
-            {
-                bool allAnswered = true;
-                for (int cat : categories) 
-                {
-                    if (answers[cat].find(player.getName()) == answers[cat].end() || 
-                        answers[cat][player.getName()].empty()) 
-                    {
-                        allAnswered = false;
-                        break;
-                    }
-                }
 
-                if (allAnswered) 
-                {
-                    fastTimerTriggered = true;
-                    startTimer(15);         
-                    writeAll("Time(15)\n"); 
-                    
-                    std::string msg = "Msg(Gracz " + player.getName() + " skończył! Czas skrócony do 15s.)\n";
-                    writeAll(msg);
-                }
+            // --- PIERWSZA ODPOWIEDŹ → SKRÓĆ CZAS ---
+            if (!shortened)
+            {
+                shortened = true;
+                startTimer(10);
+                writeAll("Time(10)\n");
             }
-            
-            std::cout << "Player " << player.getName() << " answered in category " << category << ": " << guess << "\n";
+
+            // --- WSZYSCY ODPOWIEDZIELI ---
+            if (playersAnswered == players.size())
+            {
+                endRound();
+            }
+
+            std::cout << "Player " << player.getName()
+                      << " answered in category " << category
+                      << ": " << guess << "\n";
+
+            return;
         }
+
+        // if (command == "Guess")
+        // {
+
+        //     if (!roundActive)
+        //         return;
+
+        //     if (player.answeredThisRound)
+        //         return;
+
+        //     player.answeredThisRound = true;
+        //     playersAnswered++;
+
+        //     scorePlayer(player, category, guess);
+
+        //     if (!shortened)
+        //     {
+        //         shortened = true;
+        //         restartTimer(10);
+        //         broadcast("Time(10)");
+        //     }
+
+        //     if (playersAnswered == players.size())
+        //     {
+        //         endRound();
+        //     }
+
+        //     size_t commaPos = content.find(',');
+        //     category = std::stoi(content.substr(0, commaPos));
+        //     guess = content.substr(commaPos + 1);
+        //     answers[category][player.getName()] = guess;
+
+        //     if (!guess.empty() && std::toupper(guess[0]) == currentLetter && checkAnswer(guess, category))
+        //     {
+        //         write(client_fd, "Msg(Poprawna odpowiedz)\n", 25);
+        //     }
+        //     else
+        //     {
+        //         write(client_fd, "Msg(Niepoprawna odpowiedz)\n", 28);
+        //     }
+        //     if (!fastTimerTriggered)
+        //     {
+        //         bool allAnswered = true;
+        //         for (int cat : categories)
+        //         {
+        //             if (answers[cat].find(player.getName()) == answers[cat].end() ||
+        //                 answers[cat][player.getName()].empty())
+        //             {
+        //                 allAnswered = false;
+        //                 break;
+        //             }
+        //         }
+
+        //         if (allAnswered)
+        //         {
+        //             fastTimerTriggered = true;
+        //             startTimer(15);
+        //             writeAll("Time(15)\n");
+
+        //             std::string msg = "Msg(Gracz " + player.getName() + " skończył! Czas skrócony do 15s.)\n";
+        //             writeAll(msg);
+        //         }
+        //     }
+
+        //     std::cout << "Player " << player.getName() << " answered in category " << category << ": " << guess << "\n";
+        // }
         break;
     }
 

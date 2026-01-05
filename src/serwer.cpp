@@ -183,26 +183,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
         lobbyList[lobbyID]->gameLogic(command, content, client_fd, player);
         break;
 
-        // lobbyID = playerList[index]->getCurrentLobbyID();
 
-        // if (command == "LeaveLobby")
-        // {
-        //     lobbyList[lobbyID]->removePlayer(client_fd);
-
-        //     playerList[index]->setCurrentLobbyID(-1);
-        //     playerList[index]->setState(1);
-
-        //     const char *msg = "LeftLobby()\n";
-        //     write(client_fd, msg, strlen(msg));
-
-        //     std::cout << "Gracz "
-        //               << playerList[index]->getName()
-        //               << " opuscil lobby\n";
-        //     return;
-        // }
-
-        // lobbyList[lobbyID]->gameLogic(command, content, client_fd, index);
-        // break;
     }
 
     default:
@@ -348,7 +329,12 @@ void Serwer::run()
                 read(events[i].data.fd, &expirations, sizeof(expirations));
                 int lobbyID = timerFdToLobbyId[events[i].data.fd];
                 std::cout << "Timer wywołany dla lobby ID: " << lobbyID << "\n";
-                lobbyList[lobbyID]->endRound();
+                // lobbyList[lobbyID]->endRound();
+
+                if (lobbyList[lobbyID]->isRoundActive())
+    {
+        lobbyList[lobbyID]->endRound();
+    }
 
                 continue;
             }

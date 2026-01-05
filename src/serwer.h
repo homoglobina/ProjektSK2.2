@@ -69,6 +69,7 @@ public:
     void setCategories(const std::vector<int>& cats) { categories = cats; }
     Gracz* getAdmin() const { return admin; }
     void updateAdmin();
+    bool isRoundActive() const { return roundActive; }
 
 private:
     std::vector<int> categories;
@@ -85,6 +86,11 @@ private:
     int roundTime; // Time per round in seconds
     int roundNumber{0};
     bool fastTimerTriggered;
+
+    // ===== ROUND STATE =====
+bool roundActive = false;
+bool shortened = false;
+int playersAnswered = 0;
 
 };
 
@@ -107,6 +113,8 @@ public:
     
     void setCurrentLobbyID(int id) { this->currentLobbyID = id; }
     int getCurrentLobbyID() const { return currentLobbyID; }
+
+    bool answeredThisRound = false;
 
 private:
     std::string name;
