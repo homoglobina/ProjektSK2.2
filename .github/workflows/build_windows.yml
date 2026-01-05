@@ -30,7 +30,7 @@ jobs:
         copy gui_client.exe deploy\
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Windows-Game-Release
         path: build/deploy
