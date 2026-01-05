@@ -11,7 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Simple UDP multicast client</string>
+   <string>Państwa Miasta</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="accessories-dictionary"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

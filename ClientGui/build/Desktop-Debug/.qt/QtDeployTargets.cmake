@@ -1,2 +1,2 @@
-set(__QT_DEPLOY_TARGET_l6_z2_FILE /home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2)
-set(__QT_DEPLOY_TARGET_l6_z2_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_gui_client_FILE /home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/gui_client)
+set(__QT_DEPLOY_TARGET_gui_client_TYPE EXECUTABLE)

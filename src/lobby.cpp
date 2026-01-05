@@ -7,8 +7,7 @@
 
 bool roundFinished = false;
 
-// ====== PRZECHOWYWANIE ODPOWIEDZI ======
-// answers[category][playerName] = answer
+
 std::map<int, std::map<std::string, std::string>> answers;
 
 Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlayers(10), id(id)

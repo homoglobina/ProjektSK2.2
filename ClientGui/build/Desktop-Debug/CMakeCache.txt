@@ -217,7 +217,7 @@ CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 CMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/.qtc/package-manager/auto-setup.cmake
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=l6_z2
+CMAKE_PROJECT_NAME:STATIC=gui_client
 
 //Value Computed by CMake
 CMAKE_PROJECT_SPDX_LICENSE:STATIC=
@@ -389,6 +389,15 @@ Vulkan_INCLUDE_DIR:PATH=/usr/include
 
 //Path to a library.
 Vulkan_LIBRARY:FILEPATH=/usr/lib/libvulkan.so
+
+//Value Computed by CMake
+gui_client_BINARY_DIR:STATIC=/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug
+
+//Value Computed by CMake
+gui_client_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+gui_client_SOURCE_DIR:STATIC=/home/homoglobina/College/SKII/ProjektII/ClientGui
 
 //Value Computed by CMake
 l6_z2_BINARY_DIR:STATIC=/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug
@@ -1522,5 +1531,5 @@ Vulkan_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Vulkan_LIBRARY
 Vulkan_LIBRARY-ADVANCED:INTERNAL=1
 //CMAKE_INSTALL_PREFIX during last run
-_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
+_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/tmp
 
