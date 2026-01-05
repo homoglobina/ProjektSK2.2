@@ -1,4 +1,4 @@
 /build/
 .gitignore
-/ClientGui/build/
-/ClientGui/qtcreator/
+/ClientGui/build
+/ClientGui/qtcreator
