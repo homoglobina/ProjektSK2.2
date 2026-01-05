@@ -72,6 +72,9 @@ public:
     QLabel *label_4;
     QLabel *label_5;
     QLCDNumber *timeNumber;
+    QLabel *label_6;
+    QTextEdit *currentLetter;
+    QLabel *label_7;
 
     void setupUi(QWidget *MyWidget)
     {
@@ -181,7 +184,7 @@ public:
         gameTextEdit->setGeometry(QRect(480, 490, 291, 231));
         groupBox = new QGroupBox(tab_Game);
         groupBox->setObjectName("groupBox");
-        groupBox->setGeometry(QRect(10, 420, 311, 171));
+        groupBox->setGeometry(QRect(10, 250, 311, 171));
         formLayoutWidget = new QWidget(groupBox);
         formLayoutWidget->setObjectName("formLayoutWidget");
         formLayoutWidget->setGeometry(QRect(0, 20, 291, 151));
@@ -213,7 +216,7 @@ public:
         scoreTable->setColumnCount(3);
         categoryWidget = new QTableWidget(tab_Game);
         categoryWidget->setObjectName("categoryWidget");
-        categoryWidget->setGeometry(QRect(30, 140, 221, 71));
+        categoryWidget->setGeometry(QRect(10, 90, 221, 121));
         label_3 = new QLabel(tab_Game);
         label_3->setObjectName("label_3");
         label_3->setGeometry(QRect(490, 20, 57, 16));
@@ -222,10 +225,23 @@ public:
         label_4->setGeometry(QRect(480, 470, 141, 16));
         label_5 = new QLabel(tab_Game);
         label_5->setObjectName("label_5");
-        label_5->setGeometry(QRect(30, 120, 81, 16));
+        label_5->setGeometry(QRect(10, 70, 81, 16));
         timeNumber = new QLCDNumber(tab_Game);
         timeNumber->setObjectName("timeNumber");
-        timeNumber->setGeometry(QRect(50, 590, 171, 101));
+        timeNumber->setGeometry(QRect(250, 90, 141, 51));
+        label_6 = new QLabel(tab_Game);
+        label_6->setObjectName("label_6");
+        label_6->setGeometry(QRect(250, 70, 57, 16));
+        currentLetter = new QTextEdit(tab_Game);
+        currentLetter->setObjectName("currentLetter");
+        currentLetter->setEnabled(false);
+        currentLetter->setGeometry(QRect(320, 180, 71, 64));
+        QFont font;
+        font.setBold(true);
+        currentLetter->setFont(font);
+        label_7 = new QLabel(tab_Game);
+        label_7->setObjectName("label_7");
+        label_7->setGeometry(QRect(250, 140, 91, 41));
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);
@@ -266,6 +282,17 @@ public:
         label_3->setText(QCoreApplication::translate("MyWidget", "Wyniki", nullptr));
         label_4->setText(QCoreApplication::translate("MyWidget", "DebugWindow", nullptr));
         label_5->setText(QCoreApplication::translate("MyWidget", "Kategorie", nullptr));
+        label_6->setText(QCoreApplication::translate("MyWidget", "Czas", nullptr));
+        currentLetter->setHtml(QCoreApplication::translate("MyWidget", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Cantarell'; font-size:10pt; font-weight:700; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:48pt; font-weight:400;\">Q</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:48pt; font-weight:400;\"><br /></p></body></html>", nullptr));
+        label_7->setText(QCoreApplication::translate("MyWidget", "Bie\305\274aca litera", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_Game), QCoreApplication::translate("MyWidget", "Game", nullptr));
     } // retranslateUi
 

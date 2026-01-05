@@ -60,6 +60,13 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
 
     connect(ui->startGameButton, &QPushButton::clicked, this, &MyWidget::onStartButtonClicked);
 
+    if (ui->currentLetter) {
+        ui->currentLetter->setReadOnly(true);
+        ui->currentLetter->setFont(QFont("Arial", 24, QFont::Bold)); // Optional: Make text big
+        ui->currentLetter->setAlignment(Qt::AlignCenter);            // Optional: Center text
+    }
+
+
     // Connection stuff
     connect(sock, &QTcpSocket::connected, this, &MyWidget::onConnected);
     connect(sock, &QTcpSocket::disconnected, this, &MyWidget::onDisconnected);
@@ -370,11 +377,27 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     {
         QString errText = args.join(", ");
         logToGui("<b>Error: " + errText + "</b>", "red");
-        if (!isLoggedIn)
-        {
-            QMessageBox::critical(this, "Login Error", errText + "\nPlease try a different nickname.");
+
+        if (errText == "Taken_Name"){
+            QMessageBox::critical(this, errText, "Zajęta nazwa \nSpróbuj innej ");
             ui->msgNickEdit->setFocus();
         }
+        else if (errText == "Invalid_Name"){
+            QMessageBox::critical(this, errText, "Niepoprawna nazwa\nNie używaj spacji i pustych znaków");
+        }
+        else if (errText == "Not_Admin"){
+            QMessageBox::critical(this, errText, "Nie jesteś adminem \ndo wykonania tej czynności potrzebujesz uprawnień administracyjnych");
+        }
+        else if (errText == "Game_Already_Started"){
+            QMessageBox::critical(this, errText, "Gra już rozpoczęta");
+        }
+        else if (errText =="LobbyExists"){
+            QMessageBox::critical(this, errText, "Zajęta nazwa \nLobby o tej nazwie już istnieje");
+        }
+        else {
+            QMessageBox::critical(this, errText, "Error: ");
+        }
+
     }
 
     else if (command == "Category")
@@ -414,7 +437,15 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     else if (command == "Letter")
     {
         if (!args.isEmpty())
-            currentLetter = args[0][0];
+        {
+            QString letter = args[0];
+            currentLetter = letter[0];
+
+            if (ui->currentLetter) {
+                ui->currentLetter->setText(letter);
+                ui->currentLetter->setAlignment(Qt::AlignCenter);
+            }
+        }
 
         logGame("<b>Litera:</b> " + args.join(" "), "purple");
     }

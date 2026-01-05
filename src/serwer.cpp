@@ -73,7 +73,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
     case 0:
         if (command != "PlayerName")
         {
-            write(client_fd, "Error(\"Invalid_Format\")\n", 25);
+            write(client_fd, "Error(Invalid_Format)\n", 23);
             return;
         }
         else
@@ -90,7 +90,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
             if (content.empty() || hasWhitespace)
             {
                 std::cout << "Otrzymano nieprawidłową nazwę: " << content << "\n";
-                write(client_fd, "Error(\"Invalid_Name\")\n", 23);
+                write(client_fd, "Error(Invalid_Name)\n", 21);
                 return;
             }
         }
@@ -98,7 +98,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
         {
             if (p->getName() == content)
             {
-                write(client_fd, "Error(\"Taken_Name\")\n", 21);
+                write(client_fd, "Error(Taken_Name)\n", 19);
                 return;
             }
         }
@@ -122,7 +122,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
             }
             else
             {
-                std::string errorMsg = "Error(\"Lobby_Exists\")\n";
+                std::string errorMsg = "Error(Lobby_Exists)\n";
                 write(client_fd, errorMsg.c_str(), errorMsg.size());
                 return;
             }
@@ -134,7 +134,7 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
         }
         else if (command != "LobbyName")
         {
-            write(client_fd, "Error(\"Invalid_Format\")\n", 25);
+            write(client_fd, "Error(Invalid_Format)\n", 23);
             return;
         }
         else
