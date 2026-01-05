@@ -70,6 +70,7 @@ public:
     Gracz* getAdmin() const { return admin; }
     void updateAdmin();
     bool isRoundActive() const { return roundActive; }
+    void stopGameDueToLowPlayers();
 
 private:
     std::vector<int> categories;

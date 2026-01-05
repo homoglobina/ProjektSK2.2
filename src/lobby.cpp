@@ -84,8 +84,14 @@ void Lobby::removePlayer(int playerFd)
             if (wasAdmin)
                 updateAdmin();
 
+            if (state == 2 && players.size() < 2)
+            {
+                stopGameDueToLowPlayers();
+            }
+
             break;
         }
+
     printPlayers();
 }
 
@@ -357,18 +363,6 @@ void Lobby::endRound()
         {
             int pts = 0;
 
-            // if (!ans.empty() && std::toupper(ans[0]) == currentLetter)
-            // {
-            //     if (counter[ans] == 1)
-            //         pts = 15;
-            //     else
-            //         pts = 10;
-            // }
-            // else
-            // {
-            //     pts = 0;
-            // }
-
             if (!ans.empty() &&
                 std::toupper(ans[0]) == currentLetter &&
                 checkAnswer(ans, cat))
@@ -462,29 +456,6 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             std::cout << "Player " << player.getName() << " left the lobby.\n";
             return;
         }
-
-        // if (command == "LobbyStart")
-        // {
-        //     if (players.size() >= 2)
-        //     {
-        //         state = 2;
-
-        //         // Initialize all player scores
-        //         totalScores.clear();
-        //         for (const auto *p : players)
-        //         {
-        //             totalScores[p->getName()] = 0;
-        //         }
-
-        //         roundNumber = 0;
-        //         writeAll("StartGame(Gra rozpoczeta!)\n");
-        //         startRound();
-        //     }
-        //     else
-        //     {
-        //         write(client_fd, "Msg(Za malo graczy, aby rozpocząć grę)\n", 41);
-        //     }
-        // }
 
         if (command == "LobbyStart")
         {
@@ -759,75 +730,33 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             return;
         }
 
-        // if (command == "Guess")
-        // {
-
-        //     if (!roundActive)
-        //         return;
-
-        //     if (player.answeredThisRound)
-        //         return;
-
-        //     player.answeredThisRound = true;
-        //     playersAnswered++;
-
-        //     scorePlayer(player, category, guess);
-
-        //     if (!shortened)
-        //     {
-        //         shortened = true;
-        //         restartTimer(10);
-        //         broadcast("Time(10)");
-        //     }
-
-        //     if (playersAnswered == players.size())
-        //     {
-        //         endRound();
-        //     }
-
-        //     size_t commaPos = content.find(',');
-        //     category = std::stoi(content.substr(0, commaPos));
-        //     guess = content.substr(commaPos + 1);
-        //     answers[category][player.getName()] = guess;
-
-        //     if (!guess.empty() && std::toupper(guess[0]) == currentLetter && checkAnswer(guess, category))
-        //     {
-        //         write(client_fd, "Msg(Poprawna odpowiedz)\n", 25);
-        //     }
-        //     else
-        //     {
-        //         write(client_fd, "Msg(Niepoprawna odpowiedz)\n", 28);
-        //     }
-        //     if (!fastTimerTriggered)
-        //     {
-        //         bool allAnswered = true;
-        //         for (int cat : categories)
-        //         {
-        //             if (answers[cat].find(player.getName()) == answers[cat].end() ||
-        //                 answers[cat][player.getName()].empty())
-        //             {
-        //                 allAnswered = false;
-        //                 break;
-        //             }
-        //         }
-
-        //         if (allAnswered)
-        //         {
-        //             fastTimerTriggered = true;
-        //             startTimer(15);
-        //             writeAll("Time(15)\n");
-
-        //             std::string msg = "Msg(Gracz " + player.getName() + " skończył! Czas skrócony do 15s.)\n";
-        //             writeAll(msg);
-        //         }
-        //     }
-
-        //     std::cout << "Player " << player.getName() << " answered in category " << category << ": " << guess << "\n";
-        // }
         break;
     }
 
     default:
         break;
     }
+}
+
+void Lobby::stopGameDueToLowPlayers()
+{
+    std::cout << "Gra zatrzymana – za mało graczy w lobby " << name << "\n";
+
+    // zatrzymaj timer
+    struct itimerspec stop{};
+    timerfd_settime(timer_fd, 0, &stop, nullptr);
+
+    // reset stanu gry
+    roundActive = false;
+    shortened = false;
+    playersAnswered = 0;
+    roundNumber = 0;
+
+    answers.clear();
+    totalScores.clear();
+
+    state = 1;
+
+    writeAll("RoundEnd()\n");
+    writeAll("Msg(Gra przerwana – za mało graczy)\n");
 }
