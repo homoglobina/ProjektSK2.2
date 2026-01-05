@@ -5,12 +5,6 @@
 #include <QTcpSocket>
 #include <QListWidgetItem>
 #include <QStandardItemModel>
-
-#include <QTimer>
-#include <QMap>
-#include <QVector>
-#include <QChar>
-
 namespace Ui {
 class MyWidget;
 }
@@ -32,14 +26,12 @@ private slots:
     void onJoinLobbyBtnClicked();
     void onDisconnectBtnClicked();
     void onLobbyItemDoubleClicked(QListWidgetItem *item);
-    void onCreateLobbyBtnClicked();
 
     // Tab 3 (Game)
     void onLeaveBtnClicked();
     void onStartButtonClicked();
     void onSendAnswersClicked();
-    void updateTimer();
-    void onSettingsBtnClicked();
+
 
     // All time
     void onConnected();
@@ -48,33 +40,28 @@ private slots:
     void onErrorOccurred(QAbstractSocket::SocketError socketError);
 
 
-private:
+    void highlightWinners();
 
-    void resetLobbyUI();
+
+
+
+private:
 
     QMap<QString, int> totalScores;
 
-    void updateAdminInterface();
+
     QVector<int> currentCategories;
     QChar currentLetter;
-
     bool roundActive = false;
-    bool gameRunning = false;
-    bool isAdmin = false;
 
     Ui::MyWidget *ui;
     QTcpSocket *sock;
     QString buffer;
     bool isLoggedIn;
+    bool gameInitialized = false;
+
 
     QStandardItemModel *playerModel;
-
-    QTimer *gameTimer;
-    int timeLeft;
-
-    void updateStartButtonState();
-
-    QString getCategoryName(int id);
 
     void handleMessage(const QString &command, const QStringList &args);
     void logToGui(const QString &text, const QString &color = "black");

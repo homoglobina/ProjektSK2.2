@@ -2,41 +2,12 @@
 #include "ui_mywidget.h"
 #include <QMessageBox>
 
-#include <QHeaderView>
-#include <QTableWidgetItem>
-#include <QStandardItem>
-
-
-
-QString MyWidget::getCategoryName(int id)
-{
-    QString catName;
-    switch (id) {
-    case 1: catName = "Państwa"; break;
-    case 2: catName = "Miasta (PL)"; break;
-    case 3: catName = "Miasta (świat)"; break;
-    case 4: catName = "Jeziora"; break;
-    case 5: catName = "Owoce/warzywa"; break;
-    case 6: catName = "Imiona"; break;
-    default: catName = "Kategoria " + QString::number(id); break;
-    }
-    return catName;
-}
-
 MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
 {
     ui->setupUi(this);
 
     sock = new QTcpSocket(this);
     isLoggedIn = false;
-    gameRunning = false;
-    isAdmin = false;
-
-    gameTimer = new QTimer(this);
-    connect(gameTimer, &QTimer::timeout, this, &MyWidget::updateTimer);
-    timeLeft = 0;
-
-
 
     playerModel = new QStandardItemModel(this);
     ui->columnView->setModel(playerModel);
@@ -57,20 +28,10 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     connect(ui->disconectButton, &QPushButton::clicked, this, &MyWidget::onDisconnectBtnClicked);
     connect(ui->leaveButton, &QPushButton::clicked, this, &MyWidget::onLeaveBtnClicked);
     connect(ui->listWidget, &QListWidget::itemDoubleClicked, this, &MyWidget::onLobbyItemDoubleClicked);
-    connect(ui->createLobbyButton, &QPushButton::clicked, this, &MyWidget::onCreateLobbyBtnClicked);
-    connect(ui->lobbyNameEdit, &QLineEdit::returnPressed, this, &MyWidget::onCreateLobbyBtnClicked);
-
 
     // Tab 3
 
     connect(ui->startGameButton, &QPushButton::clicked, this, &MyWidget::onStartButtonClicked);
-
-    if (ui->currentLetter) {
-        ui->currentLetter->setReadOnly(true);
-        ui->currentLetter->setFont(QFont("Arial", 24, QFont::Bold)); // Optional: Make text big
-        ui->currentLetter->setAlignment(Qt::AlignCenter);            // Optional: Center text
-    }
-
 
     // Connection stuff
     connect(sock, &QTcpSocket::connected, this, &MyWidget::onConnected);
@@ -96,36 +57,6 @@ MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
     ui->scoreTable->horizontalHeader()->setStretchLastSection(true);
     ui->scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->scoreTable->setSelectionMode(QAbstractItemView::NoSelection);
-
-    if (ui->adminLed) {
-        ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
-    }
-    updateStartButtonState();
-
-    // Settings changing
-
-    if (ui->playersBox) {
-        for(int i = 2; i <= 10; i++) ui->playersBox->addItem(QString::number(i));
-        ui->playersBox->setCurrentText("10");
-    }
-
-    if (ui->roundTimeBox) {
-        ui->roundTimeBox->addItem("30");
-        ui->roundTimeBox->addItem("60");
-        ui->roundTimeBox->addItem("90");
-        ui->roundTimeBox->addItem("120");
-        ui->roundTimeBox->addItem("180");
-        ui->roundTimeBox->setCurrentText("60");
-    }
-
-    if (ui->maxRoundsBox) {
-        for(int i = 1; i <= 10; i++) ui->maxRoundsBox->addItem(QString::number(i));
-        ui->maxRoundsBox->setCurrentText("3");
-    }
-
-    connect(ui->settingsButton, &QPushButton::clicked, this, &MyWidget::onSettingsBtnClicked);
-
-    updateAdminInterface();
 }
 
 MyWidget::~MyWidget()
@@ -156,35 +87,6 @@ void MyWidget::onDisconnectBtnClicked()
     if (sock->state() == QAbstractSocket::ConnectedState)
     {
         sock->disconnectFromHost();
-    }
-}
-
-void MyWidget::updateStartButtonState()
-{
-    if (gameRunning) {
-        ui->startGameButton->setEnabled(false);
-        ui->startGameButton->setStyleSheet("");
-        return;
-    }
-
-    int playerCount = playerModel->rowCount();
-
-    if (playerCount >= 2 && isAdmin) {
-        ui->startGameButton->setEnabled(true);
-        ui->startGameButton->setStyleSheet("background-color: green; color: white; font-weight: bold;");
-    } else {
-        ui->startGameButton->setEnabled(false);
-        ui->startGameButton->setStyleSheet("");
-    }
-}
-
-void MyWidget::updateTimer()
-{
-    if (timeLeft > 0) {
-        timeLeft--;
-        ui->timeNumber->display(timeLeft);
-    } else {
-        gameTimer->stop();
     }
 }
 
@@ -220,12 +122,7 @@ void MyWidget::onDisconnected()
     ui->tabWidget->setTabEnabled(0, true);
     ui->tabWidget->setTabEnabled(1, false);
     ui->tabWidget->setTabEnabled(2, false);
-    ui->tabWidget->setCurrentIndex(0); // Jump back to login
-
-    // Tab 2
-    if (ui->adminLed) {
-        ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
-    }
+    ui->tabWidget->setCurrentIndex(0); 
 
     isLoggedIn = false;
     logToGui("<b>Disconnected.</b>", "red");
@@ -278,7 +175,6 @@ void MyWidget::onJoinLobbyBtnClicked()
         return;
     }
 
-    // Try joining
     QString cmd = "LobbyName(" + item->text() + ")\n";
     sock->write(cmd.toUtf8());
 }
@@ -287,7 +183,7 @@ void MyWidget::onLobbyItemDoubleClicked(QListWidgetItem *item)
 {
     if (item)
     {
-        ui->listWidget->setCurrentItem(item); // Ensure it's selected
+        ui->listWidget->setCurrentItem(item); 
         onJoinLobbyBtnClicked();
     }
 }
@@ -357,33 +253,36 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         }
     }
 
-    else if (command == "StartGame")
+else if (command == "StartGame")
+{
+    logGame("<b>Gra rozpoczęta!</b>", "green");
+
+    ui->tabWidget->setTabEnabled(1, false);
+    ui->tabWidget->setTabEnabled(2, true);
+    ui->tabWidget->setCurrentIndex(2);
+
+    if (!gameInitialized)
     {
-        if (!gameRunning) {
-            ui->scoreTable->setRowCount(0);
-            totalScores.clear();
+        ui->scoreTable->setRowCount(0);
+
+        for (int r = 0; r < playerModel->rowCount(); ++r)
+        {
+            QString playerName = playerModel->item(r)->text();
+
+            int row = ui->scoreTable->rowCount();
+            ui->scoreTable->insertRow(row);
+            ui->scoreTable->setItem(row, 0, new QTableWidgetItem(playerName));
+            ui->scoreTable->setItem(row, 1, new QTableWidgetItem("0"));
         }
 
-        gameRunning = true;
-        updateStartButtonState();
-        updateAdminInterface();
-
-        logGame("<b>Gra rozpoczęta!</b>", "green");
-
-        ui->tabWidget->setTabEnabled(1, false);
-        ui->tabWidget->setTabEnabled(2, true);
-        ui->tabWidget->setCurrentIndex(2);
-
-        if (ui->msgsTextEdit) ui->msgsTextEdit->clear();
+        gameInitialized = true;
     }
+
+}
+
 
     else if (command == "Joined")
     {
-        resetLobbyUI();
-        isAdmin = false;
-        updateStartButtonState();
-        updateAdminInterface();
-
         ui->tabWidget->setTabEnabled(1, false);
         ui->tabWidget->setTabEnabled(2, true);
         ui->tabWidget->setCurrentIndex(2);
@@ -391,11 +290,8 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "PlayerRefresh")
     {
-
         if (playerModel)
             playerModel->clear();
-
-        updateStartButtonState();
     }
     else if (command == "Player")
     {
@@ -405,19 +301,12 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
             if (playerModel)
             {
                 playerModel->appendRow(new QStandardItem(playerName));
-                updateStartButtonState();
             }
         }
     }
 
     else if (command == "LeftLobby")
     {
-        if (ui->adminLed) {
-            ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
-        }
-
-        resetLobbyUI();
-
         ui->tabWidget->setTabEnabled(1, true);
         ui->tabWidget->setTabEnabled(2, false);
         ui->tabWidget->setCurrentIndex(1);
@@ -433,57 +322,23 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     {
         QString errText = args.join(", ");
         logToGui("<b>Error: " + errText + "</b>", "red");
-
-        if (errText == "Taken_Name"){
-            QMessageBox::critical(this, errText, "Zajęta nazwa \nSpróbuj innej ");
+        if (!isLoggedIn)
+        {
+            QMessageBox::critical(this, "Login Error", errText + "\nPlease try a different nickname.");
             ui->msgNickEdit->setFocus();
         }
-        else if (errText == "Invalid_Name"){
-            QMessageBox::critical(this, errText, "Niepoprawna nazwa\nNie używaj spacji i pustych znaków");
-        }
-        else if (errText == "Not_Admin"){
-            QMessageBox::critical(this, errText, "Nie jesteś adminem \ndo wykonania tej czynności potrzebujesz uprawnień administracyjnych");
-        }
-        else if (errText == "Game_Already_Started"){
-            QMessageBox::critical(this, errText, "Gra już rozpoczęta");
-        }
-        else if (errText =="LobbyExists"){
-            QMessageBox::critical(this, errText, "Zajęta nazwa \nLobby o tej nazwie już istnieje");
-        }
-        else {
-            QMessageBox::critical(this, errText, "Error: ");
-        }
-
     }
 
     else if (command == "Category")
     {
         currentCategories.clear();
 
-        ui->categoryBox->clear();
-        ui->categoryWidget->setRowCount(0);
-        ui->categoryWidget->setColumnCount(1);
-        ui->categoryWidget->setHorizontalHeaderLabels({"Aktywne Kategorie"});
-        ui->categoryWidget->horizontalHeader()->setStretchLastSection(true);
-
-        // "135" -> categories
         for (const QString &c : args)
         {
             for (QChar ch : c)
             {
                 if (ch.isDigit())
-                {
-                    int catId = ch.digitValue();
-                    currentCategories.push_back(catId);
-
-                    QString name = getCategoryName(catId);
-
-                    int row = ui->categoryWidget->rowCount();
-                    ui->categoryWidget->insertRow(row);
-                    ui->categoryWidget->setItem(row, 0, new QTableWidgetItem(name));
-
-                    ui->categoryBox->addItem(name, catId);
-                }
+                    currentCategories.push_back(ch.digitValue());
             }
         }
 
@@ -493,15 +348,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     else if (command == "Letter")
     {
         if (!args.isEmpty())
-        {
-            QString letter = args[0];
-            currentLetter = letter[0];
-
-            if (ui->currentLetter) {
-                ui->currentLetter->setText(letter);
-                ui->currentLetter->setAlignment(Qt::AlignCenter);
-            }
-        }
+            currentLetter = args[0][0];
 
         logGame("<b>Litera:</b> " + args.join(" "), "purple");
     }
@@ -511,42 +358,22 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         roundActive = true;
 
         ui->answerEdit1->clear();
+        ui->answerEdit2->clear();
+        ui->answerEdit3->clear();
+
         ui->answerEdit1->setEnabled(true);
+        ui->answerEdit2->setEnabled(true);
+        ui->answerEdit3->setEnabled(true);
         ui->sendAnswersButton->setEnabled(true);
-
-        if (!args.isEmpty()) {
-            timeLeft = args[0].toInt();
-            ui->timeNumber->display(timeLeft);
-            gameTimer->start(1000);
-        }
-
-
 
         logGame("<b>Czas:</b> " + args.join(" ") + " s", "red");
     }
 
     else if (command == "RoundEnd")
     {
-        gameTimer->stop();
-        logGame("<hr><b>Koniec rundy</b>", "black");
-    }
-
-    else if (command == "RoundEnd")
-    {
         logGame("<hr><b>Koniec rundy</b>", "black");
 
-        // ui->scoreTable->setRowCount(totalScores.size());
-
-        // int row = 0;
-        // for (auto it = totalScores.begin(); it != totalScores.end(); ++it)
-        // {
-        //     ui->scoreTable->setItem(row, 0, new QTableWidgetItem(it.key()));
-        //     ui->scoreTable->setItem(row, 1,
-        //                             new QTableWidgetItem(QString::number(it.value())));
-        //     row++;
-        // }
     }
-
 
     else if (command == "Score")
     {
@@ -571,25 +398,19 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
             ui->scoreTable->insertRow(row);
             ui->scoreTable->setItem(row, 0, new QTableWidgetItem(player));
             ui->scoreTable->setItem(row, 1, new QTableWidgetItem(QString::number(points)));
+
+                    ui->scoreTable->item(row, 1)->setText(QString::number(points));
+
         }
+
+        ui->scoreTable->sortItems(1, Qt::DescendingOrder);
+    highlightWinners();
+
     }
 
-    else if (command == "BecameAdmin")
-    {
-        isAdmin = true;
-        updateStartButtonState();
-        updateAdminInterface();
-
-        if (ui->adminLed) {
-            ui->adminLed->setStyleSheet("background-color: #00FF00; border-radius: 15px; border: 1px solid black;");
-        }
-        logToGui("<b>Zostałeś administratorem lobby!</b>", "gold");
-    }
 
     else if (command == "GameEnd")
     {
-        roundActive = false;
-        gameRunning = false;
         logGame("<hr><b>KONIEC GRY</b>", "red");
 
         QMessageBox::information(
@@ -597,12 +418,12 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
             "Koniec gry",
             "Gra zakończona! Sprawdź wyniki w tabeli.");
 
-        // ui->tabWidget->setCurrentIndex(1); // powrót do lobby
-        updateStartButtonState();
-        updateAdminInterface();
+     gameInitialized = false;
+        
+
     }
 
-    // TODO:
+
 }
 
 void MyWidget::logToGui(const QString &text, const QString &color)
@@ -618,142 +439,70 @@ void MyWidget::logGame(const QString &text, const QString &color)
 
 void MyWidget::onSendAnswersClicked()
 {
-    if (!roundActive) return;
-
-    QString ans = ui->answerEdit1->text().trimmed();
-    if (ans.isEmpty()) {
-        QMessageBox::warning(this, "Błąd", "Wpisz odpowiedź!");
+    if (!roundActive)
         return;
+
+    QVector<QLineEdit *> edits = {
+        ui->answerEdit1,
+        ui->answerEdit2,
+        ui->answerEdit3};
+
+    for (int i = 0; i < currentCategories.size() && i < edits.size(); ++i)
+    {
+        QString ans = edits[i]->text().trimmed();
+        if (ans.isEmpty())
+            continue;
+
+        QString msg = "Guess(" +
+                      QString::number(currentCategories[i]) +
+                      "," + ans + ")\n";
+
+        sock->write(msg.toUtf8());
     }
 
-    bool ok;
-    int catId = ui->categoryBox->currentData().toInt(&ok);
+    roundActive = false;
 
-    if (!ok) {
-        QMessageBox::warning(this, "Błąd", "Wybierz kategorię z listy!");
-        return;
-    }
+    ui->sendAnswersButton->setEnabled(false);
+    ui->answerEdit1->setEnabled(false);
+    ui->answerEdit2->setEnabled(false);
+    ui->answerEdit3->setEnabled(false);
 
-
-    QString msg = "Guess(" + QString::number(catId) + "," + ans + ")\n";
-    sock->write(msg.toUtf8());
-
-    ui->answerEdit1->clear();
-    ui->answerEdit1->setFocus();
-
-    logToGui("<i>Wysłano: " + getCategoryName(catId) + " - " + ans + "</i>", "gray");
+    logToGui("<i>Odpowiedzi wysłane</i>", "gray");
 }
 
-void MyWidget::onSettingsBtnClicked()
+void MyWidget::highlightWinners()
 {
-    if (!isAdmin) return;
-
-    int maxPlayers = ui->playersBox->currentText().toInt();
-    int roundTime = ui->roundTimeBox->currentText().toInt();
-    int maxRounds = ui->maxRoundsBox->currentText().toInt();
-
-    QStringList catIds;
-    if (ui->checkCountry->isChecked())   catIds << "1";
-    if (ui->checkCityPl->isChecked())    catIds << "2";
-    if (ui->checkCityWorld->isChecked()) catIds << "3";
-    if (ui->checkLake->isChecked())      catIds << "4";
-    if (ui->checkFruit->isChecked())     catIds << "5";
-    if (ui->checkName->isChecked())      catIds << "6";
-
-    if (catIds.isEmpty()) {
-        QMessageBox::warning(this, "Błąd", "Wybierz przynajmniej jedną kategorię!");
+    int rows = ui->scoreTable->rowCount();
+    if (rows == 0)
         return;
+
+    int maxScore = INT_MIN;
+
+    for (int r = 0; r < rows; ++r)
+    {
+        int score = ui->scoreTable->item(r, 1)->text().toInt();
+        maxScore = std::max(maxScore, score);
     }
 
+    for (int r = 0; r < rows; ++r)
+    {
+        int score = ui->scoreTable->item(r, 1)->text().toInt();
+        bool isWinner = (score == maxScore);
 
-    QString cmd = QString("changeSettings(%1,%2,%3,%4)\n")
-                      .arg(maxPlayers)
-                      .arg(roundTime)
-                      .arg(maxRounds)
-                      .arg(catIds.join(","));
+        QColor bg = isWinner ? QColor(180, 255, 180) : QColor(Qt::white);
 
-    sock->write(cmd.toUtf8());
-}
+        for (int c = 0; c < ui->scoreTable->columnCount(); ++c)
+        {
+            QTableWidgetItem *item = ui->scoreTable->item(r, c);
+            if (!item)
+                continue;
 
-void MyWidget::updateAdminInterface()
-{
-    bool enableSettings = (isAdmin && !gameRunning);
+            item->setBackground(bg);
 
-    QList<QWidget*> adminWidgets = {
-        ui->settingsButton,
-        ui->playersBox,
-        ui->roundTimeBox,
-        ui->maxRoundsBox,
-        ui->checkCountry,
-        ui->checkCityPl,
-        ui->checkCityWorld,
-        ui->checkLake,
-        ui->checkFruit,
-        ui->checkName,
-        ui->label_9,
-        ui->label_10,
-        ui->label_11,
-        ui->label_12
-    };
-
-    for (QWidget* w : adminWidgets) {
-        if (w) {
-            w->setVisible(enableSettings);
-            // w->setEnabled(enableSettings); // grey out instead of hiding
+            QFont f = item->font();
+            f.setBold(isWinner);
+            item->setFont(f);
         }
     }
 }
 
-void MyWidget::onCreateLobbyBtnClicked()
-{
-    QString lobbyName = ui->lobbyNameEdit->text().trimmed();
-
-    if (lobbyName.isEmpty()) {
-        QMessageBox::warning(this, "Błąd", "Wpisz nazwę lobby!");
-        return;
-    }
-
-    if (lobbyName.contains(" ")) {
-        QMessageBox::warning(this, "Błąd", "Nazwa lobby nie może zawierać spacji!");
-        return;
-    }
-
-    QString cmd = "CreateLobby(" + lobbyName + ")\n";
-    sock->write(cmd.toUtf8());
-
-    sock->write("ShowLobbies()\n");
-
-    ui->lobbyNameEdit->clear();
-}
-
-void MyWidget::resetLobbyUI()
-{
-    currentCategories.clear();
-    totalScores.clear();
-    timeLeft = 0;
-    if (gameTimer->isActive()) gameTimer->stop();
-
-    if (ui->gameTextEdit) ui->gameTextEdit->clear();
-    if (ui->currentLetter) ui->currentLetter->clear();
-    if (ui->timeNumber) ui->timeNumber->display(0);
-
-    if (ui->scoreTable) ui->scoreTable->setRowCount(0);
-    if (ui->categoryWidget) ui->categoryWidget->setRowCount(0);
-    if (ui->categoryBox) ui->categoryBox->clear();
-    if (playerModel) playerModel->clear();
-
-    ui->answerEdit1->clear();
-    ui->answerEdit1->setEnabled(false);
-    ui->sendAnswersButton->setEnabled(false);
-
-    roundActive = false;
-    gameRunning = false;
-    isAdmin = false;
-
-    updateStartButtonState();
-    updateAdminInterface();
-
-    if (ui->adminLed) {
-        ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
-    }
-}
