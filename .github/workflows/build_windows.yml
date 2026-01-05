@@ -20,17 +20,18 @@ jobs:
         cd ClientGui
         mkdir build
         cd build
-        # cmake .. -G "MinGW Makefiles"
+        cmake ..
         cmake --build . --config Release
 
     - name: Deploy
       run: |
         cd ClientGui/build
-        windeployqt --release gui_client.exe --dir deploy
-        copy gui_client.exe deploy\
+        # MSVC puts the exe in a 'Release' subfolder
+        windeployqt --release Release\gui_client.exe --dir deploy
+        copy Release\gui_client.exe deploy\
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: Windows-Game-Release
-        path: build/deploy
+        path: ClientGui/build/deploy
