@@ -49,6 +49,8 @@ private slots:
 
 private:
 
+    void resetLobbyUI();
+
     QMap<QString, int> totalScores;
 
     void updateAdminInterface();

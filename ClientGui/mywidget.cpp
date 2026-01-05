@@ -376,6 +376,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "Joined")
     {
+        resetLobbyUI();
         isAdmin = false;
         updateStartButtonState();
         updateAdminInterface();
@@ -411,6 +412,8 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         if (ui->adminLed) {
             ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
         }
+
+        resetLobbyUI();
 
         ui->tabWidget->setTabEnabled(1, true);
         ui->tabWidget->setTabEnabled(2, false);
@@ -695,5 +698,38 @@ void MyWidget::updateAdminInterface()
             w->setVisible(enableSettings);
             // w->setEnabled(enableSettings); // grey out instead of hiding
         }
+    }
+}
+
+
+void MyWidget::resetLobbyUI()
+{
+    currentCategories.clear();
+    totalScores.clear();
+    timeLeft = 0;
+    if (gameTimer->isActive()) gameTimer->stop();
+
+    if (ui->gameTextEdit) ui->gameTextEdit->clear();
+    if (ui->currentLetter) ui->currentLetter->clear();
+    if (ui->timeNumber) ui->timeNumber->display(0);
+
+    if (ui->scoreTable) ui->scoreTable->setRowCount(0);
+    if (ui->categoryWidget) ui->categoryWidget->setRowCount(0);
+    if (ui->categoryBox) ui->categoryBox->clear();
+    if (playerModel) playerModel->clear();
+
+    ui->answerEdit1->clear();
+    ui->answerEdit1->setEnabled(false);
+    ui->sendAnswersButton->setEnabled(false);
+
+    roundActive = false;
+    gameRunning = false;
+    isAdmin = false;
+
+    updateStartButtonState();
+    updateAdminInterface();
+
+    if (ui->adminLed) {
+        ui->adminLed->setStyleSheet("background-color: #404040; border-radius: 15px; border: 1px solid black;");
     }
 }
