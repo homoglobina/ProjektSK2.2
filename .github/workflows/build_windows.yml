@@ -1,0 +1,36 @@
+name: Windows Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: '6.5.0'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_mingw'
+
+    - name: Build
+      run: |
+        cd ClientGui
+        mkdir build
+        cd build
+        cmake .. -G "MinGW Makefiles"
+        cmake --build . --config Release
+
+    - name: Deploy
+      run: |
+        cd ClientGui/build
+        windeployqt --release gui_client.exe --dir deploy
+        copy gui_client.exe deploy\
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Windows-Game-Release
+        path: build/deploy
