@@ -262,7 +262,7 @@ public:
 
         retranslateUi(MyWidget);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MyWidget);
@@ -276,7 +276,7 @@ public:
         joinBtn->setText(QCoreApplication::translate("MyWidget", "connect", nullptr));
         talkGroup->setTitle(QString());
         sendBtn->setText(QCoreApplication::translate("MyWidget", "send", nullptr));
-        msgNickEdit->setText(QCoreApplication::translate("MyWidget", "Enter nickname...", nullptr));
+        msgNickEdit->setText(QString());
         tabWidget->setTabText(tabWidget->indexOf(tab_login), QCoreApplication::translate("MyWidget", "Join", nullptr));
         disconectButton->setText(QCoreApplication::translate("MyWidget", "Disconnect", nullptr));
         refreshButton->setText(QCoreApplication::translate("MyWidget", "Refresh", nullptr));

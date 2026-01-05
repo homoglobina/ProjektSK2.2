@@ -331,6 +331,11 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "StartGame")
     {
+        if (!gameRunning) {
+            ui->scoreTable->setRowCount(0);
+            totalScores.clear();
+        }
+
         gameRunning = true;
         updateStartButtonState();
 
@@ -340,12 +345,7 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         ui->tabWidget->setTabEnabled(2, true);
         ui->tabWidget->setCurrentIndex(2);
 
-        // wyczyść stare dane gry
-        ui->msgsTextEdit->clear();
-
-        ui->scoreTable->setColumnCount(2);
-        ui->scoreTable->setHorizontalHeaderLabels({"Gracz", "Punkty"});
-        ui->scoreTable->setRowCount(0);
+        if (ui->msgsTextEdit) ui->msgsTextEdit->clear();
     }
 
     else if (command == "Joined")

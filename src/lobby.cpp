@@ -473,6 +473,13 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             // TO JEST KLUCZ
             writeAll("StartGame()\n");
 
+            for (const auto *p : players)
+            {
+                std::cout << "Player in game: " << p->getName() << "\n";
+                std::string scoreMsg = "Score(" + p->getName() + ",0)\n";
+                writeAll(scoreMsg);
+            }
+
             startRound();
             return;
         }
