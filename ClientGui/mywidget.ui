@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>637</width>
-    <height>521</height>
+    <width>968</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,7 +52,7 @@
         <item>
          <widget class="QSpinBox" name="portSpinBox">
           <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::UpDownArrows</enum>
+           <enum>QAbstractSpinBox::ButtonSymbols::UpDownArrows</enum>
           </property>
           <property name="minimum">
            <number>1</number>
@@ -239,7 +239,7 @@
       <widget class="QTextEdit" name="gameTextEdit">
        <property name="geometry">
         <rect>
-         <x>300</x>
+         <x>400</x>
          <y>20</y>
          <width>291</width>
          <height>231</height>
@@ -249,8 +249,8 @@
       <widget class="QGroupBox" name="groupBox">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>280</y>
+         <x>0</x>
+         <y>400</y>
          <width>251</width>
          <height>171</height>
         </rect>
@@ -263,7 +263,7 @@
          <rect>
           <x>0</x>
           <y>20</y>
-          <width>160</width>
+          <width>163</width>
           <height>151</height>
          </rect>
         </property>
@@ -271,13 +271,7 @@
          <item row="0" column="0">
           <widget class="QLineEdit" name="answerEdit1"/>
          </item>
-         <item row="2" column="0">
-          <widget class="QLineEdit" name="answerEdit3"/>
-         </item>
          <item row="1" column="0">
-          <widget class="QLineEdit" name="answerEdit2"/>
-         </item>
-         <item row="3" column="0">
           <widget class="QPushButton" name="sendAnswersButton">
            <property name="text">
             <string>Wyslij</string>
@@ -286,12 +280,22 @@
          </item>
         </layout>
        </widget>
+       <widget class="QComboBox" name="categoryBox">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>80</y>
+          <width>75</width>
+          <height>22</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QTableWidget" name="scoreTable">
        <property name="geometry">
         <rect>
-         <x>280</x>
-         <y>260</y>
+         <x>400</x>
+         <y>290</y>
          <width>321</width>
          <height>192</height>
         </rect>
@@ -302,6 +306,16 @@
        <column/>
        <column/>
        <column/>
+      </widget>
+      <widget class="QTableWidget" name="categoryWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>300</y>
+         <width>221</width>
+         <height>71</height>
+        </rect>
+       </property>
       </widget>
      </widget>
     </widget>

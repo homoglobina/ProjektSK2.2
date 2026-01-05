@@ -5,6 +5,11 @@
 #include <QTcpSocket>
 #include <QListWidgetItem>
 #include <QStandardItemModel>
+
+#include <QMap>
+#include <QVector>
+#include <QChar>
+
 namespace Ui {
 class MyWidget;
 }
@@ -56,6 +61,8 @@ private:
     bool isLoggedIn;
 
     QStandardItemModel *playerModel;
+
+    QString getCategoryName(int id);
 
     void handleMessage(const QString &command, const QStringList &args);
     void logToGui(const QString &text, const QString &color = "black");

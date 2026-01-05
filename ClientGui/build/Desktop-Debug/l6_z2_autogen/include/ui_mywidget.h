@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mywidget.ui'
 **
-** Created by: Qt User Interface Compiler version 6.4.2
+** Created by: Qt User Interface Compiler version 6.10.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QColumnView>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
@@ -62,16 +63,16 @@ public:
     QWidget *formLayoutWidget;
     QFormLayout *formLayout;
     QLineEdit *answerEdit1;
-    QLineEdit *answerEdit3;
-    QLineEdit *answerEdit2;
     QPushButton *sendAnswersButton;
+    QComboBox *categoryBox;
     QTableWidget *scoreTable;
+    QTableWidget *categoryWidget;
 
     void setupUi(QWidget *MyWidget)
     {
         if (MyWidget->objectName().isEmpty())
             MyWidget->setObjectName("MyWidget");
-        MyWidget->resize(637, 521);
+        MyWidget->resize(968, 621);
         verticalLayout = new QVBoxLayout(MyWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -89,7 +90,7 @@ public:
         horizontalLayout->setObjectName("horizontalLayout");
         groupLineEdit = new QLineEdit(joinGroup);
         groupLineEdit->setObjectName("groupLineEdit");
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(groupLineEdit->sizePolicy().hasHeightForWidth());
@@ -99,7 +100,7 @@ public:
 
         portSpinBox = new QSpinBox(joinGroup);
         portSpinBox->setObjectName("portSpinBox");
-        portSpinBox->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
+        portSpinBox->setButtonSymbols(QAbstractSpinBox::ButtonSymbols::UpDownArrows);
         portSpinBox->setMinimum(1);
         portSpinBox->setMaximum(65535);
         portSpinBox->setValue(2000);
@@ -172,13 +173,13 @@ public:
         startGameButton->setGeometry(QRect(110, 20, 84, 26));
         gameTextEdit = new QTextEdit(tab_Game);
         gameTextEdit->setObjectName("gameTextEdit");
-        gameTextEdit->setGeometry(QRect(300, 20, 291, 231));
+        gameTextEdit->setGeometry(QRect(400, 20, 291, 231));
         groupBox = new QGroupBox(tab_Game);
         groupBox->setObjectName("groupBox");
-        groupBox->setGeometry(QRect(10, 280, 251, 171));
+        groupBox->setGeometry(QRect(0, 400, 251, 171));
         formLayoutWidget = new QWidget(groupBox);
         formLayoutWidget->setObjectName("formLayoutWidget");
-        formLayoutWidget->setGeometry(QRect(0, 20, 160, 151));
+        formLayoutWidget->setGeometry(QRect(0, 20, 163, 151));
         formLayout = new QFormLayout(formLayoutWidget);
         formLayout->setSpacing(6);
         formLayout->setContentsMargins(11, 11, 11, 11);
@@ -187,29 +188,25 @@ public:
         answerEdit1 = new QLineEdit(formLayoutWidget);
         answerEdit1->setObjectName("answerEdit1");
 
-        formLayout->setWidget(0, QFormLayout::LabelRole, answerEdit1);
-
-        answerEdit3 = new QLineEdit(formLayoutWidget);
-        answerEdit3->setObjectName("answerEdit3");
-
-        formLayout->setWidget(2, QFormLayout::LabelRole, answerEdit3);
-
-        answerEdit2 = new QLineEdit(formLayoutWidget);
-        answerEdit2->setObjectName("answerEdit2");
-
-        formLayout->setWidget(1, QFormLayout::LabelRole, answerEdit2);
+        formLayout->setWidget(0, QFormLayout::ItemRole::LabelRole, answerEdit1);
 
         sendAnswersButton = new QPushButton(formLayoutWidget);
         sendAnswersButton->setObjectName("sendAnswersButton");
 
-        formLayout->setWidget(3, QFormLayout::LabelRole, sendAnswersButton);
+        formLayout->setWidget(1, QFormLayout::ItemRole::LabelRole, sendAnswersButton);
 
+        categoryBox = new QComboBox(groupBox);
+        categoryBox->setObjectName("categoryBox");
+        categoryBox->setGeometry(QRect(170, 80, 75, 22));
         scoreTable = new QTableWidget(tab_Game);
         if (scoreTable->columnCount() < 3)
             scoreTable->setColumnCount(3);
         scoreTable->setObjectName("scoreTable");
-        scoreTable->setGeometry(QRect(280, 260, 321, 192));
+        scoreTable->setGeometry(QRect(400, 290, 321, 192));
         scoreTable->setColumnCount(3);
+        categoryWidget = new QTableWidget(tab_Game);
+        categoryWidget->setObjectName("categoryWidget");
+        categoryWidget->setGeometry(QRect(10, 300, 221, 71));
         tabWidget->addTab(tab_Game, QString());
 
         verticalLayout->addWidget(tabWidget);

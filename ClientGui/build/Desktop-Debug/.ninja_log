@@ -1,0 +1,27 @@
+# ninja log v7
+1	235	1767622041798886026	l6_z2_autogen/timestamp	2a27ea08636ed99c
+1	235	1767622041798886026	l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+1	235	1767622041798886026	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/timestamp	2a27ea08636ed99c
+1	235	1767622041798886026	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+237	2120	1767622041810468063	CMakeFiles/l6_z2.dir/main.cpp.o	1e6c44aca21fa78e
+237	2170	1767622041810056912	CMakeFiles/l6_z2.dir/l6_z2_autogen/mocs_compilation.cpp.o	1819329a83254f63
+237	2591	1767622041810279865	CMakeFiles/l6_z2.dir/mywidget.cpp.o	191b22f54c2fa26e
+2591	2800	1767622044163835161	l6_z2	3e690d5536fc71c8
+3	219	1767623449984234691	l6_z2_autogen/timestamp	2a27ea08636ed99c
+3	219	1767623449984234691	l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+3	219	1767623449984234691	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/timestamp	2a27ea08636ed99c
+3	219	1767623449984234691	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+219	2163	1767623449991841389	CMakeFiles/l6_z2.dir/main.cpp.o	1e6c44aca21fa78e
+219	2198	1767623449991489530	CMakeFiles/l6_z2.dir/l6_z2_autogen/mocs_compilation.cpp.o	1819329a83254f63
+219	2606	1767623449991753546	CMakeFiles/l6_z2.dir/mywidget.cpp.o	191b22f54c2fa26e
+2606	2823	1767623452377217507	l6_z2	3e690d5536fc71c8
+3	32	1767623624141045267	l6_z2_autogen/timestamp	2a27ea08636ed99c
+3	32	1767623624141045267	l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+3	32	1767623624141045267	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/timestamp	2a27ea08636ed99c
+3	32	1767623624141045267	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+3	31	1767623664224786824	l6_z2_autogen/timestamp	2a27ea08636ed99c
+3	31	1767623664224786824	l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+3	31	1767623664224786824	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/timestamp	2a27ea08636ed99c
+3	31	1767623664224786824	/home/homoglobina/College/SKII/ProjektII/ClientGui/build/Desktop-Debug/l6_z2_autogen/mocs_compilation.cpp	2a27ea08636ed99c
+31	2291	1767623664252786645	CMakeFiles/l6_z2.dir/mywidget.cpp.o	191b22f54c2fa26e
+2292	2508	1767623666513772215	l6_z2	3e690d5536fc71c8

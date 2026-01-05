@@ -2,6 +2,27 @@
 #include "ui_mywidget.h"
 #include <QMessageBox>
 
+#include <QHeaderView>
+#include <QTableWidgetItem>
+#include <QStandardItem>
+
+
+
+QString MyWidget::getCategoryName(int id)
+{
+    QString catName;
+    switch (id) {
+    case 1: catName = "Państwa"; break;
+    case 2: catName = "Miasta (PL)"; break;
+    case 3: catName = "Miasta (świat)"; break;
+    case 4: catName = "Jeziora"; break;
+    case 5: catName = "Owoce/warzywa"; break;
+    case 6: catName = "Imiona"; break;
+    default: catName = "Kategoria " + QString::number(id); break;
+    }
+    return catName;
+}
+
 MyWidget::MyWidget(QWidget *parent) : QWidget(parent), ui(new Ui::MyWidget)
 {
     ui->setupUi(this);
@@ -324,12 +345,30 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
     {
         currentCategories.clear();
 
+        ui->categoryBox->clear();
+        ui->categoryWidget->setRowCount(0);
+        ui->categoryWidget->setColumnCount(1);
+        ui->categoryWidget->setHorizontalHeaderLabels({"Aktywne Kategorie"});
+        ui->categoryWidget->horizontalHeader()->setStretchLastSection(true);
+
+        // "135" -> categories
         for (const QString &c : args)
         {
             for (QChar ch : c)
             {
                 if (ch.isDigit())
-                    currentCategories.push_back(ch.digitValue());
+                {
+                    int catId = ch.digitValue();
+                    currentCategories.push_back(catId);
+
+                    QString name = getCategoryName(catId);
+
+                    int row = ui->categoryWidget->rowCount();
+                    ui->categoryWidget->insertRow(row);
+                    ui->categoryWidget->setItem(row, 0, new QTableWidgetItem(name));
+
+                    ui->categoryBox->addItem(name, catId);
+                }
             }
         }
 
@@ -349,12 +388,12 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         roundActive = true;
 
         ui->answerEdit1->clear();
-        ui->answerEdit2->clear();
-        ui->answerEdit3->clear();
+        // ui->answerEdit2->clear();
+        // ui->answerEdit3->clear();
 
         ui->answerEdit1->setEnabled(true);
-        ui->answerEdit2->setEnabled(true);
-        ui->answerEdit3->setEnabled(true);
+        // ui->answerEdit2->setEnabled(true);
+        // ui->answerEdit3->setEnabled(true);
         ui->sendAnswersButton->setEnabled(true);
 
         logGame("<b>Czas:</b> " + args.join(" ") + " s", "red");
@@ -472,33 +511,28 @@ void MyWidget::logGame(const QString &text, const QString &color)
 
 void MyWidget::onSendAnswersClicked()
 {
-    if (!roundActive)
+    if (!roundActive) return;
+
+    QString ans = ui->answerEdit1->text().trimmed();
+    if (ans.isEmpty()) {
+        QMessageBox::warning(this, "Błąd", "Wpisz odpowiedź!");
         return;
-
-    QVector<QLineEdit *> edits = {
-        ui->answerEdit1,
-        ui->answerEdit2,
-        ui->answerEdit3};
-
-    for (int i = 0; i < currentCategories.size() && i < edits.size(); ++i)
-    {
-        QString ans = edits[i]->text().trimmed();
-        if (ans.isEmpty())
-            continue;
-
-        QString msg = "Guess(" +
-                      QString::number(currentCategories[i]) +
-                      "," + ans + ")\n";
-
-        sock->write(msg.toUtf8());
     }
 
-    roundActive = false;
+    bool ok;
+    int catId = ui->categoryBox->currentData().toInt(&ok);
 
-    ui->sendAnswersButton->setEnabled(false);
-    ui->answerEdit1->setEnabled(false);
-    ui->answerEdit2->setEnabled(false);
-    ui->answerEdit3->setEnabled(false);
+    if (!ok) {
+        QMessageBox::warning(this, "Błąd", "Wybierz kategorię z listy!");
+        return;
+    }
 
-    logToGui("<i>Odpowiedzi wysłane</i>", "gray");
+
+    QString msg = "Guess(" + QString::number(catId) + "," + ans + ")\n";
+    sock->write(msg.toUtf8());
+
+    ui->answerEdit1->clear();
+    ui->answerEdit1->setFocus();
+
+    logToGui("<i>Wysłano: " + getCategoryName(catId) + " - " + ans + "</i>", "gray");
 }

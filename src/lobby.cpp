@@ -469,7 +469,7 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             for (auto *p : players)
                 totalScores[p->getName()] = 0;
 
-            // 🔥 TO JEST KLUCZ 🔥
+            // TO JEST KLUCZ
             writeAll("StartGame()\n");
 
             startRound();
