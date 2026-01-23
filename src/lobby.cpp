@@ -332,7 +332,7 @@ void Lobby::endRound()
         {
             int pts = 0;
 
-            if (!ans.empty() && std::toupper(ans[0]) == currentLetter)
+            if (!ans.empty() && std::toupper(ans[0]) == currentLetter && checkAnswer(ans, cat) )
             {
                 if (counter[ans] == 1)
                     pts = 15;
@@ -685,8 +685,8 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                 bool allAnswered = true;
                 for (int cat : categories) 
                 {
-                    if (answers[cat].find(player.getName()) == answers[cat].end() || 
-                        answers[cat][player.getName()].empty()) 
+                    if (answers[cat].find(player.getName()) == answers[cat].end() /* ||    
+                        answers[cat][player.getName()].empty() */ )  // changed this line to fix timer skipping after single answer
                     {
                         allAnswered = false;
                         break;
