@@ -623,6 +623,8 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
             ui->scoreTable->setItem(row, 0, new QTableWidgetItem(player));
             ui->scoreTable->setItem(row, 1, new QTableWidgetItem(QString::number(points)));
         }
+
+        ui->scoreTable->sortItems(1, Qt::DescendingOrder);
     }
 
     else if (command == "BecameAdmin")
