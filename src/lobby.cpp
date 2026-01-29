@@ -7,7 +7,6 @@
 
 bool roundFinished = false;
 
-
 std::map<int, std::map<std::string, std::string>> answers;
 
 Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlayers(10), id(id)
@@ -20,13 +19,37 @@ Lobby::Lobby(std::string name, int id) : name(name), currentLetter('M'), maxPlay
     admin = nullptr;
 }
 
+// void Lobby::changeSettings(int maxPlayers, int roundTime, int maxRounds, const std::vector<int> &categories)
+// {
+//     this->maxPlayers = maxPlayers;
+//     this->roundTime = roundTime;
+//     this->maxRounds = maxRounds;
+//     this->categories = categories;
+// }
 
-void Lobby::changeSettings(int maxPlayers, int roundTime, int maxRounds, const std::vector<int> &categories)
+void Lobby::changeSettings(int newMaxPlayers, int newRoundTime, int newMaxRounds, const std::vector<int> &newCategories)
 {
-    this->maxPlayers = maxPlayers;
-    this->roundTime = roundTime;
-    this->maxRounds = maxRounds;
-    this->categories = categories;
+    int currentPlayers = players.size();
+
+    if (newMaxPlayers < currentPlayers)
+    {
+        this->maxPlayers = currentPlayers;
+
+        std::string msg = "Error(Min_Players_Adjusted_" + std::to_string(currentPlayers) + ")\n";
+
+        if (admin)
+        {
+            write(admin->getFd(), msg.c_str(), msg.size());
+        }
+    }
+    else
+    {
+        this->maxPlayers = newMaxPlayers;
+    }
+
+    this->roundTime = newRoundTime;
+    this->maxRounds = newMaxRounds;
+    this->categories = newCategories;
 }
 
 Lobby::~Lobby() {}
@@ -242,7 +265,7 @@ void Lobby::startRound()
 
     roundNumber++;
     fastTimerTriggered = false;
-    
+
     static bool seeded = false;
     if (!seeded)
     {
@@ -325,7 +348,8 @@ void Lobby::endRound()
         std::map<std::string, int> counter;
 
         for (auto &[playerName, ans] : playersMap)
-            if (!ans.empty()){
+            if (!ans.empty())
+            {
                 std::string upperAns = ans;
                 std::transform(upperAns.begin(), upperAns.end(), upperAns.begin(), ::toupper);
                 counter[upperAns]++;
@@ -337,7 +361,7 @@ void Lobby::endRound()
             std::string upperAns = ans;
             std::transform(upperAns.begin(), upperAns.end(), upperAns.begin(), ::toupper);
 
-            if (!ans.empty() && std::toupper(ans[0]) == currentLetter && checkAnswer(ans, cat) )
+            if (!ans.empty() && std::toupper(ans[0]) == currentLetter && checkAnswer(ans, cat))
             {
                 if (counter[upperAns] == 1)
                     pts = 15;
@@ -484,7 +508,6 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             for (auto *p : players)
                 totalScores[p->getName()] = 0;
 
-                
             writeAll("StartGame()\n");
 
             for (const auto *p : players)
@@ -498,7 +521,8 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             return;
         }
 
-        if(command == "changeSettings"){
+        if (command == "changeSettings")
+        {
             if (&player != admin)
             {
                 write(client_fd,
@@ -515,7 +539,6 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                       strlen("Error(Game_Already_Started)\n"));
                 return;
             }
-
 
             size_t pos = 0;
             size_t commaPos = content.find(',', pos);
@@ -685,30 +708,31 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             {
                 write(client_fd, "Msg(Niepoprawna odpowiedz)\n", 28);
             }
-            if (!fastTimerTriggered) 
+            if (!fastTimerTriggered)
             {
                 bool allAnswered = true;
-                for (int cat : categories) 
+                for (int cat : categories)
                 {
-                    if (answers[cat].find(player.getName()) == answers[cat].end() /* ||    
-                        answers[cat][player.getName()].empty() */ )  // changed this line to fix timer skipping after single answer
+                    if (answers[cat].find(player.getName()) == answers[cat].end() /* ||
+                        answers[cat][player.getName()].empty() */
+                        )                                                         // changed this line to fix timer skipping after single answer
                     {
                         allAnswered = false;
                         break;
                     }
                 }
 
-                if (allAnswered) 
+                if (allAnswered)
                 {
                     fastTimerTriggered = true;
-                    startTimer(15);         
-                    writeAll("Time(15)\n"); 
-                    
+                    startTimer(15);
+                    writeAll("Time(15)\n");
+
                     std::string msg = "Msg(Gracz " + player.getName() + " skończył! Czas skrócony do 15s.)\n";
                     writeAll(msg);
                 }
             }
-            
+
             std::cout << "Player " << player.getName() << " answered in category " << category << ": " << guess << "\n";
         }
         break;

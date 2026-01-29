@@ -486,6 +486,15 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
         {
             QMessageBox::critical(this, "Lobby pełne", "To lobby osiągnęło maksymalną liczbę graczy.");
         }
+        else if (errText.startsWith("Min_Players_Adjusted_"))
+        {
+            QString num = errText.mid(QString("Min_Players_Adjusted_").length());
+
+            QMessageBox::information(
+                this,
+                "Ustawienia poprawione",
+                "Ustawiono minimalną liczbę graczy na " + num);
+        }
 
         else
         {
