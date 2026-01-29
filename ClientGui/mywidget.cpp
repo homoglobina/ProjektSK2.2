@@ -383,6 +383,12 @@ void MyWidget::handleMessage(const QString &command, const QStringList &args)
 
     else if (command == "StartGame")
     {
+
+        if (ui->gameTextEdit)
+        {
+            ui->gameTextEdit->clear();
+        }
+
         if (!gameRunning)
         {
             ui->scoreTable->setRowCount(0);
