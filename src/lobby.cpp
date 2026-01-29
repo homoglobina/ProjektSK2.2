@@ -296,6 +296,8 @@ void Lobby::startRound()
     writeAll("Time(" + std::to_string(roundTime) + ")\n");
 
     startTimer(roundTime);
+
+    roundEndTime = std::chrono::steady_clock::now() + std::chrono::seconds(roundTime);
 }
 
 // =========================
@@ -447,29 +449,6 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
             std::cout << "Player " << player.getName() << " left the lobby.\n";
             return;
         }
-
-        // if (command == "LobbyStart")
-        // {
-        //     if (players.size() >= 2)
-        //     {
-        //         state = 2;
-
-        //         // Initialize all player scores
-        //         totalScores.clear();
-        //         for (const auto *p : players)
-        //         {
-        //             totalScores[p->getName()] = 0;
-        //         }
-
-        //         roundNumber = 0;
-        //         writeAll("StartGame(Gra rozpoczeta!)\n");
-        //         startRound();
-        //     }
-        //     else
-        //     {
-        //         write(client_fd, "Msg(Za malo graczy, aby rozpocząć grę)\n", 41);
-        //     }
-        // }
 
         if (command == "LobbyStart")
         {
@@ -725,8 +704,17 @@ void Lobby::gameLogic(std::string command, std::string content, int client_fd, G
                 if (allAnswered)
                 {
                     fastTimerTriggered = true;
-                    startTimer(15);
-                    writeAll("Time(15)\n");
+
+                    auto now = std::chrono::steady_clock::now();
+                    auto remaining = std::chrono::duration_cast<std::chrono::seconds>(roundEndTime - now).count();
+
+                    int newTime = std::min(15, (int)remaining);
+
+                    if (newTime > 0)
+                    {
+                        startTimer(newTime);
+                        writeAll("Time(" + std::to_string(newTime) + ")\n");
+                    }
 
                     std::string msg = "Msg(Gracz " + player.getName() + " skończył! Czas skrócony do 15s.)\n";
                     writeAll(msg);

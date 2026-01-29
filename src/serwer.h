@@ -70,6 +70,8 @@ public:
     Gracz* getAdmin() const { return admin; }
     void updateAdmin();
     int getPlayerCount() const { return players.size(); }
+    std::chrono::steady_clock::time_point roundEndTime;
+
 
 
 private:
