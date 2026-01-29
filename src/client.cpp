@@ -77,42 +77,6 @@ void sendGuess(int sock, int categoryId, const std::string &answer)
     std::cout << "[wysłano] " << cmd;
 }
 
-// =====================
-// Round input
-// =====================
-// void runRoundInput(int sock)
-// {
-//     if (currentCategories.empty() || currentLetter.empty())
-//     {
-//         std::cout << "[błąd] brak danych rundy (Category/Letter)\n";
-//         return;
-//     }
-
-//     std::cout << "\n=== ROZPOCZĘCIE RUNDY ===\n";
-//     std::cout << "Litera: " << currentLetter << "\nKategorie:";
-//     for (auto c : currentCategories)
-//         std::cout << " " << c;
-//     std::cout << "\n\n";
-
-//     for (auto cat : currentCategories)
-//     {
-//         std::string answer;
-//         std::cout << "[kategoria " << cat << "][" << currentLetter << "] > ";
-//         std::getline(std::cin, answer);
-
-//         if (!answer.empty())
-//         {
-//             sendGuess(sock, cat, answer);
-//         }
-//         else
-//         {
-//             std::cout << "[INFO] pomijam pustą odpowiedź\n";
-//         }
-//     }
-
-//     std::cout << "=== KONIEC ODPOWIEDZI — czekam na wyniki ===\n";
-// }
-
 
 
 // =====================

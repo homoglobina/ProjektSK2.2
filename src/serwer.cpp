@@ -139,42 +139,49 @@ void Serwer::handleClientMessage(int client_fd, const std::string &msg, Gracz &p
         }
         else
         {
+            bool foundLobby = false;
+
             for (const auto &lobby : lobbyList)
             {
                 if (lobby->getName() == content)
                 {
+                    foundLobby = true;
+                    lobbyID = lobbyName_to_id[content];
+
+                    // SPRAWDZ LIMIT
+                    if (lobbyList[lobbyID]->getPlayerCount() >= lobbyList[lobbyID]->getMaxPlayers())
+                    {
+                        std::string err = "Error(Lobby_Full)\n";
+                        write(client_fd, err.c_str(), err.size());
+                        return; // TU JUŻ MOŻNA return – to NIE jest błąd protokołu
+                    }
+
+                    // OK – dołączamy
                     std::string joinMsg = "Joined(" + content + ")\n";
                     write(client_fd, joinMsg.c_str(), joinMsg.size());
 
-                    lobbyID = lobbyName_to_id[content];
                     player.setCurrentLobbyID(lobbyID);
-
-                    // Add player and update admin if needed
                     lobbyList[lobbyID]->addPlayer(&player);
+
                     if (lobbyList[lobbyID]->getAdmin() == nullptr)
-                    {
                         lobbyList[lobbyID]->updateAdmin();
-                    }
 
                     player.setState(2);
 
-                    // Send current game state to the new player
                     lobbyList[lobbyID]->sendGameStateToPlayer(&player);
-
-                    // Send list of players to all in lobby
                     lobbyList[lobbyID]->printPlayers();
 
-                    std::cout << "Gracz " << player.getName() << " dołączył do lobby " << content << "\n";
-                    std::cout << "Lobby gracza : " << player.getCurrentLobbyID() << "\n";
-
+                    std::cout << "Gracz " << player.getName()
+                              << " dołączył do lobby " << content << "\n";
                     return;
                 }
             }
 
-            trimmed_msg = "Error(No Lobby named: " + content + ")\n";
-            write(client_fd, trimmed_msg.c_str(), trimmed_msg.size());
-
-            break;
+            if (!foundLobby)
+            {
+                std::string err = "Error(No_Lobby_Named)\n";
+                write(client_fd, err.c_str(), err.size());
+            }
         }
 
     case 2:
@@ -370,7 +377,7 @@ void Serwer::run()
                 continue;
             }
 
-            // KLIENT ZAMKNĄŁ SOCKET 
+            // KLIENT ZAMKNĄŁ SOCKET
             if (n == 0)
             {
                 std::cout << std::setw(16) << "Zamknięcie połączenia z " << client_fd << "\n";
@@ -383,8 +390,7 @@ void Serwer::run()
                 {
                     size_t idxToRemove = it_index->second;
 
-
-                    if (idxToRemove < playerList.size()) 
+                    if (idxToRemove < playerList.size())
                     {
                         int currentLobbyID = playerList[idxToRemove]->getCurrentLobbyID();
                         if (currentLobbyID >= 0 && currentLobbyID < static_cast<int>(lobbyList.size()))
@@ -400,19 +406,18 @@ void Serwer::run()
                         std::shared_ptr<Gracz> lastPlayer = playerList[lastIdx];
                         int lastPlayerFd = lastPlayer->getFd();
 
-                        playerList[idxToRemove] = lastPlayer; 
+                        playerList[idxToRemove] = lastPlayer;
 
                         fd_to_index[lastPlayerFd] = idxToRemove;
-                        
+
                         lastPlayer->setNr(idxToRemove);
                     }
-
 
                     playerList.pop_back();
 
                     fd_to_index.erase(client_fd);
                 }
-                else 
+                else
                 {
                     for (auto it = playerList.begin(); it != playerList.end(); ++it)
                     {
@@ -432,19 +437,19 @@ void Serwer::run()
             if (it != fd_to_index.end())
             {
                 std::string rawData(buffer, n);
-                
+
                 size_t pos = 0;
                 size_t newlinePos;
 
                 while ((newlinePos = rawData.find('\n', pos)) != std::string::npos)
                 {
                     std::string message = rawData.substr(pos, newlinePos - pos);
-                    
-                    if (!message.empty()) 
+
+                    if (!message.empty())
                     {
                         handleClientMessage(client_fd, message, *playerList[it->second]);
                     }
-                    
+
                     pos = newlinePos + 1;
                 }
             }

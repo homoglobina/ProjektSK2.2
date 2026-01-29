@@ -69,6 +69,8 @@ public:
     void setCategories(const std::vector<int>& cats) { categories = cats; }
     Gracz* getAdmin() const { return admin; }
     void updateAdmin();
+    int getPlayerCount() const { return players.size(); }
+
 
 private:
     std::vector<int> categories;
