@@ -124,7 +124,7 @@ Dąbrowa Białostocka
 Dąbrowa Górnicza
 Dąbrowa Tarnowska
 Debrzno
-Dekshv (Góra Kalwaria)
+Dekshv 
 Dębica
 Dęblin
 Dębno
@@ -234,8 +234,7 @@ Jelenia Góra
 Jeziorany
 Jędrzejów
 Jordanów
-Józefów (powiat biłgorajski)
-Józefów (powiat otwocki)
+Józefów
 Jutrosin
 Kalety
 Kalisz

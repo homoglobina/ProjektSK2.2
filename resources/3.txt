@@ -138,7 +138,8 @@ Montevideo
 Montreal
 Moroni
 Moskwa
-Bombaj (Mumbaj)
+Mumbaj
+Bombaj
 Muscat
 Nairobi
 Nassau
@@ -233,6 +234,4 @@ Wientian
 Wilno
 Wrocław
 Windhuk
-打Jaunde
 Zagrzeb
-Zatoka (Nuku’alofa)

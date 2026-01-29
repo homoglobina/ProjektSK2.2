@@ -325,16 +325,21 @@ void Lobby::endRound()
         std::map<std::string, int> counter;
 
         for (auto &[playerName, ans] : playersMap)
-            if (!ans.empty())
-                counter[ans]++;
-
+            if (!ans.empty()){
+                std::string upperAns = ans;
+                std::transform(upperAns.begin(), upperAns.end(), upperAns.begin(), ::toupper);
+                counter[upperAns]++;
+            }
         for (auto &[playerName, ans] : playersMap)
         {
             int pts = 0;
 
+            std::string upperAns = ans;
+            std::transform(upperAns.begin(), upperAns.end(), upperAns.begin(), ::toupper);
+
             if (!ans.empty() && std::toupper(ans[0]) == currentLetter && checkAnswer(ans, cat) )
             {
-                if (counter[ans] == 1)
+                if (counter[upperAns] == 1)
                     pts = 15;
                 else
                     pts = 10;

@@ -37,8 +37,7 @@ Ciecz
 Como
 Constance
 Czad
-Czarne (Drawsko)
-Czarne (Gryfice)
+Czarne
 Czarny Staw pod Rysami
 Czorsztyńskie
 Czos
@@ -62,7 +61,7 @@ Dwugłowe
 Dywickie
 Działyńskie
 Dzierżno Duże
-Dżakarta (sztuczne)
+Dżakarta
 Edwarda
 El’gygytgyn
 Enriquillo
@@ -90,7 +89,7 @@ Gopło
 Gorzyckie
 Goryńskie
 Góreckie
-Górne (Superior)
+Górne
 Gowidlińskie
 Gołdap
 Grajewko
@@ -123,7 +122,7 @@ Kamienne
 Kaniewo
 Kariba
 Karwowo
-Kaspijskie (Morze)
+Kaspijskie
 Kerid
 Kierskie
 Kierźlińskie

@@ -11,7 +11,7 @@ Atol
 Awokado
 Banan
 Berberys
-Bez czarny (owoce)
+Bez czarny
 Bilberry
 Blighia
 Borówka brusznica
@@ -28,11 +28,11 @@ Czyściec bulwiasty
 Daktyl
 Dorian
 Dżakfrut
-Fasola mung (strąki)
+Fasola mung 
 Feijoa
 Figa
 Figa indyjska
-Fizalis (Miechunka)
+Fizalis
 Granat
 Grejpfrut
 Groszek cukrowy
@@ -50,8 +50,8 @@ Jarzębina
 Jeżyna
 Jujuba
 Kajmit
-Kaki (Persymona)
-Kaktus (owoc opuncji)
+Kaki 
+Kaktus 
 Kalina
 Kantalupa
 Karambola
@@ -84,7 +84,7 @@ Nektarynka
 Nieszpułka
 Oliwka
 Opuncja
-Orzech (różne rodzaje)
+Orzech 
 Papaja
 Pawpaw
 Pigwa
@@ -100,7 +100,7 @@ Rambutan
 Rokitnik
 Salak
 Sapotilla
-Smoczy owoc (Pitaja)
+Smoczy owoc 
 Śliwka
 Śliwa tarniowa
 Tamarillo
@@ -111,20 +111,20 @@ Ugli
 Winogrono
 Wiśnia
 Żurawina
-Aksamitka (jadalna)
+Aksamitka 
 Amarantus
 Arkuszka
 Artykuł
-Bakłażan (Oberżyna)
-Bambus (pędy)
-Batat (Słodki ziemniak)
+Bakłażan 
+Bambus 
+Batat
 Bób
-Bratek (jadalny)
+Bratek 
 Brokuł
 Brukselka
 Brukiew
 Burak ćwikłowy
-Burak liściowy (Mangold)
+Burak liściowy 
 Cebula biała
 Cebula czerwona
 Cebula czosnkowa
@@ -144,11 +144,12 @@ Edamame
 Fasola biała
 Fasola Jaś
 Fasola szparagowa
-Fennel (Koper włoski)
+Fennel 
+Koper włoski
 Groszek zielony
 Imbir
 Jarmuż
-Jukka (korzeń)
+Jukka 
 Kabaczek
 Kalafior
 Kalarepa
@@ -160,10 +161,10 @@ Kapusta włoska
 Karczoch
 Kard
 Kukurydza cukrowa
-Kurkuma (kłącze)
+Kurkuma
 Lektura
 Lubczyk
-Łopian (korzeń)
+Łopian 
 Maniok
 Marchew
 Mizuna
@@ -177,8 +178,7 @@ Papryka chili
 Papryka słodka
 Pasternak
 Patison
-Pietruszka (korzeń)
-Pietruszka (natka)
+Pietruszka 
 Pomidor
 Por
 Portulaka

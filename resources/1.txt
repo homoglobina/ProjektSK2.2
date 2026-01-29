@@ -3,6 +3,7 @@ Albania
 Algieria
 Andora
 Angola
+Anglia
 Antigua i Barbuda
 Arabia Saudyjska
 Argentyna
@@ -112,7 +113,7 @@ Mauretania
 Mauritius
 Meksyk
 Mikronezja
-Birma (Mjanma)
+Birma 
 Mołdawia
 Monako
 Mongolia
