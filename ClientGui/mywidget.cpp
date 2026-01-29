@@ -784,6 +784,8 @@ void MyWidget::onCreateLobbyBtnClicked()
         return;
     }
 
+    ui->listWidget->clear();
+
     QString cmd = "CreateLobby(" + lobbyName + ")\n";
     sock->write(cmd.toUtf8());
 
